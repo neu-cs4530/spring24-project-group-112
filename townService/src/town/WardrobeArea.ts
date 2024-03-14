@@ -14,6 +14,18 @@ import {
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 
+function loadHairOptions() {
+  const potentialHairOptions = Array<HairOption>();
+  potentialHairOptions.push({ optionID: 0, optionFilePath: 'string' });
+  return potentialHairOptions;
+}
+
+function loadOutfitOptions() {
+  const potentialOutfitOptions = Array<OutfitOption>();
+  potentialOutfitOptions.push({ optionID: 0, optionFilePath: 'string' });
+  return potentialOutfitOptions;
+}
+
 export default class WardrobeArea extends InteractableArea {
   public isOpen: boolean;
 
@@ -82,8 +94,8 @@ export default class WardrobeArea extends InteractableArea {
     return new WardrobeArea(
       {
         isOpen: false,
-        hairOptions: Array<HairOption>(),
-        outfitOptions: Array<OutfitOption>(),
+        hairOptions: loadHairOptions(),
+        outfitOptions: loadOutfitOptions(),
         id: name as InteractableID,
         occupants: [],
       },
