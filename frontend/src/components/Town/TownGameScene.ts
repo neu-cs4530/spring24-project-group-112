@@ -146,9 +146,11 @@ export default class TownGameScene extends Phaser.Scene {
 
     disconnectedPlayers.forEach(disconnectedPlayer => {
       if (disconnectedPlayer.gameObjects) {
-        const { sprite, label } = disconnectedPlayer.gameObjects;
-        if (sprite && label) {
-          sprite.destroy();
+        const { bodySprite, bodyPhysics, layer, label } = disconnectedPlayer.gameObjects;
+        if (bodySprite && label) {
+          bodySprite.destroy();
+          bodyPhysics.destroy();
+          layer.destroy();
           label.destroy();
         }
       }
@@ -182,11 +184,11 @@ export default class TownGameScene extends Phaser.Scene {
       this._lastLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
     }
     if (destination.x !== undefined) {
-      gameObjects.sprite.x = destination.x;
+      gameObjects.bodySprite.x = destination.x;
       this._lastLocation.x = destination.x;
     }
     if (destination.y !== undefined) {
-      gameObjects.sprite.y = destination.y;
+      gameObjects.bodySprite.y = destination.y;
       this._lastLocation.y = destination.y;
     }
     if (destination.moving !== undefined) {
@@ -204,8 +206,8 @@ export default class TownGameScene extends Phaser.Scene {
     }
     const gameObjects = this.coveyTownController.ourPlayer.gameObjects;
     if (gameObjects && this._cursors) {
-      const prevVelocity = gameObjects.sprite.body.velocity.clone();
-      const body = gameObjects.sprite.body as Phaser.Physics.Arcade.Body;
+      const prevVelocity = gameObjects.bodyPhysics.velocity.clone();
+      const body = gameObjects.bodyPhysics;
 
       // Stop any previous movement from the last frame
       body.setVelocity(0);
@@ -214,42 +216,42 @@ export default class TownGameScene extends Phaser.Scene {
       switch (primaryDirection) {
         case 'left':
           body.setVelocityX(-MOVEMENT_SPEED);
-          gameObjects.sprite.anims.play('misa-left-walk', true);
+          gameObjects.bodySprite.anims.play('misa-left-walk', true);
           break;
         case 'right':
           body.setVelocityX(MOVEMENT_SPEED);
-          gameObjects.sprite.anims.play('misa-right-walk', true);
+          gameObjects.bodySprite.anims.play('misa-right-walk', true);
           break;
         case 'front':
           body.setVelocityY(MOVEMENT_SPEED);
-          gameObjects.sprite.anims.play('misa-front-walk', true);
+          gameObjects.bodySprite.anims.play('misa-front-walk', true);
           break;
         case 'back':
           body.setVelocityY(-MOVEMENT_SPEED);
-          gameObjects.sprite.anims.play('misa-back-walk', true);
+          gameObjects.bodySprite.anims.play('misa-back-walk', true);
           break;
         default:
           // Not moving
-          gameObjects.sprite.anims.stop();
+          gameObjects.bodySprite.anims.stop();
           // If we were moving, pick and idle frame to use
           if (prevVelocity.x < 0) {
-            gameObjects.sprite.setTexture('atlas', 'misa-left');
+            gameObjects.bodySprite.setTexture('atlas', 'misa-left');
           } else if (prevVelocity.x > 0) {
-            gameObjects.sprite.setTexture('atlas', 'misa-right');
+            gameObjects.bodySprite.setTexture('atlas', 'misa-right');
           } else if (prevVelocity.y < 0) {
-            gameObjects.sprite.setTexture('atlas', 'misa-back');
-          } else if (prevVelocity.y > 0) gameObjects.sprite.setTexture('atlas', 'misa-front');
+            gameObjects.bodySprite.setTexture('atlas', 'misa-back');
+          } else if (prevVelocity.y > 0) gameObjects.bodySprite.setTexture('atlas', 'misa-front');
           break;
       }
 
       // Normalize and scale the velocity so that player can't move faster along a diagonal
-      gameObjects.sprite.body.velocity.normalize().scale(MOVEMENT_SPEED);
+      gameObjects.bodyPhysics.velocity.normalize().scale(MOVEMENT_SPEED);
 
       const isMoving = primaryDirection !== undefined;
       gameObjects.label.setX(body.x);
       gameObjects.label.setY(body.y - 20);
-      const x = gameObjects.sprite.getBounds().centerX;
-      const y = gameObjects.sprite.getBounds().centerY;
+      const x = gameObjects.bodySprite.getBounds().centerX;
+      const y = gameObjects.bodySprite.getBounds().centerY;
       //Move the sprite
       if (
         !this._lastLocation ||
@@ -272,7 +274,7 @@ export default class TownGameScene extends Phaser.Scene {
           if (
             !Phaser.Geom.Rectangle.Overlaps(
               interactable.getBounds(),
-              gameObjects.sprite.getBounds(),
+              gameObjects.bodySprite.getBounds(),
             )
           ) {
             this._pendingOverlapExits.delete(interactable);
@@ -284,9 +286,9 @@ export default class TownGameScene extends Phaser.Scene {
 
       //Update the location for the labels of all of the other players
       for (const player of this._players) {
-        if (player.gameObjects?.label && player.gameObjects?.sprite.body) {
-          player.gameObjects.label.setX(player.gameObjects.sprite.body.x);
-          player.gameObjects.label.setY(player.gameObjects.sprite.body.y - 20);
+        if (player.gameObjects?.label && player.gameObjects?.bodyPhysics) {
+          player.gameObjects.label.setX(player.gameObjects.bodyPhysics.x);
+          player.gameObjects.label.setY(player.gameObjects.bodyPhysics.y - 20);
         }
       }
     }
@@ -411,11 +413,26 @@ export default class TownGameScene extends Phaser.Scene {
     // Create a sprite with physics enabled via the physics system. The image used for the sprite
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
     // player's body.
-    const sprite = this.physics.add
-      .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
-      .setSize(30, 40)
-      .setOffset(0, 24)
-      .setDepth(6);
+
+    // const sprite = this.physics.add
+    //   .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
+    //   .setSize(30, 40)
+    //   .setOffset(0, 24)
+    //   .setDepth(6);
+
+    const bodySprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front').setSize(30,40).setDepth(6);
+    const bodyPhysics = this.physics.add
+            .body(spawnPoint.x, spawnPoint.y)
+            .setSize(30,40)
+            .setOffset(0,24)
+            .setGameObject(bodySprite);
+
+    const hairSprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas');
+    const outfitSprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas');
+    const layer = this.add.layer();
+    layer.add(hairSprite);
+    layer.add(outfitSprite);
+
     const label = this.add
       .text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
         font: '18px monospace',
@@ -425,7 +442,9 @@ export default class TownGameScene extends Phaser.Scene {
       })
       .setDepth(6);
     this.coveyTownController.ourPlayer.gameObjects = {
-      sprite,
+      bodySprite,
+      bodyPhysics,
+      layer,
       label,
       locationManagedByGameScene: true,
     };
@@ -439,7 +458,7 @@ export default class TownGameScene extends Phaser.Scene {
     this._collidingLayers.push(wallsLayer);
     this._collidingLayers.push(aboveLayer);
     this._collidingLayers.push(onTheWallsLayer);
-    this._collidingLayers.forEach(layer => this.physics.add.collider(sprite, layer));
+    this._collidingLayers.forEach(layer => this.physics.add.collider(bodySprite, layer));
 
     // Create the player's walking animations from the texture atlas. These are stored in the global
     // animation manager so any sprite can access them.
@@ -490,7 +509,7 @@ export default class TownGameScene extends Phaser.Scene {
     });
 
     const camera = this.cameras.main;
-    camera.startFollow(this.coveyTownController.ourPlayer.gameObjects.sprite);
+    camera.startFollow(this.coveyTownController.ourPlayer.gameObjects.bodySprite);
     camera.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
     // Help text that has a "fixed" position on the screen
@@ -517,10 +536,19 @@ export default class TownGameScene extends Phaser.Scene {
 
   createPlayerSprites(player: PlayerController) {
     if (!player.gameObjects) {
-      const sprite = this.physics.add
-        .sprite(player.location.x, player.location.y, 'atlas', 'misa-front')
-        .setSize(30, 40)
-        .setOffset(0, 24);
+      const bodySprite = this.add.sprite(player.location.x, player.location.y, 'atlas', 'misa-front').setSize(30,40).setDepth(6);
+      const bodyPhysics = this.physics.add
+            .body(player.location.x, player.location.y)
+            .setSize(30,40)
+            .setOffset(0,24)
+            .setGameObject(bodySprite);
+
+      const hairSprite = this.add.sprite(player.location.x, player.location.y, 'atlas');
+      const outfitSprite = this.add.sprite(player.location.x, player.location.y, 'atlas');
+      const layer = this.add.layer();
+      layer.add(hairSprite);
+      layer.add(outfitSprite);
+    
       const label = this.add.text(
         player.location.x,
         player.location.y - 20,
@@ -533,11 +561,13 @@ export default class TownGameScene extends Phaser.Scene {
         },
       );
       player.gameObjects = {
-        sprite,
+        bodySprite,
+        bodyPhysics,
+        layer,
         label,
-        locationManagedByGameScene: false,
+        locationManagedByGameScene: true,
       };
-      this._collidingLayers.forEach(layer => this.physics.add.collider(sprite, layer));
+      this._collidingLayers.forEach(layer => this.physics.add.collider(bodySprite, layer));
     }
   }
 
@@ -546,9 +576,9 @@ export default class TownGameScene extends Phaser.Scene {
       this._paused = true;
       const gameObjects = this.coveyTownController.ourPlayer.gameObjects;
       if (gameObjects) {
-        gameObjects.sprite.anims.stop();
-        const body = gameObjects.sprite.body as Phaser.Physics.Arcade.Body;
-        body.setVelocity(0);
+        gameObjects.bodySprite.anims.stop();
+        // const body = gameObjects.sprite.body as Phaser.Physics.Arcade.Body;
+        gameObjects.bodyPhysics.setVelocity(0);
       }
       assert(this.input.keyboard);
       this._previouslyCapturedKeys = this.input.keyboard.getCaptures();
