@@ -8,7 +8,9 @@ export default class Player {
   /** The current location of this user in the world map * */
   public location: PlayerLocation;
 
-  /** The unique identifier for this player * */
+  /** The unique identifier for this player *
+   * Connect this to their id in Firestore as a unique identifier
+   */
   private readonly _id: string;
 
   /** The player's username, which is not guaranteed to be unique within the town * */
