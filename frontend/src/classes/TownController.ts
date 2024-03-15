@@ -43,6 +43,8 @@ import InteractableAreaController, {
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
+import WardrobeArea from '../components/Town/interactables/WardrobeArea';
+import WardrobeAreaController from '../interactable/WardrobeAreaController';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
 const SOCKET_COMMAND_TIMEOUT_MS = 5000;
@@ -673,6 +675,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       throw new Error(`No such viewing area controller ${existingController}`);
     }
   }
+
+  public getWardrobeAreaController(wardrobeArea: WardrobeArea): WardrobeAreaController {}
 
   /**
    * Retrives the game area controller corresponding to a game area by ID, or

@@ -10,7 +10,6 @@ import {
   HairOption,
   OutfitOption,
   InteractableID,
-  WardrobeAreaUpdateCommand,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 
@@ -33,6 +32,11 @@ export default class WardrobeArea extends InteractableArea {
 
   public outfitOptions: Array<OutfitOption>;
 
+  /** The conversation area is "active" when there are players inside of it  */
+  public get isActive(): boolean {
+    return this._occupants.length > 0;
+  }
+
   /**
    * Creates a new WardrobeArea
    * @param wardrobeAreaModel model containing this area's hair and outfit options
@@ -40,7 +44,7 @@ export default class WardrobeArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { isOpen, hairOptions, outfitOptions, id }: Omit<WardrobeAreaModel, 'type'>,
+    { isOpen, hairOptions, outfitOptions, id, occupants }: Omit<WardrobeAreaModel, 'type'>,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
   ) {

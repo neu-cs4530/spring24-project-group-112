@@ -21,12 +21,12 @@ import { GenericGameAreaController } from '../../../classes/interactable/GameAre
 import PlayerController from '../../../classes/PlayerController';
 import { useInteractable, useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-import { GameResult, InteractableID } from '../../../types/CoveyTownSocket';
+import { GameResult, InteractableID, InteractableType } from '../../../types/CoveyTownSocket';
 import ChatChannel from './ChatChannel';
 import ConnectFourArea from './ConnectFour/ConnectFourArea';
 import GameAreaInteractable from './GameArea';
-import Leaderboard from './Leaderboard';
-import TicTacToeArea from './TicTacToe/TicTacToeArea';
+import WardrobeAreaInteractable from './WardrobeArea';
+
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
 
@@ -52,13 +52,13 @@ function WardrobeArea({ interactableID }: { interactableID: InteractableID }): J
  *
  */
 export default function WardrobeWrapper(): JSX.Element {
-  const wardrobe = useInteractable<GameAreaInteractable>('wardrobeArea');
+  const wardrobe = useInteractable<WardrobeAreaInteractable>('wardrobeArea');
   const townController = useTownController();
   const closeModal = useCallback(() => {
     if (wardrobe) {
       townController.interactEnd(wardrobe);
       // TODO: This should probably be chanaged to involve the wardrobeArea
-      const controller = townController.getGameAreaController(wardrobe);
+      const controller = townController.getWardrobeAreaController(wardrobe);
       controller.leaveGame();
     }
   }, [townController, wardrobe]);
