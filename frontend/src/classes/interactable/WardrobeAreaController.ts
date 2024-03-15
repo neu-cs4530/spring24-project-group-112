@@ -31,6 +31,31 @@ export default class WardrobeAreaController extends InteractableAreaController<
   WardrobeAreaEvents,
   WardrobeAreaModel
 > {
+  private _chosenHairOption?: HairOption;
+
+  private _chosenOutfitOption?: OutfitOption;
+
+  private _isOpen: boolean;
+
+  /**
+   * Create a new WardrobeAreaController
+   * @param id
+   * @param hairOption
+   * @param outfitOption
+   * @param isToggledOpen
+   */
+  constructor(
+    id: string,
+    isToggledOpen: boolean,
+    hairOption?: HairOption,
+    outfitOption?: OutfitOption,
+  ) {
+    super(id);
+    this._chosenHairOption = hairOption;
+    this._chosenOutfitOption = outfitOption;
+    this._isOpen = isToggledOpen;
+  }
+
   toInteractableAreaModel(): WardrobeAreaModel {
     throw new Error('Method not implemented.');
   }
@@ -40,7 +65,7 @@ export default class WardrobeAreaController extends InteractableAreaController<
   }
 
   public isActive(): boolean {
-    throw new Error('Method not implemented.');
+    return this._isOpen && this.occupants.length > 0;
   }
 
   public get friendlyName(): string {
