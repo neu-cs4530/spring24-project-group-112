@@ -84,6 +84,10 @@ export interface OutfitOption {
   optionFilePath: string; 
   optionFrame?: string; 
 }
+export interface BodyOption {
+  optionID: number; 
+  
+}
 export interface WardrobeArea extends Interactable {
   isOpen: boolean; 
   hairOptions: Array<HairOption>;
