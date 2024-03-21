@@ -1,6 +1,6 @@
 import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
 import Player from '../../lib/Player';
-import InvalidParametersError from '../../lib/InvalidParametersError';
+import InvalidParametersError, { INVALID_COMMAND_MESSAGE } from '../../lib/InvalidParametersError';
 import {
   BoundingBox,
   WardrobeArea as WardrobeAreaModel,
@@ -12,6 +12,7 @@ import {
   InteractableID,
   PlayerID,
 } from '../../types/CoveyTownSocket';
+import Wardrobe from './Wardrobe';
 import InteractableArea from '../InteractableArea';
 
 export default class WardrobeArea extends InteractableArea {
@@ -22,6 +23,12 @@ export default class WardrobeArea extends InteractableArea {
   public hairChoice?: HairOption;
 
   public outfitChoice?: OutfitOption;
+
+  protected _session?: Wardrobe;
+
+  public get session(): Wardrobe | undefined {
+    return this._session;
+  }
 
   /** The conversation area is "active" when there are players inside of it  */
   public get isActive(): boolean {
@@ -43,6 +50,26 @@ export default class WardrobeArea extends InteractableArea {
     this.isOpen = isOpen;
     this.hairChoice = hairChoice;
     this.outfitChoice = outfitChoice;
+  }
+
+  /**
+   * Adds a player to the wardrobe area.
+   * When the first player enters, this method sets the room as open and emits that update to all of the players.
+   * If the wardrobe area is already occupied, this method throws an error as only one player can be in the wardrobe area at a time.
+   * 
+   * @throws Error if the wardrobe area is already occupied (occupants.length > 0)
+   * 
+   * @param player Player to add
+   */
+  public add(player: Player): void {
+    if (this._occupants.length > 0) {
+      throw new Error('WardrobeArea is already occupied');
+    } else {
+      super.add(player);
+      this.isOpen = true;
+      this.user = player.id;
+      //TODO: Need to create the Wardrobe object somewhere. Do it here when a player is added? Need to get a PlayerController, this class has a Player object.
+    }
   }
 
   /**
@@ -105,6 +132,12 @@ export default class WardrobeArea extends InteractableArea {
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
-    throw new InvalidParametersError('Unknown command type');
+    if (command.type === "WardrobeAreaUpdate") {
+      this.isOpen = true;
+      this.user = player.id;
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
+    //TODO: Handle commands for joining and leaving the wardrobe area
+    throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
   }
 }
