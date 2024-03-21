@@ -1,6 +1,6 @@
 import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
-import Player from '../lib/Player';
-import InvalidParametersError from '../lib/InvalidParametersError';
+import Player from '../../lib/Player';
+import InvalidParametersError from '../../lib/InvalidParametersError';
 import {
   BoundingBox,
   WardrobeArea as WardrobeAreaModel,
@@ -10,31 +10,22 @@ import {
   HairOption,
   OutfitOption,
   InteractableID,
-} from '../types/CoveyTownSocket';
-import InteractableArea from './InteractableArea';
-
-function loadHairOptions() {
-  const potentialHairOptions = Array<HairOption>();
-  potentialHairOptions.push({ optionID: 0, optionFilePath: 'string' });
-  return potentialHairOptions;
-}
-
-function loadOutfitOptions() {
-  const potentialOutfitOptions = Array<OutfitOption>();
-  potentialOutfitOptions.push({ optionID: 0, optionFilePath: 'string' });
-  return potentialOutfitOptions;
-}
+  PlayerID,
+} from '../../types/CoveyTownSocket';
+import InteractableArea from '../InteractableArea';
 
 export default class WardrobeArea extends InteractableArea {
   public isOpen: boolean;
 
-  public hairOptions: Array<HairOption>;
+  public user?: PlayerID;
 
-  public outfitOptions: Array<OutfitOption>;
+  public hairChoice?: HairOption;
+
+  public outfitChoice?: OutfitOption;
 
   /** The conversation area is "active" when there are players inside of it  */
   public get isActive(): boolean {
-    return this._occupants.length > 0;
+    return this._occupants.length > 0 && this.isOpen;
   }
 
   /**
@@ -44,14 +35,14 @@ export default class WardrobeArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { isOpen, hairOptions, outfitOptions, id, occupants }: Omit<WardrobeAreaModel, 'type'>,
+    { isOpen, hairChoice, outfitChoice, id, occupants }: Omit<WardrobeAreaModel, 'type'>,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
   ) {
     super(id, coordinates, townEmitter);
     this.isOpen = isOpen;
-    this.hairOptions = hairOptions;
-    this.outfitOptions = outfitOptions;
+    this.hairChoice = hairChoice;
+    this.outfitChoice = outfitChoice;
   }
 
   /**
@@ -76,8 +67,9 @@ export default class WardrobeArea extends InteractableArea {
     return {
       id: this.id,
       isOpen: this.isOpen,
-      hairOptions: this.hairOptions,
-      outfitOptions: this.outfitOptions,
+      user: this.user,
+      hairChoice: this.hairChoice,
+      outfitChoice: this.outfitChoice,
       occupants: this.occupantsByID,
       type: 'WardrobeArea',
     };
@@ -98,8 +90,9 @@ export default class WardrobeArea extends InteractableArea {
     return new WardrobeArea(
       {
         isOpen: false,
-        hairOptions: loadHairOptions(),
-        outfitOptions: loadOutfitOptions(),
+        user: undefined,
+        hairChoice: undefined,
+        outfitChoice: undefined,
         id: name as InteractableID,
         occupants: [],
       },

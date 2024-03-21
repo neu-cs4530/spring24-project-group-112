@@ -90,8 +90,9 @@ export interface BodyOption {
 }
 export interface WardrobeArea extends Interactable {
   isOpen: boolean; 
-  hairOptions: Array<HairOption>;
-  outfitOptions: Array<OutfitOption>;
+  user: PlayerID | undefined;
+  hairChoice?: HairOption;
+  outfitChoice?: OutfitOption;
 };
 
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER' | 'WAITING_FOR_PLAYERS';

@@ -3,12 +3,13 @@ import {
   HairOption,
   OutfitOption,
   WardrobeArea as WardrobeAreaModel,
-} from '../../types/CoveyTownSocket';
-import PlayerController from '../PlayerController';
+} from '../../../types/CoveyTownSocket';
+import PlayerController from '../../PlayerController';
 import InteractableAreaController, {
   BaseInteractableEventMap,
   WARDROBE_AREA_TYPE,
-} from './InteractableAreaController';
+} from '../InteractableAreaController';
+import TownController from '../../TownController';
 
 /**
  * The events that the WardrobeAreaController emits to subscribers. These events
@@ -31,33 +32,43 @@ export default class WardrobeAreaController extends InteractableAreaController<
   WardrobeAreaEvents,
   WardrobeAreaModel
 > {
+  private _model: WardrobeAreaModel;
+
+  private _townController: TownController;
+
+  private _player?: PlayerController;
+
   private _chosenHairOption?: HairOption;
 
   private _chosenOutfitOption?: OutfitOption;
 
-  private _isOpen: boolean;
-
   /**
    * Create a new WardrobeAreaController
    * @param id
+   * @param wardrobeAreaModel
+   * @param townController
    * @param hairOption
    * @param outfitOption
-   * @param isToggledOpen
    */
   constructor(
     id: string,
-    isToggledOpen: boolean,
+    wardrobeAreaModel: WardrobeAreaModel,
+    townController: TownController,
     hairOption?: HairOption,
     outfitOption?: OutfitOption,
   ) {
     super(id);
+    this._model = wardrobeAreaModel;
+    this._townController = townController;
     this._chosenHairOption = hairOption;
     this._chosenOutfitOption = outfitOption;
-    this._isOpen = isToggledOpen;
+    if (this._model.user) {
+      this._player = this._townController.getPlayer(this._model.user);
+    }
   }
 
   toInteractableAreaModel(): WardrobeAreaModel {
-    throw new Error('Method not implemented.');
+    return this._model;
   }
 
   protected _updateFrom(newModel: WardrobeAreaModel): void {
@@ -65,11 +76,11 @@ export default class WardrobeAreaController extends InteractableAreaController<
   }
 
   public isActive(): boolean {
-    return this._isOpen && this.occupants.length > 0;
+    return this._model.isOpen && this.occupants.length > 0 && this._player !== undefined;
   }
 
   public get friendlyName(): string {
-    throw new Error('Method not implemented.');
+    return this.id;
   }
 
   public get type(): string {
