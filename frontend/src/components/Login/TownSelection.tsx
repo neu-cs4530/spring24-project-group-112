@@ -22,6 +22,7 @@ import {
 } from '@chakra-ui/react';
 import { Town } from '../../generated/client';
 import Login from './Authenticator';
+import { firebaseConfig } from './Config';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
 import firebase from 'firebase/compat/app';
@@ -42,7 +43,7 @@ export default function TownSelection(): JSX.Element {
   const app = firebase.initializeApp(firebaseConfig);
 
   // Instantiate Login Element
-  const loginTool = Login(app);
+  const loginTool = Login({ app: app });
 
   const toast = useToast();
 
