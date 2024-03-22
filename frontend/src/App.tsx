@@ -19,6 +19,7 @@ import LoginControllerContext from './contexts/LoginControllerContext';
 import { TownsServiceClient } from './generated/client';
 import { nanoid } from 'nanoid';
 import ToggleChatButton from './components/VideoCall/VideoFrontend/components/Buttons/ToggleChatButton/ToggleChatButton';
+import firebase from 'firebase/compat/app';
 
 function App() {
   const [townController, setTownController] = useState<TownController | null>(null);
