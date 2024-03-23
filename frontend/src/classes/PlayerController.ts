@@ -16,20 +16,20 @@ export type PlayerGameObjects = {
 
 /**
  * This prototype player game object includes:
- * - A GameObject.Sprite that represents the body as a sprite 
+ * - A GameObject.Sprite that represents the body as a sprite
  * - A Physics.Arcade.Body that represents the dynamic body component attached to the body
  * - A GameObject.Layer that stores 3 different components
- * 
+ *
  * The layer contains two GameObject.Sprite objects: Hair and Outfit.
- * 
- * 
+ *
+ *
  */
 export type PrototypePlayerGameObjects = {
-  bodySprite: Phaser.GameObjects.Sprite; 
+  bodySprite: Phaser.GameObjects.Sprite;
   bodyPhysics: Phaser.Physics.Arcade.Body;
   layer: Phaser.GameObjects.Layer;
   label: Phaser.GameObjects.Text;
-  locationManagedByGameScene: boolean; /* For the local player, the game scene will calculate the current location, and we should NOT apply updates when we receive events */
+  locationManagedByGameScene: boolean /* For the local player, the game scene will calculate the current location, and we should NOT apply updates when we receive events */;
 };
 export default class PlayerController extends (EventEmitter as new () => TypedEmitter<PlayerEvents>) {
   private _location: PlayerLocation;
@@ -61,16 +61,16 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
    * Sets the texture of the new hair selected in the wardrobe.
    * @throws 'No body detected' if the game object of this player is undefined.
    * @throws 'Hair component is not a Sprite object' if the found hair gameobject is not an instance of a sprite.
-   * @param file path of the image of the hair 
+   * @param file path of the image of the hair
    */
   set hair(newHair: string) {
     if (this.gameObjects === undefined) {
-      throw error('No body detected');
+      throw new Error('No body detected');
     }
     const layerChildren = this.gameObjects.layer.getChildren();
     const hairComponent = layerChildren[0];
     if (!(hairComponent instanceof Phaser.GameObjects.Sprite)) {
-      throw error('Hair component is not a Sprite object');
+      throw new Error('Hair component is not a Sprite object');
     }
     hairComponent.setTexture(newHair);
   }
@@ -83,12 +83,12 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
    */
   set outfit(newOutfit: string) {
     if (this.gameObjects === undefined) {
-      throw error('No body detected');
+      throw new Error('No body detected');
     }
     const layerChildren = this.gameObjects.layer.getChildren();
     const outfitComponent = layerChildren[1];
     if (!(outfitComponent instanceof Phaser.GameObjects.Sprite)) {
-      throw error('Outfit component is not a Sprite object');
+      throw new Error('Outfit component is not a Sprite object');
     }
     outfitComponent.setTexture(newOutfit);
   }
@@ -105,7 +105,6 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     return { id: this.id, userName: this.userName, location: this.location };
   }
 
-
   private _updateGameComponentLocation() {
     if (this.gameObjects && !this.gameObjects.locationManagedByGameScene) {
       const { bodySprite, bodyPhysics, label } = this.gameObjects;
@@ -113,7 +112,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       bodySprite.setX(this.location.x);
       bodySprite.setY(this.location.y);
       if (this.location.moving) {
-        bodySprite.anims.play(`misa-${this.location.rotation}-walk`, true);
+        bodySprite.anims.play(`body-${this.location.rotation}-walk`, true);
         switch (this.location.rotation) {
           case 'front':
             bodyPhysics.setVelocity(0, MOVEMENT_SPEED);
@@ -132,7 +131,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       } else {
         bodyPhysics.setVelocity(0, 0);
         bodySprite.anims.stop();
-        bodySprite.setTexture('atlas', `misa-${this.location.rotation}`); // change this soon
+        bodySprite.setTexture('bodyatlas', `body-${this.location.rotation}`); // change this soon
       }
       label.setX(bodyPhysics.x);
       label.setY(bodyPhysics.y - 20);

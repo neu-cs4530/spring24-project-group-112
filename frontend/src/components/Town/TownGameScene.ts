@@ -128,10 +128,11 @@ export default class TownGameScene extends Phaser.Scene {
       this._resourcePathPrefix + '/assets/tilesets/16_Grocery_store_32x32.png',
     );
     this.load.tilemapTiledJSON('map', this._resourcePathPrefix + '/assets/tilemaps/indoors.json');
+    // this atlas is specifically for
     this.load.atlas(
-      'atlas',
-      this._resourcePathPrefix + '/assets/atlas/atlas.png',
-      this._resourcePathPrefix + '/assets/atlas/atlas.json',
+      'bodyatlas',
+      this._resourcePathPrefix + '/assets/newatlas/body.png',
+      this._resourcePathPrefix + '/assets/newatlas/body.json',
     );
   }
 
@@ -420,12 +421,15 @@ export default class TownGameScene extends Phaser.Scene {
     //   .setOffset(0, 24)
     //   .setDepth(6);
 
-    const bodySprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front').setSize(30,40).setDepth(6);
+    const bodySprite = this.add
+      .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
+      .setSize(30, 40)
+      .setDepth(6);
     const bodyPhysics = this.physics.add
-            .body(spawnPoint.x, spawnPoint.y)
-            .setSize(30,40)
-            .setOffset(0,24)
-            .setGameObject(bodySprite);
+      .body(spawnPoint.x, spawnPoint.y)
+      .setSize(30, 40)
+      .setOffset(0, 24)
+      .setGameObject(bodySprite);
 
     const hairSprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas');
     const outfitSprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas');
@@ -458,15 +462,28 @@ export default class TownGameScene extends Phaser.Scene {
     this._collidingLayers.push(wallsLayer);
     this._collidingLayers.push(aboveLayer);
     this._collidingLayers.push(onTheWallsLayer);
-    this._collidingLayers.forEach(layer => this.physics.add.collider(bodySprite, layer));
+    this._collidingLayers.forEach(collidingLayer =>
+      this.physics.add.collider(bodySprite, collidingLayer),
+    );
 
     // Create the player's walking animations from the texture atlas. These are stored in the global
     // animation manager so any sprite can access them.
     const { anims } = this;
     anims.create({
-      key: 'misa-left-walk',
-      frames: anims.generateFrameNames('atlas', {
-        prefix: 'misa-left-walk.',
+      key: 'body-left-walk',
+      frames: anims.generateFrameNames('bodyatlas', {
+        prefix: 'body-left-walk.',
+        start: 0,
+        end: 4,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    anims.create({
+      key: 'body-right-walk',
+      frames: anims.generateFrameNames('bodyatlas', {
+        prefix: 'body-right-walk.',
         start: 0,
         end: 3,
         zeroPad: 3,
@@ -475,9 +492,9 @@ export default class TownGameScene extends Phaser.Scene {
       repeat: -1,
     });
     anims.create({
-      key: 'misa-right-walk',
-      frames: anims.generateFrameNames('atlas', {
-        prefix: 'misa-right-walk.',
+      key: 'body-front-walk',
+      frames: anims.generateFrameNames('bodyatlas', {
+        prefix: 'body-front-walk.',
         start: 0,
         end: 3,
         zeroPad: 3,
@@ -486,20 +503,9 @@ export default class TownGameScene extends Phaser.Scene {
       repeat: -1,
     });
     anims.create({
-      key: 'misa-front-walk',
-      frames: anims.generateFrameNames('atlas', {
-        prefix: 'misa-front-walk.',
-        start: 0,
-        end: 3,
-        zeroPad: 3,
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    anims.create({
-      key: 'misa-back-walk',
-      frames: anims.generateFrameNames('atlas', {
-        prefix: 'misa-back-walk.',
+      key: 'body-back-walk',
+      frames: anims.generateFrameNames('bodyatlas', {
+        prefix: 'body-back-walk.',
         start: 0,
         end: 3,
         zeroPad: 3,
@@ -536,19 +542,22 @@ export default class TownGameScene extends Phaser.Scene {
 
   createPlayerSprites(player: PlayerController) {
     if (!player.gameObjects) {
-      const bodySprite = this.add.sprite(player.location.x, player.location.y, 'atlas', 'misa-front').setSize(30,40).setDepth(6);
+      const bodySprite = this.add
+        .sprite(player.location.x, player.location.y, 'bodyatlas', 'body-front')
+        .setSize(14, 20)
+        .setDepth(6);
       const bodyPhysics = this.physics.add
-            .body(player.location.x, player.location.y)
-            .setSize(30,40)
-            .setOffset(0,24)
-            .setGameObject(bodySprite);
+        .body(player.location.x, player.location.y)
+        .setSize(14, 20)
+        .setOffset(0, 24)
+        .setGameObject(bodySprite);
 
-      const hairSprite = this.add.sprite(player.location.x, player.location.y, 'atlas');
-      const outfitSprite = this.add.sprite(player.location.x, player.location.y, 'atlas');
+      // const hairSprite = this.add.sprite(player.location.x, player.location.y, 'newatlas');
+      // const outfitSprite = this.add.sprite(player.location.x, player.location.y, 'newatlas');
       const layer = this.add.layer();
-      layer.add(hairSprite);
-      layer.add(outfitSprite);
-    
+      // layer.add(hairSprite);
+      // layer.add(outfitSprite);
+
       const label = this.add.text(
         player.location.x,
         player.location.y - 20,
@@ -567,7 +576,9 @@ export default class TownGameScene extends Phaser.Scene {
         label,
         locationManagedByGameScene: true,
       };
-      this._collidingLayers.forEach(layer => this.physics.add.collider(bodySprite, layer));
+      this._collidingLayers.forEach(collidingLayer =>
+        this.physics.add.collider(bodySprite, collidingLayer),
+      );
     }
   }
 

@@ -1,0 +1,356 @@
+{
+	"textures": [
+		{
+			"image": "body.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 223,
+				"h": 20
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "body-back-walk.000.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-back-walk.001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 14,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-back-walk.002.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 28,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-back.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 42,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-front-walk.000.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 56,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-front-walk.001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 70,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-front-walk.002.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 84,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-front.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 98,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-left-walk.001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 112,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-left-walk.002.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 126,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-left.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 140,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-right-walk.000.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 154,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-right-walk.001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 168,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-right-walk.002.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 182,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-right.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 196,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "body-left-walk.000.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 0,
+						"w": 13,
+						"h": 20
+					},
+					"frame": {
+						"x": 210,
+						"y": 0,
+						"w": 13,
+						"h": 20
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:fe425776bf7fe3f3a1e4e1f210511e3c:b4f0c808d82467b51187b1dd36e99159:6edbb70161d1b060b04ac1ffb23eaae4$"
+	}
+}
