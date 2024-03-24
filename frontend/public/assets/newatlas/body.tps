@@ -74,7 +74,7 @@
         <key>textureSubPath</key>
         <string></string>
         <key>textureFormat</key>
-        <enum type="SettingsBase::TextureFormat">png</enum>
+        <enum type="SettingsBase::TextureFormat">png8</enum>
         <key>borderPadding</key>
         <uint>0</uint>
         <key>maxTextureSize</key>
@@ -94,7 +94,7 @@
         <key>algorithmSettings</key>
         <struct type="AlgorithmSettings">
             <key>algorithm</key>
-            <enum type="AlgorithmSettings::AlgorithmId">MaxRects</enum>
+            <enum type="AlgorithmSettings::AlgorithmId">Basic</enum>
             <key>freeSizeMode</key>
             <enum type="AlgorithmSettings::AlgorithmFreeSizeMode">Best</enum>
             <key>sizeConstraints</key>
@@ -169,26 +169,84 @@
             <key>defaultPivotPoint</key>
             <point_f>0.5,0.5</point_f>
             <key>writePivotPoints</key>
-            <false/>
+            <true/>
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">../../../../../../../Desktop/body-back-walk.000.png</key>
-            <key type="filename">../../../../../../../Desktop/body-back-walk.001.png</key>
-            <key type="filename">../../../../../../../Desktop/body-back-walk.002.png</key>
-            <key type="filename">../../../../../../../Desktop/body-back.png</key>
-            <key type="filename">../../../../../../../Desktop/body-front-walk.000.png</key>
-            <key type="filename">../../../../../../../Desktop/body-front-walk.001.png</key>
-            <key type="filename">../../../../../../../Desktop/body-front-walk.002.png</key>
-            <key type="filename">../../../../../../../Desktop/body-front.png</key>
-            <key type="filename">../../../../../../../Desktop/body-left-walk.000.png</key>
-            <key type="filename">../../../../../../../Desktop/body-left-walk.001.png</key>
-            <key type="filename">../../../../../../../Desktop/body-left-walk.002.png</key>
-            <key type="filename">../../../../../../../Desktop/body-left.png</key>
-            <key type="filename">../../../../../../../Desktop/body-right-walk.000.png</key>
-            <key type="filename">../../../../../../../Desktop/body-right-walk.001.png</key>
-            <key type="filename">../../../../../../../Desktop/body-right-walk.002.png</key>
-            <key type="filename">../../../../../../../Desktop/body-right.png</key>
+            <key type="filename">prototype-body/body-backward-walk.000.png</key>
+            <key type="filename">prototype-body/body-backward-walk.003.png</key>
+            <key type="filename">prototype-body/body-backward-walk.004.png</key>
+            <key type="filename">prototype-body/body-backward-walk.007.png</key>
+            <key type="filename">prototype-body/body-backward.png</key>
+            <key type="filename">prototype-body/body-front-walk.003.png</key>
+            <key type="filename">prototype-body/body-front-walk.007.png</key>
+            <key type="filename">prototype-body/body-left-walk.000.png</key>
+            <key type="filename">prototype-body/body-left-walk.001.png</key>
+            <key type="filename">prototype-body/body-left-walk.003.png</key>
+            <key type="filename">prototype-body/body-left-walk.004.png</key>
+            <key type="filename">prototype-body/body-left.png</key>
+            <key type="filename">prototype-body/body-right-walk.000.png</key>
+            <key type="filename">prototype-body/body-right-walk.004.png</key>
+            <key type="filename">prototype-body/body-right-walk.005.png</key>
+            <key type="filename">prototype-body/body-right-walk.007.png</key>
+            <key type="filename">prototype-body/body-right.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>3,5,6,10</rect>
+                <key>scale9Paddings</key>
+                <rect>3,5,6,10</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">prototype-body/body-backward-walk.001.png</key>
+            <key type="filename">prototype-body/body-backward-walk.005.png</key>
+            <key type="filename">prototype-body/body-front-walk.001.png</key>
+            <key type="filename">prototype-body/body-front-walk.002.png</key>
+            <key type="filename">prototype-body/body-front-walk.005.png</key>
+            <key type="filename">prototype-body/body-left-walk.005.png</key>
+            <key type="filename">prototype-body/body-right-walk.001.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>3,5,7,10</rect>
+                <key>scale9Paddings</key>
+                <rect>3,5,7,10</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">prototype-body/body-backward-walk.002.png</key>
+            <key type="filename">prototype-body/body-backward-walk.006.png</key>
+            <key type="filename">prototype-body/body-front-walk.006.png</key>
+            <key type="filename">prototype-body/body-left-walk.007.png</key>
+            <key type="filename">prototype-body/body-right-walk.003.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>3,5,7,9</rect>
+                <key>scale9Paddings</key>
+                <rect>3,5,7,9</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">prototype-body/body-front-walk.000.png</key>
+            <key type="filename">prototype-body/body-front-walk.004.png</key>
+            <key type="filename">prototype-body/body-front.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -203,6 +261,38 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">prototype-body/body-left-walk.002.png</key>
+            <key type="filename">prototype-body/body-right-walk.006.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>3,5,6,9</rect>
+                <key>scale9Paddings</key>
+                <rect>3,5,6,9</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">prototype-body/body-left-walk.006.png</key>
+            <key type="filename">prototype-body/body-right-walk.002.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>4,5,7,9</rect>
+                <key>scale9Paddings</key>
+                <rect>4,5,7,9</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
         </map>
         <key>fileLists</key>
         <map type="SpriteSheetMap">
@@ -210,22 +300,7 @@
             <struct type="SpriteSheet">
                 <key>files</key>
                 <array>
-                    <filename>../../../../../../../Desktop/body-back-walk.000.png</filename>
-                    <filename>../../../../../../../Desktop/body-back-walk.001.png</filename>
-                    <filename>../../../../../../../Desktop/body-back-walk.002.png</filename>
-                    <filename>../../../../../../../Desktop/body-front-walk.000.png</filename>
-                    <filename>../../../../../../../Desktop/body-front-walk.001.png</filename>
-                    <filename>../../../../../../../Desktop/body-front-walk.002.png</filename>
-                    <filename>../../../../../../../Desktop/body-front.png</filename>
-                    <filename>../../../../../../../Desktop/body-left-walk.000.png</filename>
-                    <filename>../../../../../../../Desktop/body-left-walk.001.png</filename>
-                    <filename>../../../../../../../Desktop/body-left-walk.002.png</filename>
-                    <filename>../../../../../../../Desktop/body-left.png</filename>
-                    <filename>../../../../../../../Desktop/body-right-walk.000.png</filename>
-                    <filename>../../../../../../../Desktop/body-right-walk.001.png</filename>
-                    <filename>../../../../../../../Desktop/body-right-walk.002.png</filename>
-                    <filename>../../../../../../../Desktop/body-right.png</filename>
-                    <filename>../../../../../../../Desktop/body-back.png</filename>
+                    <filename>prototype-body</filename>
                 </array>
             </struct>
         </map>
