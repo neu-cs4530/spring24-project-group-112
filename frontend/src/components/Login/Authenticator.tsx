@@ -11,7 +11,7 @@ import {
   InputRightElement,
   InputGroup,
 } from '@chakra-ui/react';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, deleteUser } from 'firebase/auth'; // Import deleteUser for account deletion
 import 'firebaseui/dist/firebaseui.css';
 import { firebaseConfig } from './Config';
 import { ILoginPageProps } from '../../types/CoveyTownSocket';
@@ -40,6 +40,40 @@ export default function Login(props: ILoginPageProps): JSX.Element {
       })
       .catch(error => {
         console.error('Error signing in:', error);
+        setAuthing(false);
+        setError(error.message);
+      });
+  };
+
+  const createAccount = async () => {
+    setAuthing(true);
+
+    createUserWithEmailAndPassword(auth, username, password)
+      .then(userCredential => {
+        // Account created
+        console.log('Account created for ' + userCredential.user?.email);
+        setAuthing(false);
+        setError('');
+      })
+      .catch(error => {
+        console.error('Error creating account:', error);
+        setAuthing(false);
+        setError(error.message);
+      });
+  };
+
+  const deleteAccount = async () => {
+    setAuthing(true);
+
+    deleteUser(auth.currentUser)
+      .then(() => {
+        // Account deleted
+        console.log('Account deleted');
+        setAuthing(false);
+        setError('');
+      })
+      .catch(error => {
+        console.error('Error deleting account:', error);
         setAuthing(false);
         setError(error.message);
       });
@@ -88,6 +122,12 @@ export default function Login(props: ILoginPageProps): JSX.Element {
       </Box>
       <Button onClick={signIn} isLoading={authing}>
         Login
+      </Button>
+      <Button onClick={createAccount} isLoading={authing}>
+        Create Account
+      </Button>
+      <Button onClick={deleteAccount} isLoading={authing}>
+        Delete Account
       </Button>
     </Stack>
   );
