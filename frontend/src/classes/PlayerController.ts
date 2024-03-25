@@ -4,16 +4,7 @@ import { Player as PlayerModel, PlayerLocation } from '../types/CoveyTownSocket'
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore/lite';
-
-// Your web app's Firebase configuration
-export const firebaseConfig = {
-  apiKey: 'AIzaSyDsXaSPKpBQNG0rielahA9jt-YSVzLnmsc',
-  authDomain: 'coveytest-50d56.firebaseapp.com',
-  projectId: 'coveytest-50d56',
-  storageBucket: 'coveytest-50d56.appspot.com',
-  messagingSenderId: '131579696929',
-  appId: '1:131579696929:web:e6b4acc60fb56faee29060',
-};
+import { firebaseConfig } from '../components/Login/Config';
 
 export const MOVEMENT_SPEED = 175;
 

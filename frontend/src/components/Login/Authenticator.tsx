@@ -26,6 +26,7 @@ export default function Login(props: ILoginPageProps): JSX.Element {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [show, setShow] = React.useState(false);
+  const [error, setError] = React.useState('');
 
   const signIn = async () => {
     setAuthing(true);
@@ -35,10 +36,12 @@ export default function Login(props: ILoginPageProps): JSX.Element {
         // Signed in
         console.log('Log in successful as ' + userCredential.user?.email);
         setAuthing(false);
+        setError('');
       })
       .catch(error => {
         console.error('Error signing in:', error);
         setAuthing(false);
+        setError(error.message);
       });
   };
 
@@ -77,6 +80,11 @@ export default function Login(props: ILoginPageProps): JSX.Element {
             </InputRightElement>
           </InputGroup>
         </FormControl>
+        {error && (
+          <Box color='red' mt={2} fontSize='sm'>
+            {error}
+          </Box>
+        )}
       </Box>
       <Button onClick={signIn} isLoading={authing}>
         Login
