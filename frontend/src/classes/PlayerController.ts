@@ -1,7 +1,6 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
 import { Player as PlayerModel, PlayerLocation } from '../types/CoveyTownSocket';
-import { error } from 'console';
 export const MOVEMENT_SPEED = 175;
 
 export type PlayerEvents = {
@@ -131,7 +130,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       } else {
         bodyPhysics.setVelocity(0, 0);
         bodySprite.anims.stop();
-        bodySprite.setTexture('bodyatlas', `body-${this.location.rotation}`); // change this soon
+        bodySprite.setTexture('bodyatlas', `body-${this.location.rotation}`);
       }
       label.setX(bodyPhysics.x);
       label.setY(bodyPhysics.y - 20);

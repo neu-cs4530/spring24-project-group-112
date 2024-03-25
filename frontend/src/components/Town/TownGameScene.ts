@@ -131,7 +131,6 @@ export default class TownGameScene extends Phaser.Scene {
       this._resourcePathPrefix + '/assets/tilesets/16_Grocery_store_32x32.png',
     );
     this.load.tilemapTiledJSON('map', this._resourcePathPrefix + '/assets/tilemaps/indoors.json');
-    // this atlas is specifically for
     this.load.atlas(
       'bodyatlas',
       this._resourcePathPrefix + '/assets/newatlas/body.png',
@@ -220,31 +219,32 @@ export default class TownGameScene extends Phaser.Scene {
       switch (primaryDirection) {
         case 'left':
           body.setVelocityX(-MOVEMENT_SPEED);
-          gameObjects.bodySprite.anims.play('misa-left-walk', true);
+          gameObjects.bodySprite.anims.play('body-left-walk', true);
           break;
         case 'right':
           body.setVelocityX(MOVEMENT_SPEED);
-          gameObjects.bodySprite.anims.play('misa-right-walk', true);
+          gameObjects.bodySprite.anims.play('body-right-walk', true);
           break;
         case 'front':
           body.setVelocityY(MOVEMENT_SPEED);
-          gameObjects.bodySprite.anims.play('misa-front-walk', true);
+          gameObjects.bodySprite.anims.play('body-front-walk', true);
           break;
         case 'back':
           body.setVelocityY(-MOVEMENT_SPEED);
-          gameObjects.bodySprite.anims.play('misa-back-walk', true);
+          gameObjects.bodySprite.anims.play('body-back-walk', true);
           break;
         default:
           // Not moving
           gameObjects.bodySprite.anims.stop();
           // If we were moving, pick and idle frame to use
           if (prevVelocity.x < 0) {
-            gameObjects.bodySprite.setTexture('atlas', 'misa-left');
+            gameObjects.bodySprite.setTexture('bodyatlas', 'body-left');
           } else if (prevVelocity.x > 0) {
-            gameObjects.bodySprite.setTexture('atlas', 'misa-right');
+            gameObjects.bodySprite.setTexture('bodyatlas', 'body-right');
           } else if (prevVelocity.y < 0) {
-            gameObjects.bodySprite.setTexture('atlas', 'misa-back');
-          } else if (prevVelocity.y > 0) gameObjects.bodySprite.setTexture('atlas', 'misa-front');
+            gameObjects.bodySprite.setTexture('bodyatlas', 'body-back');
+          } else if (prevVelocity.y > 0)
+            gameObjects.bodySprite.setTexture('bodyatlas', 'body-front');
           break;
       }
 
@@ -425,7 +425,7 @@ export default class TownGameScene extends Phaser.Scene {
     //   .setDepth(6);
 
     const bodySprite = this.add
-      .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
+      .sprite(spawnPoint.x, spawnPoint.y, 'bodyatlas', 'body-front')
       .setSize(30, 40)
       .setDepth(6);
     const bodyPhysics = this.physics.add
@@ -434,11 +434,11 @@ export default class TownGameScene extends Phaser.Scene {
       .setOffset(0, 24)
       .setGameObject(bodySprite);
 
-    const hairSprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas');
-    const outfitSprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas');
+    // const hairSprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas');
+    // const outfitSprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas');
     const layer = this.add.layer();
-    layer.add(hairSprite);
-    layer.add(outfitSprite);
+    // layer.add(hairSprite);
+    // layer.add(outfitSprite);
 
     const label = this.add
       .text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
@@ -477,7 +477,7 @@ export default class TownGameScene extends Phaser.Scene {
       frames: anims.generateFrameNames('bodyatlas', {
         prefix: 'body-left-walk.',
         start: 0,
-        end: 4,
+        end: 7,
         zeroPad: 3,
       }),
       frameRate: 10,
@@ -488,7 +488,7 @@ export default class TownGameScene extends Phaser.Scene {
       frames: anims.generateFrameNames('bodyatlas', {
         prefix: 'body-right-walk.',
         start: 0,
-        end: 3,
+        end: 7,
         zeroPad: 3,
       }),
       frameRate: 10,
@@ -499,7 +499,7 @@ export default class TownGameScene extends Phaser.Scene {
       frames: anims.generateFrameNames('bodyatlas', {
         prefix: 'body-front-walk.',
         start: 0,
-        end: 3,
+        end: 7,
         zeroPad: 3,
       }),
       frameRate: 10,
@@ -510,7 +510,7 @@ export default class TownGameScene extends Phaser.Scene {
       frames: anims.generateFrameNames('bodyatlas', {
         prefix: 'body-back-walk.',
         start: 0,
-        end: 3,
+        end: 7,
         zeroPad: 3,
       }),
       frameRate: 10,
@@ -547,11 +547,11 @@ export default class TownGameScene extends Phaser.Scene {
     if (!player.gameObjects) {
       const bodySprite = this.add
         .sprite(player.location.x, player.location.y, 'bodyatlas', 'body-front')
-        .setSize(14, 20)
+        .setSize(30, 40)
         .setDepth(6);
       const bodyPhysics = this.physics.add
         .body(player.location.x, player.location.y)
-        .setSize(14, 20)
+        .setSize(30, 40)
         .setOffset(0, 24)
         .setGameObject(bodySprite);
 

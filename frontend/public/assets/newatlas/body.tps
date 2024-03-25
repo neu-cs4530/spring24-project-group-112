@@ -173,11 +173,11 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">prototype-body/body-backward-walk.000.png</key>
-            <key type="filename">prototype-body/body-backward-walk.003.png</key>
-            <key type="filename">prototype-body/body-backward-walk.004.png</key>
-            <key type="filename">prototype-body/body-backward-walk.007.png</key>
-            <key type="filename">prototype-body/body-backward.png</key>
+            <key type="filename">prototype-body/body-back-walk.000.png</key>
+            <key type="filename">prototype-body/body-back-walk.003.png</key>
+            <key type="filename">prototype-body/body-back-walk.004.png</key>
+            <key type="filename">prototype-body/body-back-walk.007.png</key>
+            <key type="filename">prototype-body/body-back.png</key>
             <key type="filename">prototype-body/body-front-walk.003.png</key>
             <key type="filename">prototype-body/body-front-walk.007.png</key>
             <key type="filename">prototype-body/body-left-walk.000.png</key>
@@ -204,8 +204,8 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">prototype-body/body-backward-walk.001.png</key>
-            <key type="filename">prototype-body/body-backward-walk.005.png</key>
+            <key type="filename">prototype-body/body-back-walk.001.png</key>
+            <key type="filename">prototype-body/body-back-walk.005.png</key>
             <key type="filename">prototype-body/body-front-walk.001.png</key>
             <key type="filename">prototype-body/body-front-walk.002.png</key>
             <key type="filename">prototype-body/body-front-walk.005.png</key>
@@ -225,8 +225,8 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">prototype-body/body-backward-walk.002.png</key>
-            <key type="filename">prototype-body/body-backward-walk.006.png</key>
+            <key type="filename">prototype-body/body-back-walk.002.png</key>
+            <key type="filename">prototype-body/body-back-walk.006.png</key>
             <key type="filename">prototype-body/body-front-walk.006.png</key>
             <key type="filename">prototype-body/body-left-walk.007.png</key>
             <key type="filename">prototype-body/body-right-walk.003.png</key>
