@@ -54,7 +54,7 @@ export default function Login(props: ILoginPageProps): JSX.Element {
     createUserWithEmailAndPassword(auth, email, password)
       .then(async userCredential => {
         console.log('Account created for ' + userCredential.user?.email);
-        await addDoc(collection(db, 'users'), { username: email, userId: userCredential.user.uid });
+        await addDoc(collection(db, 'Users'), { username: email, userId: userCredential.user.uid });
         setAuthing(false);
         setError('');
         setResponseMessage('Account Created');
@@ -72,6 +72,7 @@ export default function Login(props: ILoginPageProps): JSX.Element {
 
     deleteUser(auth.currentUser)
       .then(() => {
+        // TODO: remove user from Firestore
         console.log('Account deleted');
         setAuthing(false);
         setError('');
