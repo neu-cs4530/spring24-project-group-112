@@ -136,6 +136,11 @@ export default class TownGameScene extends Phaser.Scene {
       this._resourcePathPrefix + '/assets/newatlas/body.png',
       this._resourcePathPrefix + '/assets/newatlas/body.json',
     );
+    this.load.atlas(
+      'hairatlas',
+      this._resourcePathPrefix + '/assets/newatlas/hair.png',
+      this._resourcePathPrefix + '/assets/newatlas/hair.json',
+    );
   }
 
   updatePlayers(players: PlayerController[]) {
@@ -186,12 +191,17 @@ export default class TownGameScene extends Phaser.Scene {
     if (!this._lastLocation) {
       this._lastLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
     }
+    const hairSprite = gameObjects.layer.getAt(
+      0,
+    ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     if (destination.x !== undefined) {
       gameObjects.bodySprite.x = destination.x;
+      hairSprite.x = destination.x;
       this._lastLocation.x = destination.x;
     }
     if (destination.y !== undefined) {
       gameObjects.bodySprite.y = destination.y;
+      hairSprite.y = destination.y;
       this._lastLocation.y = destination.y;
     }
     if (destination.moving !== undefined) {
@@ -211,26 +221,35 @@ export default class TownGameScene extends Phaser.Scene {
     if (gameObjects && this._cursors) {
       const prevVelocity = gameObjects.bodyPhysics.velocity.clone();
       const body = gameObjects.bodyPhysics;
+      const hairSprite = gameObjects.layer.getAt(
+        0,
+      ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
       // Stop any previous movement from the last frame
       body.setVelocity(0);
+      hairSprite.setVelocity(0);
 
       const primaryDirection = this.getNewMovementDirection();
+
       switch (primaryDirection) {
         case 'left':
           body.setVelocityX(-MOVEMENT_SPEED);
+          hairSprite.setVelocityX(-MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-left-walk', true);
           break;
         case 'right':
           body.setVelocityX(MOVEMENT_SPEED);
+          hairSprite.setVelocityX(MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-right-walk', true);
           break;
         case 'front':
           body.setVelocityY(MOVEMENT_SPEED);
+          hairSprite.setVelocityY(MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-front-walk', true);
           break;
         case 'back':
           body.setVelocityY(-MOVEMENT_SPEED);
+          hairSprite.setVelocityY(-MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-back-walk', true);
           break;
         default:
@@ -239,19 +258,25 @@ export default class TownGameScene extends Phaser.Scene {
           // If we were moving, pick and idle frame to use
           if (prevVelocity.x < 0) {
             gameObjects.bodySprite.setTexture('bodyatlas', 'body-left');
+            hairSprite.setTexture('hairatlas', 'hair-left');
           } else if (prevVelocity.x > 0) {
             gameObjects.bodySprite.setTexture('bodyatlas', 'body-right');
+            hairSprite.setTexture('hairatlas', 'hair-right');
           } else if (prevVelocity.y < 0) {
             gameObjects.bodySprite.setTexture('bodyatlas', 'body-back');
-          } else if (prevVelocity.y > 0)
+            hairSprite.setTexture('hairatlas', 'hair-back');
+          } else if (prevVelocity.y > 0) {
             gameObjects.bodySprite.setTexture('bodyatlas', 'body-front');
+            hairSprite.setTexture('hairatlas', 'hair-front');
+          }
           break;
       }
 
       // Normalize and scale the velocity so that player can't move faster along a diagonal
       gameObjects.bodyPhysics.velocity.normalize().scale(MOVEMENT_SPEED);
-
+      hairSprite.body.velocity.normalize().scale(MOVEMENT_SPEED);
       const isMoving = primaryDirection !== undefined;
+      hairSprite.setY(body.y + 13);
       gameObjects.label.setX(body.x);
       gameObjects.label.setY(body.y - 20);
       const x = gameObjects.bodySprite.getBounds().centerX;
@@ -431,13 +456,15 @@ export default class TownGameScene extends Phaser.Scene {
     const bodyPhysics = this.physics.add
       .body(spawnPoint.x, spawnPoint.y)
       .setSize(30, 40)
-      .setOffset(0, 24)
+      // .setOffset(0, 24)
       .setGameObject(bodySprite);
 
-    // const hairSprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas');
+    const hairSprite = this.physics.add
+      .sprite(spawnPoint.x, spawnPoint.y, 'hairatlas', 'hair-front')
+      .setSize(32, 26);
     // const outfitSprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas');
-    const layer = this.add.layer();
-    // layer.add(hairSprite);
+    const layer = this.add.layer().setDepth(7);
+    layer.add(hairSprite);
     // layer.add(outfitSprite);
 
     const label = this.add
@@ -552,13 +579,18 @@ export default class TownGameScene extends Phaser.Scene {
       const bodyPhysics = this.physics.add
         .body(player.location.x, player.location.y)
         .setSize(30, 40)
-        .setOffset(0, 24)
+        // .setOffset(0, 24)
         .setGameObject(bodySprite);
 
-      // const hairSprite = this.add.sprite(player.location.x, player.location.y, 'newatlas');
+      const hairSprite = this.physics.add.sprite(
+        player.location.x,
+        player.location.y,
+        'hairatlas',
+        'hair-front',
+      );
       // const outfitSprite = this.add.sprite(player.location.x, player.location.y, 'newatlas');
-      const layer = this.add.layer();
-      // layer.add(hairSprite);
+      const layer = this.add.layer().setDepth(7);
+      layer.add(hairSprite);
       // layer.add(outfitSprite);
 
       const label = this.add.text(

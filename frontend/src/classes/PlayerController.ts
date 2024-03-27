@@ -68,7 +68,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     }
     const layerChildren = this.gameObjects.layer.getChildren();
     const hairComponent = layerChildren[0];
-    if (!(hairComponent instanceof Phaser.GameObjects.Sprite)) {
+    if (!(hairComponent instanceof Phaser.Physics.Arcade.Sprite)) {
       throw new Error('Hair component is not a Sprite object');
     }
     hairComponent.setTexture(newHair);
@@ -86,7 +86,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     }
     const layerChildren = this.gameObjects.layer.getChildren();
     const outfitComponent = layerChildren[1];
-    if (!(outfitComponent instanceof Phaser.GameObjects.Sprite)) {
+    if (!(outfitComponent instanceof Phaser.Physics.Arcade.Sprite)) {
       throw new Error('Outfit component is not a Sprite object');
     }
     outfitComponent.setTexture(newOutfit);
@@ -106,31 +106,41 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   private _updateGameComponentLocation() {
     if (this.gameObjects && !this.gameObjects.locationManagedByGameScene) {
-      const { bodySprite, bodyPhysics, label } = this.gameObjects;
-      if (!bodySprite.anims) return;
+      const { bodySprite, bodyPhysics, layer, label } = this.gameObjects;
+      const hair = layer.getAt(0) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+      if (!bodySprite.anims || !hair.anims) return;
       bodySprite.setX(this.location.x);
       bodySprite.setY(this.location.y);
+      hair.setX(bodyPhysics.x);
+      hair.setY(bodyPhysics.y);
       if (this.location.moving) {
         bodySprite.anims.play(`body-${this.location.rotation}-walk`, true);
         switch (this.location.rotation) {
           case 'front':
             bodyPhysics.setVelocity(0, MOVEMENT_SPEED);
+            hair.body.setVelocity(0, MOVEMENT_SPEED);
             break;
           case 'right':
             bodyPhysics.setVelocity(MOVEMENT_SPEED, 0);
+            hair.body.setVelocity(MOVEMENT_SPEED, 0);
             break;
           case 'back':
             bodyPhysics.setVelocity(0, -MOVEMENT_SPEED);
+            hair.body.setVelocity(0, -MOVEMENT_SPEED);
             break;
           case 'left':
             bodyPhysics.setVelocity(-MOVEMENT_SPEED, 0);
+            hair.body.setVelocity(-MOVEMENT_SPEED, 0);
             break;
         }
         bodyPhysics.velocity.normalize().scale(175);
+        hair.body.velocity.normalize().scale(175);
       } else {
         bodyPhysics.setVelocity(0, 0);
+        hair.body.setVelocity(0, 0);
         bodySprite.anims.stop();
         bodySprite.setTexture('bodyatlas', `body-${this.location.rotation}`);
+        hair.setTexture('hairatlas', `hair-${this.location.rotation}`);
       }
       label.setX(bodyPhysics.x);
       label.setY(bodyPhysics.y - 20);
