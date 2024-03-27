@@ -115,6 +115,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       hair.setY(bodyPhysics.y);
       if (this.location.moving) {
         bodySprite.anims.play(`body-${this.location.rotation}-walk`, true);
+        hair.anims.play('hair-${this.location.rotation}-walk', true);
         switch (this.location.rotation) {
           case 'front':
             bodyPhysics.setVelocity(0, MOVEMENT_SPEED);

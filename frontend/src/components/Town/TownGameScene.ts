@@ -236,21 +236,25 @@ export default class TownGameScene extends Phaser.Scene {
           body.setVelocityX(-MOVEMENT_SPEED);
           hairSprite.setVelocityX(-MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-left-walk', true);
+          hairSprite.anims.play('hair-left-walk', true);
           break;
         case 'right':
           body.setVelocityX(MOVEMENT_SPEED);
           hairSprite.setVelocityX(MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-right-walk', true);
+          hairSprite.anims.play('hair-right-walk', true);
           break;
         case 'front':
           body.setVelocityY(MOVEMENT_SPEED);
           hairSprite.setVelocityY(MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-front-walk', true);
+          hairSprite.anims.play('hair-front-walk', true);
           break;
         case 'back':
           body.setVelocityY(-MOVEMENT_SPEED);
           hairSprite.setVelocityY(-MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-back-walk', true);
+          hairSprite.anims.play('hair-back-walk', true);
           break;
         default:
           // Not moving
@@ -536,6 +540,57 @@ export default class TownGameScene extends Phaser.Scene {
       key: 'body-back-walk',
       frames: anims.generateFrameNames('bodyatlas', {
         prefix: 'body-back-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    // const gameObjects = this.coveyTownController.ourPlayer.gameObjects;
+    // const hair = gameObjects.layer.getAt(0) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+
+    this.anims.create({
+      key: 'hair-back-walk',
+      frames: this.anims.generateFrameNames('hairatlas', {
+        prefix: 'hair-back-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'hair-front-walk',
+      frames: this.anims.generateFrameNames('hairatlas', {
+        prefix: 'hair-front-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'hair-right-walk',
+      frames: this.anims.generateFrameNames('hairatlas', {
+        prefix: 'hair-right-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'hair-left-walk',
+      frames: this.anims.generateFrameNames('hairatlas', {
+        prefix: 'hair-left-walk.',
         start: 0,
         end: 7,
         zeroPad: 3,
