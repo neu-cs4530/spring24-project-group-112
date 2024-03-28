@@ -21,8 +21,11 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Town } from '../../generated/client';
+import Login from './Authenticator';
+import { firebaseConfig } from './Config';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
+import firebase from 'firebase/compat/app';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 
 export default function TownSelection(): JSX.Element {
@@ -35,6 +38,12 @@ export default function TownSelection(): JSX.Element {
   const loginController = useLoginController();
   const { setTownController, townsService } = loginController;
   const { connect: videoConnect } = useVideoContext();
+
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+
+  // Instantiate Login Element
+  const loginTool = Login({ app: app });
 
   const toast = useToast();
 
@@ -49,7 +58,7 @@ export default function TownSelection(): JSX.Element {
     return () => {
       clearInterval(timer);
     };
-  }, [updateTownListings]);
+  }, [updateTownListings, loginTool]);
 
   const handleJoin = useCallback(
     async (coveyRoomID: string) => {

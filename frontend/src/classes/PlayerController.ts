@@ -1,17 +1,17 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
 import { Player as PlayerModel, PlayerLocation } from '../types/CoveyTownSocket';
+// Import the functions you need from the SDKs you need
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore/lite';
+import { firebaseConfig } from '../components/Login/Config';
+
 export const MOVEMENT_SPEED = 175;
 
 export type PlayerEvents = {
   movement: (newLocation: PlayerLocation) => void;
 };
 
-export type PlayerGameObjects = {
-  sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-  label: Phaser.GameObjects.Text;
-  locationManagedByGameScene: boolean /* For the local player, the game scene will calculate the current location, and we should NOT apply updates when we receive events */;
-};
 
 /**
  * This prototype player game object includes:
@@ -30,6 +30,7 @@ export type PrototypePlayerGameObjects = {
   label: Phaser.GameObjects.Text;
   locationManagedByGameScene: boolean /* For the local player, the game scene will calculate the current location, and we should NOT apply updates when we receive events */;
 };
+
 export default class PlayerController extends (EventEmitter as new () => TypedEmitter<PlayerEvents>) {
   private _location: PlayerLocation;
 
@@ -39,11 +40,17 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   public gameObjects?: PrototypePlayerGameObjects;
 
+  private static _app: FirebaseApp = initializeApp(firebaseConfig);
+
   constructor(id: string, userName: string, location: PlayerLocation) {
     super();
+
     this._id = id;
     this._userName = userName;
     this._location = location;
+
+    // Store player data to Firestore
+    this._savePlayer();
   }
 
   set location(newLocation: PlayerLocation) {
@@ -98,6 +105,32 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   get id(): string {
     return this._id;
+  }
+
+  private async _getPlayer(id: string) {
+    const db = getFirestore(PlayerController._app);
+    const playersCol = collection(db, 'players');
+    const playerSnapshot = await getDocs(playersCol);
+    const players = playerSnapshot.docs.filter(doc => doc.id === id);
+    if (players.length === 1) {
+      console.log('Player id "', id, '" exists');
+      return players[0];
+    } else if (players.length > 1) {
+      console.error('More than one player with id "', id, '" exists');
+      return undefined;
+    } else {
+      console.log('Player id "', id, '" does not exist');
+      return undefined;
+    }
+  }
+
+  private async _savePlayer() {
+    const db = getFirestore(PlayerController._app);
+    const docRef = await addDoc(collection(db, 'players'), {
+      id: this.id,
+      userName: this.userName,
+    });
+    console.log('Document written with ID: ', docRef.id);
   }
 
   toPlayerModel(): PlayerModel {
