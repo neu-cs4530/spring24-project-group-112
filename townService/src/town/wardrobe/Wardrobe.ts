@@ -1,12 +1,18 @@
 import PlayerController from '../../../../frontend/src/classes/PlayerController';
-import { HairOption, OutfitOption } from '../../types/CoveyTownSocket';
+import fromPlayerModel from '../../../../frontend/src/classes/PlayerController';
+import Player from '../../lib/Player';
+import toPlayerModel from '../../lib/Player';
+import { HairOption, OutfitOption, WardrobeState } from '../../types/CoveyTownSocket';
 
 export default class Wardrobe {
-  private _player?: PlayerController;
+  private _player?: Player;
+  private _controller?: PlayerController;
 
   private _hairOptions: Array<HairOption>;
 
   private _outfitOptions: Array<OutfitOption>;
+
+  private _state: WardrobeState;
 
   private _loadHairOptions(): Array<HairOption> {
     return Array<HairOption>();
@@ -17,14 +23,27 @@ export default class Wardrobe {
   }
 
   /**
-   * FIXME: How should the constructor work?
-   * Should there be a new instance of a wardrobe for a new player?
-   * Should the player be removed from the constructor?
+   * 'JoinGame' command is what starts the customization process
+   * 'ApplyMove' command is what applies the customization to the player
+   * 'LeaveGame' command is what ends the customization process and saves the changes
+   * should this also end the Wardrobe session (delete the object?)
+   * 
+   * Need Player field for this object?
    */
-  public constructor(playerToChange: PlayerController) {
-    this._player = playerToChange;
-    this._hairOptions = this._loadHairOptions();
-    this._outfitOptions = this._loadOutfitOptions();
+
+  public constructor(initialState: WardrobeState) {
+    //this._player = playerToChange;
+    this._state = initialState;
+    this._hairOptions = initialState.hairChoices;
+    this._outfitOptions = initialState.outfitChoices;
+  }
+
+  public get state(): WardrobeState {
+    return this._state;
+  }
+
+  public set state(newState: WardrobeState) {
+    this._state = newState;
   }
 
   /**
@@ -37,21 +56,21 @@ export default class Wardrobe {
    */
   public applyChange(optionID: number, isHair: boolean): void {
     // Select the hair or outfit option based on the optionID
-    if (!this._player) {
+    if (!this._controller) {
       throw new Error("Player not found");
     }
+    const controller = this._controller;
     if (isHair) {
       let hairOption = this._hairOptions.find(obj => obj.optionID === optionID);
       if (hairOption) {
-        this._player.hair = hairOption.optionFilePath;
+        controller.hair = hairOption.optionFilePath;
       } else {
-        //TODO: Make a new error type for these errors?
         throw new Error("Hair option not found");
       }
     } else {
       let outfitChoice = this._outfitOptions.find(obj => obj.optionID === optionID);
       if (outfitChoice) {
-        this._player.outfit = outfitChoice.optionFilePath;
+        controller.outfit = outfitChoice.optionFilePath;
       } else {
         throw new Error("Outfit option not found");
       }
@@ -65,11 +84,14 @@ export default class Wardrobe {
    * 
    * @param player Player to join the wardrobe
    */
-  public join(player: PlayerController): void {
+  public join(player: Player): void {
     if (this._player) {
       throw new Error("Wardrobe is already occupied");
     }
     this._player = player;
+    // Set the controller to the player's controller
+    // Need to replace the previous controller with this one?
+    this._controller = PlayerController.fromPlayerModel(player.toPlayerModel()); // Call the fromPlayerModel function
   }
 
   /**
@@ -77,14 +99,10 @@ export default class Wardrobe {
    * 
    * @throws Error if the player is not found
    */
-  public leave(): void {
-    if (!this._player) {
+  public leave(player: Player): void {
+    if (!this._player || player !== this._player) {
       throw new Error("Player not found");
     }
     this._player = undefined;
-  }
-
-  public toModel(): Wardrobe {
-    return this;
   }
 }

@@ -4,6 +4,7 @@ import InvalidParametersError, { INVALID_COMMAND_MESSAGE } from '../../lib/Inval
 import {
   BoundingBox,
   WardrobeArea as WardrobeAreaModel,
+  WardrobeState,
   InteractableCommand,
   InteractableCommandReturnType,
   TownEmitter,
@@ -14,21 +15,37 @@ import {
 } from '../../types/CoveyTownSocket';
 import Wardrobe from './Wardrobe';
 import InteractableArea from '../InteractableArea';
+import { nanoid } from 'nanoid';
 
 export default class WardrobeArea extends InteractableArea {
   public isOpen: boolean;
 
   public user?: PlayerID;
 
-  public hairChoice?: HairOption;
+  public hairChoices: Array<HairOption>;
 
-  public outfitChoice?: OutfitOption;
+  public outfitChoices: Array<OutfitOption>;
 
   protected _session?: Wardrobe;
 
   public get session(): Wardrobe | undefined {
     return this._session;
   }
+
+  // Is this needed?
+  private _stateUpdated(updatedState: WardrobeState) {
+    if (updatedState.status === 'OCCUPIED') {
+      this.isOpen = false;
+    }
+    this._emitAreaChanged();
+  }
+
+  /**
+   * WardrobeArea exists publically, but the wardrobe session is private.
+   * WardrobeArea is persistent, but the wardrobe session is temporary.
+   * Only one player allowed in WardrobeArea at a time
+   * If other player tries to join, give "Occupied" message
+   */
 
   /** The conversation area is "active" when there are players inside of it  */
   public get isActive(): boolean {
@@ -42,14 +59,16 @@ export default class WardrobeArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { isOpen, hairChoice, outfitChoice, id, occupants }: Omit<WardrobeAreaModel, 'type'>,
+    id: string,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
+    hairChoices: Array<HairOption>,
+    outfitChoices: Array<OutfitOption>,
   ) {
     super(id, coordinates, townEmitter);
-    this.isOpen = isOpen;
-    this.hairChoice = hairChoice;
-    this.outfitChoice = outfitChoice;
+    this.isOpen = true;
+    this.hairChoices = hairChoices;
+    this.outfitChoices = outfitChoices;
   }
 
   /**
@@ -68,7 +87,6 @@ export default class WardrobeArea extends InteractableArea {
       super.add(player);
       this.isOpen = true;
       this.user = player.id;
-      //TODO: Need to create the Wardrobe object somewhere. Do it here when a player is added? Need to get a PlayerController, this class has a Player object.
     }
   }
 
@@ -95,18 +113,19 @@ export default class WardrobeArea extends InteractableArea {
       id: this.id,
       isOpen: this.isOpen,
       user: this.user,
-      hairChoice: this.hairChoice,
-      outfitChoice: this.outfitChoice,
+      //hairChoices: this.hairChoices,
+      //outfitChoice: this.outfitChoices,
       occupants: this.occupantsByID,
       type: 'WardrobeArea',
     };
   }
 
   /**
-   * Creates a new WardrobeArea object that will represent a Wardrobe Area object in the town map.
+   * Creates a new WardrobeArea object that will represent a Wardrobe Area object in the town map with a random ID.
+   * 
    * @param mapObject An ITiledMapObject that represents a rectangle in which this wardrobe area exists
    * @param townEmitter An emitter that can be used by this wardrobe area to broadcast updates to players in the town
-   * @returns
+   * @returns the WardrobeArea object
    */
   public static fromMapObject(mapObject: ITiledMapObject, townEmitter: TownEmitter): WardrobeArea {
     const { name, width, height } = mapObject;
@@ -115,29 +134,54 @@ export default class WardrobeArea extends InteractableArea {
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
     return new WardrobeArea(
-      {
-        isOpen: false,
-        user: undefined,
-        hairChoice: undefined,
-        outfitChoice: undefined,
-        id: name as InteractableID,
-        occupants: [],
-      },
+      nanoid(),
       rect,
       townEmitter,
+      [],
+      [], // Need to find the proper way to load the hair and outfit options
     );
   }
+
+  /**
+   * 'JoinGame' command is what starts the customization process
+   * 'ApplyMove' command is what applies the customization to the player
+   * 'LeaveGame' command is what ends the customization process and saves the changes
+   * should this also end the Wardrobe session (delete the object?)
+   * 
+   * Use the same commands as the ConnectFourGameArea?
+   */
 
   public handleCommand<CommandType extends InteractableCommand>(
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
-    if (command.type === "WardrobeAreaUpdate") {
-      this.isOpen = true;
-      this.user = player.id;
+    // applyChange is handled by the wardrobe itself, not in the WardrobeArea
+    if (command.type === 'JoinGame') {
+      let session = this._session;
+      if (!session) {
+        // No session in progress, make a new one
+        session = new Wardrobe({
+          status: 'OCCUPIED',
+          hairChoices: this.hairChoices,
+          outfitChoices: this.outfitChoices,
+          player: player.id,
+        });
+        this._session = session;
+      }
+      session.join(player);
+      this._emitAreaChanged();
+      // Is this the right return here?
       return undefined as InteractableCommandReturnType<CommandType>;
     }
-    //TODO: Handle commands for joining and leaving the wardrobe area
+    if (command.type === 'LeaveGame') {
+      const session = this._session;
+      if (!session) {
+        throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
+      }
+      session.leave(player);
+      this._emitAreaChanged();
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
     throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
   }
 }
