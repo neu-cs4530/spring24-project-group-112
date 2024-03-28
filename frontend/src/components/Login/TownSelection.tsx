@@ -95,6 +95,7 @@ export default function TownSelection(): JSX.Element {
           }
         }, 1000);
         setIsJoining(true);
+        // TODO: modify constructor to take other player info
         const newController = new TownController({
           userName,
           townID: coveyRoomID,

@@ -3,6 +3,7 @@ import { Player as PlayerModel, PlayerLocation, TownEmitter } from '../types/Cov
 
 /**
  * Each user who is connected to a town is represented by a Player object
+ * TODO: This class should have more variables to represent the added components in PlayerController
  */
 export default class Player {
   /** The current location of this user in the world map * */

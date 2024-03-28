@@ -20,7 +20,9 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   private readonly _userName: string;
 
   public gameObjects?: PlayerGameObjects;
+  // TODO: implement way to get firebase instance
 
+  // TODO: expect more player info!
   constructor(id: string, userName: string, location: PlayerLocation) {
     super();
     this._id = id;

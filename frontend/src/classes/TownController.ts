@@ -213,6 +213,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private _interactableEmitter = new EventEmitter();
 
+  // TODO: modify constructor to accept additional player info
   public constructor({ userName, townID, loginController }: ConnectionProperties) {
     super();
     this._townID = townID;
