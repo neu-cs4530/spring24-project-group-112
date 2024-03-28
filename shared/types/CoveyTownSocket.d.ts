@@ -17,7 +17,7 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 }
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea';
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'WardrobeArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -73,6 +73,27 @@ export interface ViewingArea extends Interactable {
   isPlaying: boolean;
   elapsedTimeSec: number;
 }
+
+export interface HairOption {
+  optionID: number;
+  optionFilePath: string; 
+  optionFrame?: string; 
+};
+export interface OutfitOption {
+  optionID: number; 
+  optionFilePath: string; 
+  optionFrame?: string; 
+}
+export interface BodyOption {
+  optionID: number; 
+  
+}
+export interface WardrobeArea extends Interactable {
+  isOpen: boolean; 
+  user: PlayerID | undefined;
+  hairChoice?: HairOption;
+  outfitChoice?: OutfitOption;
+};
 
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER' | 'WAITING_FOR_PLAYERS';
 /**
@@ -216,10 +237,14 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | WardrobeAreaUpdateCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
+}
+export interface WardrobeAreaUpdateCommand {
+  type: 'WardrobeAreaUpdate';
+  update: WardrobeArea;
 }
 export interface JoinGameCommand {
   type: 'JoinGame';
