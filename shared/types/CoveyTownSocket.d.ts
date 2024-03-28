@@ -276,6 +276,10 @@ export type InteractableCommandResponse<MessageType> = {
   payload?: InteractableCommandResponseMap[MessageType];
 }
 
+export interface ILoginPageProps {
+  app: FirebaseApp | undefined;
+}
+
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;
   playerDisconnect: (disconnectedPlayer: Player) => void;

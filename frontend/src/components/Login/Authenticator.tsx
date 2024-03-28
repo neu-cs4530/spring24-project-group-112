@@ -10,7 +10,13 @@ import {
   InputRightElement,
   InputGroup,
 } from '@chakra-ui/react';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  deleteUser,
+} from 'firebase/auth';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import 'firebaseui/dist/firebaseui.css';
 import { firebaseConfig } from './Config';
 import { ILoginPageProps } from '../../types/CoveyTownSocket';
@@ -21,23 +27,67 @@ export default function Login(props: ILoginPageProps): JSX.Element {
     firebase.initializeApp(firebaseConfig);
   }
   const auth = getAuth();
+  const db = getFirestore();
   const [authing, setAuthing] = React.useState(false);
-  const [username, setUsername] = React.useState('');
+  const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [show, setShow] = React.useState(false);
+  const [error, setError] = React.useState('');
+  const [responseMessage, setResponseMessage] = React.useState('');
 
   const signIn = async () => {
     setAuthing(true);
 
-    signInWithEmailAndPassword(auth, username, password)
+    signInWithEmailAndPassword(auth, email, password)
       .then(userCredential => {
-        // Signed in
         console.log('Log in successful as ' + userCredential.user?.email);
         setAuthing(false);
+        setError('');
+        setResponseMessage('Logged in as: ' + email);
       })
-      .catch(error => {
-        console.error('Error signing in:', error);
+      .catch(err => {
+        console.error('Error signing in:', err);
         setAuthing(false);
+        setError(err.message);
+        setResponseMessage('');
+      });
+  };
+
+  const createAccount = async () => {
+    setAuthing(true);
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(async userCredential => {
+        console.log('Account created for ' + userCredential.user?.email);
+        await addDoc(collection(db, 'Users'), { username: email, userId: userCredential.user.uid });
+        setAuthing(false);
+        setError('');
+        setResponseMessage('Account Created');
+      })
+      .catch(err => {
+        console.error('Error creating account:', err);
+        setAuthing(false);
+        setError(err.message);
+        setResponseMessage('');
+      });
+  };
+
+  const deleteAccount = async () => {
+    setAuthing(true);
+
+    deleteUser(auth.currentUser)
+      .then(() => {
+        // TODO: remove user from Firestore
+        console.log('Account deleted');
+        setAuthing(false);
+        setError('');
+        setResponseMessage('Account Deleted');
+      })
+      .catch(err => {
+        console.error('Error deleting account:', err);
+        setAuthing(false);
+        setError(err.message);
+        setResponseMessage('');
       });
   };
 
@@ -45,18 +95,14 @@ export default function Login(props: ILoginPageProps): JSX.Element {
     <Stack>
       <h1>Welcome to Covey.Town!</h1>
       <Box p='4' borderWidth='1px' borderRadius='lg'>
-        <Heading as='h2' size='lg'>
-          Please enter your credentials
-        </Heading>
-
         <FormControl>
-          <FormLabel htmlFor='username'>Username</FormLabel>
+          <FormLabel htmlFor='email'>Email</FormLabel>
           <Input
             autoFocus
-            name='username'
-            placeholder='Your username'
-            value={username}
-            onChange={event => setUsername(event.target.value)}
+            name='email'
+            placeholder='Your email'
+            value={email}
+            onChange={event => setEmail(event.target.value)}
           />
         </FormControl>
         <FormControl>
@@ -76,9 +122,25 @@ export default function Login(props: ILoginPageProps): JSX.Element {
             </InputRightElement>
           </InputGroup>
         </FormControl>
+        {error && (
+          <Box color='red' as='h4' mt={2} fontSize='sm'>
+            {error}
+          </Box>
+        )}
+        {responseMessage && (
+          <Heading as='h4' mt={2} size='sm'>
+            {responseMessage}
+          </Heading>
+        )}
       </Box>
       <Button onClick={signIn} isLoading={authing}>
         Login
+      </Button>
+      <Button onClick={createAccount} isLoading={authing}>
+        Create Account
+      </Button>
+      <Button onClick={deleteAccount} isLoading={authing}>
+        Delete Account
       </Button>
     </Stack>
   );
