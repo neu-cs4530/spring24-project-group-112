@@ -35,6 +35,7 @@ export type PlayerID = string;
 export interface Player {
   id: PlayerID;
   userName: string;
+  outfit?: PrototypePlayerGameObjects;
   location: PlayerLocation;
 };
 
@@ -278,7 +279,26 @@ export type InteractableCommandResponse<MessageType> = {
 
 export interface ILoginPageProps {
   app: FirebaseApp | undefined;
+  callback: (userName: string, outfit?: PrototypePlayerGameObjects) => void;
 }
+
+/**
+ * This prototype player game object includes:
+ * - A GameObject.Sprite that represents the body as a sprite
+ * - A Physics.Arcade.Body that represents the dynamic body component attached to the body
+ * - A GameObject.Layer that stores 3 different components
+ *
+ * The layer contains two GameObject.Sprite objects: Hair and Outfit.
+ *
+ *
+ */
+export type PrototypePlayerGameObjects = {
+  bodySprite: Phaser.GameObjects.Sprite;
+  bodyPhysics: Phaser.Physics.Arcade.Body;
+  layer: Phaser.GameObjects.Layer;
+  label: Phaser.GameObjects.Text;
+  locationManagedByGameScene: boolean /* For the local player, the game scene will calculate the current location, and we should NOT apply updates when we receive events */;
+};
 
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;

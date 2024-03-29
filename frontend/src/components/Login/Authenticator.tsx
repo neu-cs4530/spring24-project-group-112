@@ -16,7 +16,7 @@ import {
   createUserWithEmailAndPassword,
   deleteUser,
 } from 'firebase/auth';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDoc, doc } from 'firebase/firestore';
 import 'firebaseui/dist/firebaseui.css';
 import { firebaseConfig } from './Config';
 import { ILoginPageProps } from '../../types/CoveyTownSocket';
@@ -40,10 +40,20 @@ export default function Login(props: ILoginPageProps): JSX.Element {
 
     signInWithEmailAndPassword(auth, email, password)
       .then(userCredential => {
-        console.log('Log in successful as ' + userCredential.user?.email);
-        setAuthing(false);
-        setError('');
-        setResponseMessage('Logged in as: ' + email);
+        if (userCredential.user === null) {
+          throw new Error('User not found');
+        }
+        const docRef = doc(db, 'accounts', userCredential.user?.uid);
+        getDoc(docRef).then(docSnap => {
+          if (docSnap.exists() && docSnap.data().userName !== undefined) {
+            const userName = docSnap.data().userName;
+            console.log('Log in successful as ' + userName);
+            setAuthing(false);
+            setError('');
+            setResponseMessage('Logged in as: ' + userName);
+            props.callback(userName);
+          }
+        });
       })
       .catch(err => {
         console.error('Error signing in:', err);
@@ -74,7 +84,13 @@ export default function Login(props: ILoginPageProps): JSX.Element {
 
   const deleteAccount = async () => {
     setAuthing(true);
-
+    if (auth.currentUser === null) {
+      console.error('No user is signed in');
+      setAuthing(false);
+      setError('No user is signed in');
+      setResponseMessage('');
+      return;
+    }
     deleteUser(auth.currentUser)
       .then(() => {
         // TODO: remove user from Firestore
@@ -122,6 +138,19 @@ export default function Login(props: ILoginPageProps): JSX.Element {
             </InputRightElement>
           </InputGroup>
         </FormControl>
+        <Box p='4' borderRadius='lg'>
+          <Stack>
+            <Button onClick={signIn} isLoading={authing}>
+              Login
+            </Button>
+            <Button onClick={createAccount} isLoading={authing}>
+              Create Account
+            </Button>
+            <Button onClick={deleteAccount} isLoading={authing}>
+              Delete Account
+            </Button>
+          </Stack>
+        </Box>
         {error && (
           <Box color='red' as='h4' mt={2} fontSize='sm'>
             {error}
@@ -133,15 +162,6 @@ export default function Login(props: ILoginPageProps): JSX.Element {
           </Heading>
         )}
       </Box>
-      <Button onClick={signIn} isLoading={authing}>
-        Login
-      </Button>
-      <Button onClick={createAccount} isLoading={authing}>
-        Create Account
-      </Button>
-      <Button onClick={deleteAccount} isLoading={authing}>
-        Delete Account
-      </Button>
     </Stack>
   );
 }
