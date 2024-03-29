@@ -15,12 +15,14 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   deleteUser,
+  UserCredential,
 } from 'firebase/auth';
 import { getFirestore, collection, addDoc, getDoc, doc } from 'firebase/firestore';
 import 'firebaseui/dist/firebaseui.css';
 import { firebaseConfig } from './Config';
 import { ILoginPageProps } from '../../types/CoveyTownSocket';
 import firebase from 'firebase/compat/app';
+import { use } from 'matter';
 
 export default function Login(props: ILoginPageProps): JSX.Element {
   if (props.app === undefined) {
@@ -35,25 +37,27 @@ export default function Login(props: ILoginPageProps): JSX.Element {
   const [error, setError] = React.useState('');
   const [responseMessage, setResponseMessage] = React.useState('');
 
+  const getDocSnapFromCredential = async (userCredential: UserCredential) => {
+    const docRef = doc(db, 'accounts', userCredential.user?.uid);
+    return getDoc(docRef);
+  };
+
   const signIn = async () => {
     setAuthing(true);
 
     signInWithEmailAndPassword(auth, email, password)
-      .then(userCredential => {
-        if (userCredential.user === null) {
-          throw new Error('User not found');
+      .then(userCredential => getDocSnapFromCredential(userCredential))
+      .then(docSnap => {
+        if (docSnap.exists() && docSnap.data().userName !== undefined) {
+          const userName = docSnap.data().userName;
+          console.log('Log in successful as ' + userName);
+          setAuthing(false);
+          setError('');
+          setResponseMessage('Logged in as: ' + userName);
+          props.callback(userName);
+        } else {
+          throw new Error('User data not found');
         }
-        const docRef = doc(db, 'accounts', userCredential.user?.uid);
-        getDoc(docRef).then(docSnap => {
-          if (docSnap.exists() && docSnap.data().userName !== undefined) {
-            const userName = docSnap.data().userName;
-            console.log('Log in successful as ' + userName);
-            setAuthing(false);
-            setError('');
-            setResponseMessage('Logged in as: ' + userName);
-            props.callback(userName);
-          }
-        });
       })
       .catch(err => {
         console.error('Error signing in:', err);
