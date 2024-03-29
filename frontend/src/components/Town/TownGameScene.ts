@@ -141,6 +141,11 @@ export default class TownGameScene extends Phaser.Scene {
       this._resourcePathPrefix + '/assets/newatlas/hair.png',
       this._resourcePathPrefix + '/assets/newatlas/hair.json',
     );
+    this.load.atlas(
+      'dressatlas',
+      this._resourcePathPrefix + '/assets/newatlas/dress-outfit.png',
+      this._resourcePathPrefix + 'assets/newatlas/dress-outfit.json',
+    );
   }
 
   updatePlayers(players: PlayerController[]) {
