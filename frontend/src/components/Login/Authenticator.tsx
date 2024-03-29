@@ -16,7 +16,7 @@ import {
   createUserWithEmailAndPassword,
   deleteUser,
 } from 'firebase/auth';
-import { getFirestore, collection, addDoc, getDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDoc, doc, deleteDoc, query, where, getDocs, setDoc } from 'firebase/firestore';
 import 'firebaseui/dist/firebaseui.css';
 import { firebaseConfig } from './Config';
 import { ILoginPageProps } from '../../types/CoveyTownSocket';
@@ -44,6 +44,7 @@ export default function Login(props: ILoginPageProps): JSX.Element {
           throw new Error('User not found');
         }
         const docRef = doc(db, 'accounts', userCredential.user?.uid);
+        console.log('Searching for ' + email + ' in ' + userCredential.user?.uid);
         getDoc(docRef).then(docSnap => {
           if (docSnap.exists() && docSnap.data().userName !== undefined) {
             const userName = docSnap.data().userName;
@@ -69,7 +70,11 @@ export default function Login(props: ILoginPageProps): JSX.Element {
     createUserWithEmailAndPassword(auth, email, password)
       .then(async userCredential => {
         console.log('Account created for ' + userCredential.user?.email);
-        await addDoc(collection(db, 'Users'), { username: email, userId: userCredential.user.uid });
+        // await addDoc(collection(db, 'accounts'), userCredential.user?.uid, { userName: email });
+        const userDocRef = doc(db, 'accounts', userCredential.user?.uid);
+
+        // Set the data in the document
+        await setDoc(userDocRef, { userName: email });
         setAuthing(false);
         setError('');
         setResponseMessage('Account Created');
@@ -91,16 +96,18 @@ export default function Login(props: ILoginPageProps): JSX.Element {
       setResponseMessage('');
       return;
     }
+    const userId = auth.currentUser.uid;
     deleteUser(auth.currentUser)
+      const userDocRef = doc(db, 'accounts', userId); // Reference to user's document
+      deleteDoc(userDocRef)
       .then(() => {
-        // TODO: remove user from Firestore
-        console.log('Account deleted');
+        console.log('User document deleted from Firestore');
         setAuthing(false);
         setError('');
         setResponseMessage('Account Deleted');
       })
       .catch(err => {
-        console.error('Error deleting account:', err);
+        console.error('Error deleting user document from Firestore:', err);
         setAuthing(false);
         setError(err.message);
         setResponseMessage('');

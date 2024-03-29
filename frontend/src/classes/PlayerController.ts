@@ -118,7 +118,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   private async _savePlayer() {
     const db = getFirestore(PlayerController._app);
-    const docRef = await addDoc(collection(db, 'players'), {
+    const docRef = await addDoc(collection(db, 'accounts'), {
       id: this.id,
       userName: this.userName,
     });
