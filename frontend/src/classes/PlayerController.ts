@@ -16,27 +16,6 @@ export type PlayerEvents = {
   movement: (newLocation: PlayerLocation) => void;
 };
 
-<<<<<<< Updated upstream
-=======
-/**
- * This prototype player game object includes:
- * - A GameObject.Sprite that represents the body as a sprite
- * - A Physics.Arcade.Body that represents the dynamic body component attached to the body
- * - A GameObject.Layer that stores 3 different components
- *
- * The layer contains two GameObject.Sprite objects: Hair and Outfit.
- *
- *
- */
-export type PrototypePlayerGameObjects = {
-  bodySprite: Phaser.GameObjects.Sprite;
-  bodyPhysics: Phaser.Physics.Arcade.Body;
-  layer: Phaser.GameObjects.Layer;
-  label: Phaser.GameObjects.Text;
-  locationManagedByGameScene: boolean /* For the local player, the game scene will calculate the current location, and we should NOT apply updates when we receive events */;
-};
-
->>>>>>> Stashed changes
 export default class PlayerController extends (EventEmitter as new () => TypedEmitter<PlayerEvents>) {
   private _location: PlayerLocation;
 
