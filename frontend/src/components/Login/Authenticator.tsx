@@ -70,10 +70,8 @@ export default function Login(props: ILoginPageProps): JSX.Element {
     createUserWithEmailAndPassword(auth, email, password)
       .then(async userCredential => {
         console.log('Account created for ' + userCredential.user?.email);
-        // await addDoc(collection(db, 'accounts'), userCredential.user?.uid, { userName: email });
         const userDocRef = doc(db, 'accounts', userCredential.user?.uid);
 
-        // Set the data in the document
         await setDoc(userDocRef, { userName: email });
         setAuthing(false);
         setError('');
