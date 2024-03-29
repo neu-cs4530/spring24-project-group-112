@@ -1,5 +1,10 @@
 import { nanoid } from 'nanoid';
-import { Player as PlayerModel, PlayerLocation, TownEmitter } from '../types/CoveyTownSocket';
+import {
+  Player as PlayerModel,
+  PlayerLocation,
+  TownEmitter,
+  PrototypePlayerGameObjects,
+} from '../types/CoveyTownSocket';
 
 /**
  * Each user who is connected to a town is represented by a Player object
@@ -10,6 +15,9 @@ export default class Player {
 
   /** The unique identifier for this player * */
   private readonly _id: string;
+
+  /** The outfit data for this player */
+  private readonly _outfit?: PrototypePlayerGameObjects;
 
   /** The player's username, which is not guaranteed to be unique within the town * */
   private readonly _userName: string;
@@ -23,7 +31,12 @@ export default class Player {
   /** A special town emitter that will emit events to the entire town BUT NOT to this player */
   public readonly townEmitter: TownEmitter;
 
-  constructor(userName: string, townEmitter: TownEmitter) {
+  constructor(
+    userName: string,
+    townEmitter: TownEmitter,
+    id?: string,
+    outfit?: PrototypePlayerGameObjects,
+  ) {
     this.location = {
       x: 0,
       y: 0,
@@ -31,7 +44,11 @@ export default class Player {
       rotation: 'front',
     };
     this._userName = userName;
-    this._id = nanoid();
+    if (id) {
+      this._id = id;
+    } else {
+      this._id = nanoid();
+    }
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
   }
@@ -60,6 +77,7 @@ export default class Player {
     return {
       id: this._id,
       location: this.location,
+      outfit: this._outfit,
       userName: this._userName,
     };
   }

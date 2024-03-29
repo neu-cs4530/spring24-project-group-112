@@ -1,4 +1,3 @@
-import WardrobeArea from '../components/Town/interactables/WardrobeArea';
 import {
   ConversationArea,
   Interactable,
@@ -6,6 +5,7 @@ import {
   ViewingArea,
   GameArea,
   ConnectFourGameState,
+  WardrobeArea,
 } from './CoveyTownSocket';
 
 /**

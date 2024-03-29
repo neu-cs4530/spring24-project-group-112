@@ -4,7 +4,7 @@ import PreJoinScreens from '../VideoCall/VideoFrontend/components/PreJoinScreens
 export default function Login(): JSX.Element {
   return (
     <>
-      <PreJoinScreens />
+      <PreJoinScreens app={undefined} />
     </>
   );
 }
