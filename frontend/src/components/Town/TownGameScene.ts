@@ -199,14 +199,19 @@ export default class TownGameScene extends Phaser.Scene {
     const hairSprite = gameObjects.layer.getAt(
       0,
     ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+    const outfitSprite = gameObjects.layer.getAt(
+      1,
+    ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     if (destination.x !== undefined) {
       gameObjects.bodySprite.x = destination.x;
       hairSprite.x = destination.x;
+      outfitSprite.x = destination.x;
       this._lastLocation.x = destination.x;
     }
     if (destination.y !== undefined) {
       gameObjects.bodySprite.y = destination.y;
       hairSprite.y = destination.y + 12;
+      outfitSprite.y = destination.y + 10;
       this._lastLocation.y = destination.y;
     }
     if (destination.moving !== undefined) {
@@ -229,10 +234,14 @@ export default class TownGameScene extends Phaser.Scene {
       const hairSprite = gameObjects.layer.getAt(
         0,
       ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+      const outfitSprite = gameObjects.layer.getAt(
+        1,
+      ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
       // Stop any previous movement from the last frame
       body.setVelocity(0);
       hairSprite.setVelocity(0);
+      outfitSprite.setVelocity(0);
 
       const primaryDirection = this.getNewMovementDirection();
 
@@ -240,43 +249,57 @@ export default class TownGameScene extends Phaser.Scene {
         case 'left':
           body.setVelocityX(-MOVEMENT_SPEED);
           hairSprite.setVelocityX(-MOVEMENT_SPEED);
+          outfitSprite.setVelocityX(-MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-left-walk', true);
           hairSprite.anims.play('hair-left-walk', true);
+          outfitSprite.anims.play('dress-left-walk', true);
           break;
         case 'right':
           body.setVelocityX(MOVEMENT_SPEED);
           hairSprite.setVelocityX(MOVEMENT_SPEED);
+          outfitSprite.setVelocityX(MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-right-walk', true);
           hairSprite.anims.play('hair-right-walk', true);
+          outfitSprite.anims.play('dress-right-walk', true);
           break;
         case 'front':
           body.setVelocityY(MOVEMENT_SPEED);
           hairSprite.setVelocityY(MOVEMENT_SPEED);
+          outfitSprite.setVelocityY(MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-front-walk', true);
           hairSprite.anims.play('hair-front-walk', true);
+          outfitSprite.anims.play('dress-front-walk', true);
           break;
         case 'back':
           body.setVelocityY(-MOVEMENT_SPEED);
           hairSprite.setVelocityY(-MOVEMENT_SPEED);
+          outfitSprite.setVelocityY(-MOVEMENT_SPEED);
           gameObjects.bodySprite.anims.play('body-back-walk', true);
           hairSprite.anims.play('hair-back-walk', true);
+          outfitSprite.anims.play('dress-back-walk', true);
           break;
         default:
           // Not moving
           gameObjects.bodySprite.anims.stop();
+          hairSprite.anims.stop();
+          outfitSprite.anims.stop();
           // If we were moving, pick and idle frame to use
           if (prevVelocity.x < 0) {
             gameObjects.bodySprite.setTexture('bodyatlas', 'body-left');
             hairSprite.setTexture('hairatlas', 'hair-left');
+            outfitSprite.setTexture('dressatlas', 'dress-left');
           } else if (prevVelocity.x > 0) {
             gameObjects.bodySprite.setTexture('bodyatlas', 'body-right');
             hairSprite.setTexture('hairatlas', 'hair-right');
+            outfitSprite.setTexture('dressatlas', 'dress-right');
           } else if (prevVelocity.y < 0) {
             gameObjects.bodySprite.setTexture('bodyatlas', 'body-back');
             hairSprite.setTexture('hairatlas', 'hair-back');
+            outfitSprite.setTexture('dressatlas', 'dress-back');
           } else if (prevVelocity.y > 0) {
             gameObjects.bodySprite.setTexture('bodyatlas', 'body-front');
             hairSprite.setTexture('hairatlas', 'hair-front');
+            outfitSprite.setTexture('dressatlas', 'dress-front');
           }
           break;
       }
@@ -284,6 +307,7 @@ export default class TownGameScene extends Phaser.Scene {
       // Normalize and scale the velocity so that player can't move faster along a diagonal
       gameObjects.bodyPhysics.velocity.normalize().scale(MOVEMENT_SPEED);
       hairSprite.body.velocity.normalize().scale(MOVEMENT_SPEED);
+      outfitSprite.body.velocity.normalize().scale(MOVEMENT_SPEED);
       const isMoving = primaryDirection !== undefined;
       hairSprite.setY(body.y + 12);
       gameObjects.label.setX(body.x);
@@ -465,16 +489,17 @@ export default class TownGameScene extends Phaser.Scene {
     const bodyPhysics = this.physics.add
       .body(spawnPoint.x, spawnPoint.y)
       .setSize(30, 40)
-      // .setOffset(0, 24)
       .setGameObject(bodySprite);
 
     const hairSprite = this.physics.add
-      .sprite(spawnPoint.x, spawnPoint.y + 10, 'hairatlas', 'hair-front')
+      .sprite(spawnPoint.x, spawnPoint.y + 12, 'hairatlas', 'hair-front')
       .setSize(32, 26);
-    // const outfitSprite = this.add.sprite(spawnPoint.x, spawnPoint.y, 'atlas');
+    const outfitSprite = this.physics.add
+      .sprite(spawnPoint.x, spawnPoint.y + 10, 'dressatlas', 'dress-front')
+      .setSize(20, 14);
     const layer = this.add.layer().setDepth(7);
     layer.add(hairSprite);
-    // layer.add(outfitSprite);
+    layer.add(outfitSprite);
 
     const label = this.add
       .text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
@@ -553,9 +578,6 @@ export default class TownGameScene extends Phaser.Scene {
       repeat: -1,
     });
 
-    // const gameObjects = this.coveyTownController.ourPlayer.gameObjects;
-    // const hair = gameObjects.layer.getAt(0) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-
     this.anims.create({
       key: 'hair-back-walk',
       frames: this.anims.generateFrameNames('hairatlas', {
@@ -596,6 +618,52 @@ export default class TownGameScene extends Phaser.Scene {
       key: 'hair-left-walk',
       frames: this.anims.generateFrameNames('hairatlas', {
         prefix: 'hair-left-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'dress-back-walk',
+      frames: this.anims.generateFrameNames('dressatlas', {
+        prefix: 'dress-back-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: 'dress-front-walk',
+      frames: this.anims.generateFrameNames('dressatlas', {
+        prefix: 'dress-front-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'dress-right-walk',
+      frames: this.anims.generateFrameNames('dressatlas', {
+        prefix: 'dress-right-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: 'dress-left-walk',
+      frames: this.anims.generateFrameNames('dressatlas', {
+        prefix: 'dress-left-walk.',
         start: 0,
         end: 7,
         zeroPad: 3,
@@ -648,10 +716,15 @@ export default class TownGameScene extends Phaser.Scene {
         'hairatlas',
         'hair-front',
       );
-      // const outfitSprite = this.add.sprite(player.location.x, player.location.y, 'newatlas');
+      const outfitSprite = this.physics.add.sprite(
+        player.location.x,
+        player.location.y + 10,
+        'dressatlas',
+        'dress-front',
+      );
       const layer = this.add.layer().setDepth(7);
       layer.add(hairSprite);
-      // layer.add(outfitSprite);
+      layer.add(outfitSprite);
 
       const label = this.add.text(
         player.location.x,
