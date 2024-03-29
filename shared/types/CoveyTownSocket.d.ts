@@ -92,9 +92,16 @@ export interface BodyOption {
 export interface WardrobeArea extends Interactable {
   isOpen: boolean; 
   user: PlayerID | undefined;
-  hairChoice?: HairOption;
-  outfitChoice?: OutfitOption;
 };
+
+export type WardrobeStatus = 'OPEN' | 'OCCUPIED';
+
+export interface WardrobeState {
+  status: WardrobeStatus;
+  hairChoices: Array<HairOption>;
+  outfitChoices: Array<OutfitOption>;
+  player?: PlayerID;
+}
 
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER' | 'WAITING_FOR_PLAYERS';
 /**
