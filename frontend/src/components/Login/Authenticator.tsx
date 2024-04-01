@@ -17,7 +17,6 @@ import {
   deleteUser,
 } from 'firebase/auth';
 import { getFirestore, collection, addDoc, getDoc, doc, deleteDoc, query, where, getDocs, setDoc } from 'firebase/firestore';
-import 'firebaseui/dist/firebaseui.css';
 import { firebaseConfig } from './Config';
 import { ILoginPageProps } from '../../types/CoveyTownSocket';
 import firebase from 'firebase/compat/app';
