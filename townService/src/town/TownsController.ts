@@ -198,6 +198,7 @@ export class TownsController extends Controller {
    */
   public async joinTown(socket: CoveyTownSocket) {
     // Parse the client's requested username from the connection
+    // TODO: This socket information should include more player information
     const { userName, townID } = socket.handshake.auth as { userName: string; townID: string };
 
     const town = this._townsStore.getTownByID(townID);
