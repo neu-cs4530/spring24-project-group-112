@@ -1,4 +1,5 @@
 import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
+import { nanoid } from 'nanoid';
 import Player from '../../lib/Player';
 import InvalidParametersError, { INVALID_COMMAND_MESSAGE } from '../../lib/InvalidParametersError';
 import {
@@ -15,7 +16,6 @@ import {
 } from '../../types/CoveyTownSocket';
 import Wardrobe from './Wardrobe';
 import InteractableArea from '../InteractableArea';
-import { nanoid } from 'nanoid';
 
 export default class WardrobeArea extends InteractableArea {
   public isOpen: boolean;
@@ -75,9 +75,9 @@ export default class WardrobeArea extends InteractableArea {
    * Adds a player to the wardrobe area.
    * When the first player enters, this method sets the room as open and emits that update to all of the players.
    * If the wardrobe area is already occupied, this method throws an error as only one player can be in the wardrobe area at a time.
-   * 
+   *
    * @throws Error if the wardrobe area is already occupied (occupants.length > 0)
-   * 
+   *
    * @param player Player to add
    */
   public add(player: Player): void {
@@ -113,8 +113,6 @@ export default class WardrobeArea extends InteractableArea {
       id: this.id,
       isOpen: this.isOpen,
       user: this.user,
-      //hairChoices: this.hairChoices,
-      //outfitChoice: this.outfitChoices,
       occupants: this.occupantsByID,
       type: 'WardrobeArea',
     };
@@ -122,7 +120,7 @@ export default class WardrobeArea extends InteractableArea {
 
   /**
    * Creates a new WardrobeArea object that will represent a Wardrobe Area object in the town map with a random ID.
-   * 
+   *
    * @param mapObject An ITiledMapObject that represents a rectangle in which this wardrobe area exists
    * @param townEmitter An emitter that can be used by this wardrobe area to broadcast updates to players in the town
    * @returns the WardrobeArea object
@@ -147,7 +145,7 @@ export default class WardrobeArea extends InteractableArea {
    * 'ApplyMove' command is what applies the customization to the player
    * 'LeaveGame' command is what ends the customization process and saves the changes
    * should this also end the Wardrobe session (delete the object?)
-   * 
+   *
    * Use the same commands as the ConnectFourGameArea?
    */
 
@@ -156,7 +154,7 @@ export default class WardrobeArea extends InteractableArea {
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
     // applyChange is handled by the wardrobe itself, not in the WardrobeArea
-    if (command.type === 'JoinGame') {
+    if (command.type === 'JoinWardrobe') {
       let session = this._session;
       if (!session) {
         // No session in progress, make a new one
@@ -173,7 +171,7 @@ export default class WardrobeArea extends InteractableArea {
       // Is this the right return here?
       return undefined as InteractableCommandReturnType<CommandType>;
     }
-    if (command.type === 'LeaveGame') {
+    if (command.type === 'LeaveWardrobe') {
       const session = this._session;
       if (!session) {
         throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);

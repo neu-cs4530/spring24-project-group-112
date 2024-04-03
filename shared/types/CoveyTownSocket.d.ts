@@ -245,14 +245,18 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | WardrobeAreaUpdateCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | JoinWardrobeCommand | LeaveWardrobeCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
 }
-export interface WardrobeAreaUpdateCommand {
-  type: 'WardrobeAreaUpdate';
-  update: WardrobeArea;
+export interface JoinWardrobeCommand {
+  type: 'JoinWardrobe';
+}
+
+export interface LeaveWardrobeCommand {
+  type: 'LeaveWardrobe';
+  gameID: GameInstanceID;
 }
 export interface JoinGameCommand {
   type: 'JoinGame';
