@@ -1,11 +1,14 @@
+import { nanoid } from 'nanoid';
 import PlayerController from '../../../../frontend/src/classes/PlayerController';
 import fromPlayerModel from '../../../../frontend/src/classes/PlayerController';
 import Player from '../../lib/Player';
 import toPlayerModel from '../../lib/Player';
-import { HairOption, OutfitOption, WardrobeState } from '../../types/CoveyTownSocket';
+import { GameInstanceID, HairOption, OutfitOption, WardrobeState } from '../../types/CoveyTownSocket';
 
 export default class Wardrobe {
   private _player?: Player;
+
+  public readonly id: GameInstanceID;
 
   private _controller?: PlayerController;
 
@@ -34,6 +37,7 @@ export default class Wardrobe {
 
   public constructor(initialState: WardrobeState) {
     //this._player = playerToChange;
+    this.id = nanoid() as GameInstanceID;
     this._state = initialState;
     this._hairOptions = initialState.hairChoices;
     this._outfitOptions = initialState.outfitChoices;

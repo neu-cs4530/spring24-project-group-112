@@ -169,13 +169,14 @@ export default class WardrobeArea extends InteractableArea {
       session.join(player);
       this._emitAreaChanged();
       // Is this the right return here?
-      return undefined as InteractableCommandReturnType<CommandType>;
+      return { gameID: session.id } as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'LeaveWardrobe') {
       const session = this._session;
       if (!session) {
         throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
       }
+      // TODO: When player leaves the wardrobe, save changes to the Firebase DB
       session.leave(player);
       this._emitAreaChanged();
       return undefined as InteractableCommandReturnType<CommandType>;
