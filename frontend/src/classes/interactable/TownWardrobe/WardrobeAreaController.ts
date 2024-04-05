@@ -34,7 +34,7 @@ export default class WardrobeAreaController extends InteractableAreaController<
   WardrobeAreaModel
 > {
   protected _instanceID?: GameInstanceID;
-  
+
   private _model: WardrobeAreaModel;
 
   private _townController: TownController;
@@ -49,11 +49,7 @@ export default class WardrobeAreaController extends InteractableAreaController<
    * @param hairOption
    * @param outfitOption
    */
-  constructor(
-    id: string,
-    wardrobeAreaModel: WardrobeAreaModel,
-    townController: TownController,
-  ) {
+  constructor(id: string, wardrobeAreaModel: WardrobeAreaModel, townController: TownController) {
     super(id);
     this._model = wardrobeAreaModel;
     this._townController = townController;
@@ -93,7 +89,9 @@ export default class WardrobeAreaController extends InteractableAreaController<
 
   protected _updateFrom(newModel: WardrobeAreaModel): void {
     // If players change
-    const newPlayer = newModel.session?.player ? this._townController.getPlayer(newModel.session.player) : undefined;
+    const newPlayer = newModel.session?.player
+      ? this._townController.getPlayer(newModel.session.player)
+      : undefined;
     if (newPlayer) {
       this._player = newPlayer;
       this.emit('playersChange', [newPlayer]);
