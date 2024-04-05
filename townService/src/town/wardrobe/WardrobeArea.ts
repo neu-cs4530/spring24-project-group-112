@@ -176,7 +176,15 @@ export default class WardrobeArea extends InteractableArea {
       if (!session) {
         throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
       }
+
+      const auth = getAuth();
+      const db = getFirestore();
+
+      const userDocRef = doc(db, 'accounts', userCredential.user?.uid);
+
       // TODO: When player leaves the wardrobe, save changes to the Firebase DB
+
+        
       session.leave(player);
       this._emitAreaChanged();
       return undefined as InteractableCommandReturnType<CommandType>;
@@ -184,3 +192,11 @@ export default class WardrobeArea extends InteractableArea {
     throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
   }
 }
+function getFirestore() {
+  throw new Error('Function not implemented.');
+}
+
+function getAuth() {
+  throw new Error('Function not implemented.');
+}
+
