@@ -6,6 +6,7 @@ import { HairOption, OutfitOption, WardrobeState } from '../../types/CoveyTownSo
 
 export default class Wardrobe {
   private _player?: Player;
+
   private _controller?: PlayerController;
 
   private _hairOptions: Array<HairOption>;
@@ -61,14 +62,14 @@ export default class Wardrobe {
     }
     const controller = this._controller;
     if (isHair) {
-      let hairOption = this._hairOptions.find(obj => obj.optionID === optionID);
+      const hairOption = this._hairOptions.find(obj => obj.optionID === optionID);
       if (hairOption) {
         controller.hair = hairOption.optionFilePath;
       } else {
         throw new Error("Hair option not found");
       }
     } else {
-      let outfitChoice = this._outfitOptions.find(obj => obj.optionID === optionID);
+      const outfitChoice = this._outfitOptions.find(obj => obj.optionID === optionID);
       if (outfitChoice) {
         controller.outfit = outfitChoice.optionFilePath;
       } else {
