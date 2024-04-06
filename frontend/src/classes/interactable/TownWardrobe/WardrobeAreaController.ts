@@ -10,6 +10,10 @@ import InteractableAreaController, {
   WARDROBE_AREA_TYPE,
 } from '../InteractableAreaController';
 import TownController from '../../TownController';
+import { doc, getFirestore, updateDoc } from 'firebase/firestore';
+
+import firebase from 'firebase/app';
+import 'firebase/firestore';
 
 /**
  * The events that the WardrobeAreaController emits to subscribers. These events
@@ -85,6 +89,40 @@ export default class WardrobeAreaController extends InteractableAreaController<
         gameID: instanceID,
       });
     }
+    const db = getFirestore();
+
+    try {
+      const userDocRef = doc(db, 'accounts', this._player?.id ?? '');
+
+      const customizationData = {
+        hairoption: this._player?.gameObjects ?? NO_HAIR_OBJECT,
+        outfitOption: NO_OUTFIT_OBJECT,
+      };
+
+      // Save data to Firestore for the specified user ID
+      await updateDoc(userDocRef, customizationData);
+      console.log('Customization saved to Firestore successfully!');
+    } catch (error) {
+      console.error('Error saving customization to Firestore.');
+    }
+
+    // const db = getFirestore();
+    // const accountsRef = doc(db, 'accounts', this._player?.id); // Assuming player ID is used as the document ID
+    // try {
+    //   await updateDoc(accountsRef, {
+    //     hairoption: this.hairOption,
+    //     outfitOption: this._model.outfitOption,
+    //   });
+    //   console.log('Hair and outfit options updated in the accounts document.');
+    //   } catch (error) {
+    //     console.error('Error updating hair and outfit options:', error);
+    //     // Handle error as needed
+    //   }
+    // } else {
+    //   console.warn('Instance ID not found. Cannot update hair and outfit options.');
+    //   // Handle scenario where instance ID is missing
+    // }
+    
   }
 
   toInteractableAreaModel(): WardrobeAreaModel {

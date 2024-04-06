@@ -677,7 +677,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
   }
 
-  public getWardrobeAreaController(wardrobeArea: WardrobeArea): void {}
+  public getWardrobeAreaController(wardrobeArea: WardrobeArea): WardrobeAreaController {
+    // Add your code here to return a WardrobeAreaController object
+    const existingController = this._interactableControllers.find(
+      eachExistingArea => eachExistingArea.id === wardrobeArea.name,
+    );
+    if (existingController instanceof WardrobeAreaController) {
+      return existingController;
+    } else {
+      throw new Error(`No such viewing area controller ${existingController}`);
+    }
+  }
 
   /**
    * Retrives the game area controller corresponding to a game area by ID, or
