@@ -199,7 +199,11 @@ export class TownsController extends Controller {
   public async joinTown(socket: CoveyTownSocket) {
     // Parse the client's requested username from the connection
     // TODO: This socket information should include more player information
-    const { userName, townID } = socket.handshake.auth as { userName: string; townID: string };
+    const { userName, townID, userID } = socket.handshake.auth as {
+      userName: string;
+      townID: string;
+      userID: string;
+    };
 
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
@@ -210,7 +214,7 @@ export class TownsController extends Controller {
     // Connect the client to the socket.io broadcast room for this town
     socket.join(town.townID);
 
-    const newPlayer = await town.addPlayer(userName, socket);
+    const newPlayer = await town.addPlayer(userName, socket, userID);
     assert(newPlayer.videoToken);
     socket.emit('initialize', {
       userID: newPlayer.id,

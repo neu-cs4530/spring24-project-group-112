@@ -31,7 +31,7 @@ import { PrototypePlayerGameObjects } from '../../../../shared/types/CoveyTownSo
 
 export default function TownSelection(): JSX.Element {
   const [userName, setUserName] = useState<string>('');
-  const [userID, setUserID] = useState<string>(undefined);
+  const [userID, setUserID] = useState<string>('');
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
   const [townIDToJoin, setTownIDToJoin] = useState<string>('');
@@ -45,9 +45,9 @@ export default function TownSelection(): JSX.Element {
   const app = firebase.initializeApp(firebaseConfig);
 
   // Create login calllback
-  const loginCallBack = (user: string, id?: string) => {
+  const loginCallBack = (user: string, id: string) => {
     setUserName(user);
-    if (id) setUserID(id);
+    setUserID(id);
   };
 
   const toast = useToast();
@@ -109,6 +109,7 @@ export default function TownSelection(): JSX.Element {
           }
         }, 1000);
         setIsJoining(true);
+        console.log(`Creating town controller with userID ${userID}`);
         const newController = new TownController(
           {
             userName,

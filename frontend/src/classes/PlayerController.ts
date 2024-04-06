@@ -182,7 +182,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   }
 
   static async fromPlayerModel(modelPlayer: PlayerModel): Promise<PlayerController> {
-    const fbReturn = await this._init();
+    // const fbReturn = await this._init();
     const ret = new PlayerController(modelPlayer.id, modelPlayer.userName, modelPlayer.location);
 
     return ret;

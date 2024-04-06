@@ -16,9 +16,6 @@ export default class Player {
   /** The unique identifier for this player * */
   private readonly _id: string;
 
-  /** The outfit data for this player */
-  private readonly _outfit?: PrototypePlayerGameObjects;
-
   /** The player's username, which is not guaranteed to be unique within the town * */
   private readonly _userName: string;
 
@@ -72,7 +69,6 @@ export default class Player {
     return {
       id: this._id,
       location: this.location,
-      outfit: this._outfit,
       userName: this._userName,
     };
   }

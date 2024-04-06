@@ -55,8 +55,9 @@ export default function Login(props: ILoginPageProps): JSX.Element {
       if (userCredential.user === null) {
         throw new Error('User not found');
       }
-      const docRef = doc(db, 'accounts', userCredential.user?.uid);
-      console.log('Searching for ' + email + ' in ' + userCredential.user?.uid);
+      const id = userCredential.user?.uid;
+      const docRef = doc(db, 'accounts', id);
+      console.log('Searching for ' + email + ' in ' + id);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists() && docSnap.data().userName !== undefined) {
@@ -65,7 +66,7 @@ export default function Login(props: ILoginPageProps): JSX.Element {
         setAuthing(false);
         setError('');
         setResponseMessage('Logged in as: ' + userName);
-        props.callback(userName);
+        props.callback(userName, id);
       } else {
         throw new Error('User document not found');
       }

@@ -243,6 +243,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     const url = process.env.NEXT_PUBLIC_TOWNS_SERVICE_URL;
     assert(url);
     this._socket = io(url, { auth: { userName, townID, userID } });
+    console.log(`User connecting with ${userID}`);
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
     this.registerSocketListeners();
   }
@@ -426,7 +427,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      * Note that setting the players array will also emit an event that the players in the town have changed.
      */
     this._socket.on('playerJoined', async newPlayer => {
-      const newPlayerObj = PlayerController.fromPlayerModel(newPlayer);
+      const newPlayerObj = await PlayerController.fromPlayerModel(newPlayer);
       this._players = this.players.concat([newPlayerObj]);
       this.emit('playerMoved', newPlayerObj);
     });
@@ -623,13 +624,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
          */
     return new Promise<void>((resolve, reject) => {
       this._socket.connect();
-      this._socket.on('initialize', initialData => {
+      this._socket.on('initialize', async initialData => {
         this._providerVideoToken = initialData.providerVideoToken;
         this._friendlyNameInternal = initialData.friendlyName;
         this._townIsPubliclyListedInternal = initialData.isPubliclyListed;
         this._sessionToken = initialData.sessionToken;
-        this._players = initialData.currentPlayers.map(eachPlayerModel =>
-          PlayerController.fromPlayerModel(eachPlayerModel),
+        this._players = await Promise.all(
+          initialData.currentPlayers.map(eachPlayerModel =>
+            PlayerController.fromPlayerModel(eachPlayerModel),
+          ),
         );
 
         this._interactableControllers = [];
@@ -655,6 +658,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         });
         this._userID = initialData.userID;
         this._ourPlayer = this.players.find(eachPlayer => eachPlayer.id == this.userID);
+        this.emitChatMessage({
+          author: 'SERVER',
+          sid: '',
+          body: `Player ${this._userID} has joined the town`,
+          dateCreated: new Date(),
+        });
         this.emit('connect', initialData.providerVideoToken);
         resolve();
       });
