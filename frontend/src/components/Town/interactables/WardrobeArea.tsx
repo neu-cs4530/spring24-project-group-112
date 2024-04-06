@@ -5,6 +5,7 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
+  Button,
   Flex,
   Heading,
   List,
@@ -15,17 +16,20 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { GenericGameAreaController } from '../../../classes/interactable/GameAreaController';
 import PlayerController from '../../../classes/PlayerController';
 import { useInteractable, useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-import { GameResult, InteractableID, InteractableType } from '../../../types/CoveyTownSocket';
+import { GameResult, InteractableID, InteractableType, WardrobeStatus } from '../../../types/CoveyTownSocket';
 import ChatChannel from './ChatChannel';
 import ConnectFourArea from './ConnectFour/ConnectFourArea';
 import GameAreaInteractable from './GameArea';
 import WardrobeAreaInteractable from './WardrobeArea';
+import WardrobeAreaController from '../../../classes/interactable/TownWardrobe/WardrobeAreaController';
+import WardrobeBoard from './Wardrobe/WardrobeBoard';
 
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
@@ -38,13 +42,63 @@ export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
  * 
  * TODO: What should it render?
  */
-function WardrobeArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
+function WardrobeArea({
+  interactableID,
+}: {
+  interactableID: InteractableID;
+}): JSX.Element {
+  const wardrobeAreaController = useInteractableAreaController<WardrobeAreaController>(interactableID);
+  const townController = useTownController();
+
+  const [player, setPlayer] = useState<PlayerController | undefined>(wardrobeAreaController.player);
+  const [joiningWardrobe, setJoiningWardrobe] = useState(false);
+  const [wardrobeStatus, setWardrobeStatus] = useState<WardrobeStatus>(wardrobeAreaController.status);
+  const toast = useToast();
+
+  useEffect(() => {
+    const updateWardrobeState = () => {
+      setPlayer(wardrobeAreaController.player);
+      setWardrobeStatus(wardrobeAreaController.status);
+    };
+    wardrobeAreaController.addListener('playersChange', updateWardrobeState);
+  }, [townController, wardrobeAreaController, toast]);
+
+  let statusText = <></>
+  if (wardrobeStatus === 'OCCUPIED') {
+    const joinButton = (
+      <Button
+        onClick={() => {
+          setJoiningWardrobe(true);
+          wardrobeAreaController.joinGame().catch(err => {
+            toast({
+              title: 'Failed to join wardrobe',
+              description: err,
+              status: 'error',
+            });
+          }).finally(() => {
+            setJoiningWardrobe(false);
+          });
+        }}
+        isLoading={joiningWardrobe}
+        disabled={joiningWardrobe}>
+        Join
+      </Button>
+    );
+    statusText = (
+      <b>Waiting for player to join. {joinButton}</b>
+    );
+  } else {
+    statusText = <b>Player in Wardrobe: {player?.userName || "(No player yet!)"}</b>
+  }
+
   return (
-    <>
-    <h1>Wardrobe Area</h1>
-    </>
-  );
+      <>
+      {statusText}
+      <WardrobeBoard wardrobeAreaController={wardrobeAreaController} />
+      </>
+  )
 }
+
 /**
  * A wrapper component for the ConnectFourArea and TicTacToeArea components.
  * Determines if the player is currently in a game area on the map, and if so,

@@ -3,6 +3,7 @@ import {
   HairOption,
   OutfitOption,
   WardrobeArea as WardrobeAreaModel,
+  WardrobeStatus,
 } from '../../../types/CoveyTownSocket';
 import PlayerController from '../../PlayerController';
 import InteractableAreaController, {
@@ -56,6 +57,23 @@ export default class WardrobeAreaController extends InteractableAreaController<
     if (this._model.session?.player) {
       this._player = this._townController.getPlayer(this._model.session?.player);
     }
+  }
+
+  /**
+   * Returns the player controller of the player in the wardrobe
+   * or undefined if there is no player in the wardrobe.
+   * 
+   * @returns The player controller of the player in the wardrobe, or undefined if there is no player in the wardrobe
+   */
+  get player(): PlayerController | undefined {
+    return this._player;
+  }
+
+  /**
+   * Returns the status of the wardrobe
+   */
+  get status(): WardrobeStatus {
+    return this._model.isOpen ? 'OPEN' : 'OCCUPIED';
   }
 
   /**

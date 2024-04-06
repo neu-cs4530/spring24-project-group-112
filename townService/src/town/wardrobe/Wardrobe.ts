@@ -39,8 +39,8 @@ export default class Wardrobe {
     //this._player = playerToChange;
     this.id = nanoid() as GameInstanceID;
     this._state = initialState;
-    this._hairOptions = initialState.hairChoices;
-    this._outfitOptions = initialState.outfitChoices;
+    this._hairOptions = [];
+    this._outfitOptions = [];
   }
 
   public get state(): WardrobeState {

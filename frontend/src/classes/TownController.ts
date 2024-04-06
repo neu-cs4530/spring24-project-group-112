@@ -677,7 +677,25 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
   }
 
-  public getWardrobeAreaController(wardrobeArea: WardrobeArea): void {}
+  /**
+   * Retrieve the wardrobe area controller that corresponds to a wardrobeArea, creating one if necessary
+   * or throws an error if the wardrobe area controller does not exist
+   * 
+   * @throws Error if the wardrobe area controller does not exist
+   * 
+   * @param wardrobeArea 
+   * @returns the corresponding WardrobeAreaController
+   */
+  public getWardrobeAreaController(wardrobeArea: WardrobeArea): WardrobeAreaController {
+    const existingController = this._interactableControllers.find(
+      eachExistingArea => eachExistingArea.id === wardrobeArea.name,
+    );
+    if (existingController instanceof WardrobeAreaController) {
+      return existingController;
+    } else {
+      throw new Error(`No such wardrobe area controller ${existingController}`);
+    }
+  }
 
   /**
    * Retrives the game area controller corresponding to a game area by ID, or

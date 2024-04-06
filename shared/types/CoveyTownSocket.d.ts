@@ -104,8 +104,6 @@ export type WardrobeStatus = 'OPEN' | 'OCCUPIED';
 
 export interface WardrobeState {
   status: WardrobeStatus;
-  hairChoices: Array<HairOption>;
-  outfitChoices: Array<OutfitOption>;
   player?: PlayerID;
 }
 
