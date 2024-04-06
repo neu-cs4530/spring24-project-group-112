@@ -31,12 +31,7 @@ export default class Player {
   /** A special town emitter that will emit events to the entire town BUT NOT to this player */
   public readonly townEmitter: TownEmitter;
 
-  constructor(
-    userName: string,
-    townEmitter: TownEmitter,
-    id?: string,
-    outfit?: PrototypePlayerGameObjects,
-  ) {
+  constructor(userName: string, townEmitter: TownEmitter, id?: string) {
     this.location = {
       x: 0,
       y: 0,

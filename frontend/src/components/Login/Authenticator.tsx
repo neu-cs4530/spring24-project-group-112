@@ -16,7 +16,18 @@ import {
   createUserWithEmailAndPassword,
   deleteUser,
 } from 'firebase/auth';
-import { getFirestore, collection, addDoc, getDoc, doc, deleteDoc, query, where, getDocs, setDoc } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDoc,
+  doc,
+  deleteDoc,
+  query,
+  where,
+  getDocs,
+  setDoc,
+} from 'firebase/firestore';
 import 'firebaseui/dist/firebaseui.css';
 import { firebaseConfig } from './Config';
 import { ILoginPageProps } from '../../types/CoveyTownSocket';
@@ -38,30 +49,32 @@ export default function Login(props: ILoginPageProps): JSX.Element {
   const signIn = async () => {
     setAuthing(true);
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then(userCredential => {
-        if (userCredential.user === null) {
-          throw new Error('User not found');
-        }
-        const docRef = doc(db, 'accounts', userCredential.user?.uid);
-        console.log('Searching for ' + email + ' in ' + userCredential.user?.uid);
-        getDoc(docRef).then(docSnap => {
-          if (docSnap.exists() && docSnap.data().userName !== undefined) {
-            const userName = docSnap.data().userName;
-            console.log('Log in successful as ' + userName);
-            setAuthing(false);
-            setError('');
-            setResponseMessage('Logged in as: ' + userName);
-            props.callback(userName);
-          }
-        });
-      })
-      .catch(err => {
-        console.error('Error signing in:', err);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+      if (userCredential.user === null) {
+        throw new Error('User not found');
+      }
+      const docRef = doc(db, 'accounts', userCredential.user?.uid);
+      console.log('Searching for ' + email + ' in ' + userCredential.user?.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists() && docSnap.data().userName !== undefined) {
+        const userName = docSnap.data().userName;
+        console.log('Log in successful as ' + userName);
         setAuthing(false);
-        setError(err.message);
-        setResponseMessage('');
-      });
+        setError('');
+        setResponseMessage('Logged in as: ' + userName);
+        props.callback(userName);
+      } else {
+        throw new Error('User document not found');
+      }
+    } catch (err: any) {
+      console.error('Error signing in:', err);
+      setAuthing(false);
+      setError(err.message);
+      setResponseMessage('');
+    }
   };
 
   const createAccount = async () => {
@@ -95,9 +108,9 @@ export default function Login(props: ILoginPageProps): JSX.Element {
       return;
     }
     const userId = auth.currentUser.uid;
-    deleteUser(auth.currentUser)
-      const userDocRef = doc(db, 'accounts', userId); // Reference to user's document
-      deleteDoc(userDocRef)
+    deleteUser(auth.currentUser);
+    const userDocRef = doc(db, 'accounts', userId); // Reference to user's document
+    deleteDoc(userDocRef)
       .then(() => {
         console.log('User document deleted from Firestore');
         setAuthing(false);

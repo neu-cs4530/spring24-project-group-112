@@ -45,6 +45,8 @@ import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
 import WardrobeArea from '../components/Town/interactables/WardrobeArea';
 import WardrobeAreaController from './interactable/TownWardrobe/WardrobeAreaController';
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import { firebaseConfig } from '../components/Login/Config';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
 const SOCKET_COMMAND_TIMEOUT_MS = 5000;
@@ -180,10 +182,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private readonly _userName: string;
 
   /**
-   * The user ID of the player whose browser created this TownController. The user ID is set by the backend townsService, and
-   * is only available after the service is connected.
+   * The user ID of the player whose browser created this TownController. The user ID is provided from Firebase and the TownSelection
    */
   private _userID?: string;
+
+  /**
+   * The Firebase app object that is used to connect the user with the Firestore service
+   */
+  private readonly _app: FirebaseApp;
 
   /**
    * A reference to the Player object that represents the player whose browser created this TownController.
@@ -214,11 +220,18 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private _interactableEmitter = new EventEmitter();
 
   // TODO: modify constructor to accept additional player info
-  public constructor({ userName, townID, loginController }: ConnectionProperties) {
+  public constructor(
+    { userName, townID, loginController }: ConnectionProperties,
+    userID?: string,
+    firebaseApp?: FirebaseApp,
+  ) {
     super();
     this._townID = townID;
+    this._userID = userID;
     this._userName = userName;
     this._loginController = loginController;
+
+    this._app = firebaseApp || initializeApp(firebaseConfig);
 
     /*
         The event emitter will show a warning if more than this number of listeners are registered, as it
@@ -229,7 +242,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     const url = process.env.NEXT_PUBLIC_TOWNS_SERVICE_URL;
     assert(url);
-    this._socket = io(url, { auth: { userName, townID } });
+    this._socket = io(url, { auth: { userName, townID, userID } });
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
     this.registerSocketListeners();
   }
@@ -242,6 +255,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     const id = this._userID;
     assert(id);
     return id;
+  }
+
+  public get firebase() {
+    return this._app;
   }
 
   public get townIsPubliclyListed() {
@@ -408,7 +425,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      *
      * Note that setting the players array will also emit an event that the players in the town have changed.
      */
-    this._socket.on('playerJoined', newPlayer => {
+    this._socket.on('playerJoined', async newPlayer => {
       const newPlayerObj = PlayerController.fromPlayerModel(newPlayer);
       this._players = this.players.concat([newPlayerObj]);
       this.emit('playerMoved', newPlayerObj);

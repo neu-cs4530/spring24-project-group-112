@@ -28,7 +28,6 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   // TODO: is this really an acceptable way to implement this?
   private static _app: FirebaseApp = initializeApp(firebaseConfig);
 
-
   constructor(
     id: string,
     userName: string,
@@ -41,7 +40,6 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._userName = userName;
     this._location = location;
     this.gameObjects = outfit;
-
   }
 
   set location(newLocation: PlayerLocation) {
@@ -89,6 +87,13 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     return this._id;
   }
 
+  private static async _init(PID: string) {
+    const player = await this._getPlayer(PID);
+    if (player) {
+      console.log('Player id "', this.id, '" exists');
+    }
+  }
+
   private async _getPlayer(id: string) {
     const db = getFirestore(PlayerController._app);
     const playersCol = collection(db, 'players');
@@ -118,7 +123,6 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   toPlayerModel(): PlayerModel {
     return { id: this.id, userName: this.userName, location: this.location };
   }
-
 
   private _updateGameComponentLocation() {
     if (this.gameObjects && !this.gameObjects.locationManagedByGameScene) {
@@ -177,7 +181,10 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     }
   }
 
-  static fromPlayerModel(modelPlayer: PlayerModel): PlayerController {
-    return new PlayerController(modelPlayer.id, modelPlayer.userName, modelPlayer.location);
+  static async fromPlayerModel(modelPlayer: PlayerModel): Promise<PlayerController> {
+    const fbReturn = await this._init();
+    const ret = new PlayerController(modelPlayer.id, modelPlayer.userName, modelPlayer.location);
+
+    return ret;
   }
 }
