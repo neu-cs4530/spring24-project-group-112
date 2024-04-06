@@ -32,6 +32,7 @@ import {
   isConversationArea,
   isTicTacToeArea,
   isViewingArea,
+  isWardrobeArea,
 } from '../types/TypeUtils';
 import ConnectFourAreaController from './interactable/ConnectFourAreaController';
 import ConversationAreaController from './interactable/ConversationAreaController';
@@ -633,6 +634,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           } else if (isConnectFourArea(eachInteractable)) {
             this._interactableControllers.push(
               new ConnectFourAreaController(eachInteractable.id, eachInteractable, this),
+            );
+          } else if (isWardrobeArea(eachInteractable)) {
+            this._interactableControllers.push(
+              new WardrobeAreaController(eachInteractable.id, eachInteractable, this),
             );
           }
         });
