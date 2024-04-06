@@ -621,6 +621,17 @@
                  "width":1.33529176124966,
                  "x":3296.83535852584,
                  "y":1068.23340899987
+                }, 
+                {
+                 "height":90.9961685823754,
+                 "id":54,
+                 "name":"Wardrobe",
+                 "rotation":0,
+                 "type":"WardrobeArea",
+                 "visible":true,
+                 "width":98.1800766283527,
+                 "x":3583.57279693487,
+                 "y":551.963601532567
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -629,7 +640,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":52,
+ "nextobjectid":56,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
