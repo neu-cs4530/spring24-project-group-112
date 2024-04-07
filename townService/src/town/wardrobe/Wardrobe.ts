@@ -1,9 +1,13 @@
 import { nanoid } from 'nanoid';
+// eslint-disable-next-line import/no-relative-packages
 import PlayerController from '../../../../frontend/src/classes/PlayerController';
-import fromPlayerModel from '../../../../frontend/src/classes/PlayerController';
 import Player from '../../lib/Player';
-import toPlayerModel from '../../lib/Player';
-import { GameInstanceID, HairOption, OutfitOption, WardrobeState } from '../../types/CoveyTownSocket';
+import {
+  GameInstanceID,
+  HairOption,
+  OutfitOption,
+  WardrobeState,
+} from '../../types/CoveyTownSocket';
 
 export default class Wardrobe {
   private _player?: Player;
@@ -36,7 +40,7 @@ export default class Wardrobe {
    */
 
   public constructor(initialState: WardrobeState) {
-    //this._player = playerToChange;
+    // this._player = playerToChange;
     this.id = nanoid() as GameInstanceID;
     this._state = initialState;
     this._hairOptions = [];
@@ -53,16 +57,16 @@ export default class Wardrobe {
 
   /**
    * Applies the change to the player's hair or outfit based on the optionID
-   * 
+   *
    * @throws Error if the player is not found
-   * 
+   *
    * @param optionID optionID of the hair or outfit option to apply to player
    * @param isHair flag to determine if the change is for hair or outfit
    */
   public applyChange(optionID: number, isHair: boolean): void {
     // Select the hair or outfit option based on the optionID
     if (!this._controller) {
-      throw new Error("Player not found");
+      throw new Error('Player not found');
     }
     const controller = this._controller;
     if (isHair) {
@@ -70,28 +74,28 @@ export default class Wardrobe {
       if (hairOption) {
         controller.hair = hairOption.optionFilePath;
       } else {
-        throw new Error("Hair option not found");
+        throw new Error('Hair option not found');
       }
     } else {
       const outfitChoice = this._outfitOptions.find(obj => obj.optionID === optionID);
       if (outfitChoice) {
         controller.outfit = outfitChoice.optionFilePath;
       } else {
-        throw new Error("Outfit option not found");
+        throw new Error('Outfit option not found');
       }
     }
   }
 
   /**
    * Adds a player to the wardrobe
-   * 
+   *
    * @throws Error if the wardrobe is already occupied
-   * 
+   *
    * @param player Player to join the wardrobe
    */
   public join(player: Player): void {
     if (this._player) {
-      throw new Error("Wardrobe is already occupied");
+      throw new Error('Wardrobe is already occupied');
     }
     this._player = player;
     // Set the controller to the player's controller
@@ -101,12 +105,12 @@ export default class Wardrobe {
 
   /**
    * Removes player from the wardrobe
-   * 
+   *
    * @throws Error if the player is not found
    */
   public leave(player: Player): void {
     if (!this._player || player !== this._player) {
-      throw new Error("Player not found");
+      throw new Error('Player not found');
     }
     this._player = undefined;
   }
