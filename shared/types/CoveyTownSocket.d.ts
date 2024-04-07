@@ -17,7 +17,7 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 }
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea';
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'WardrobeArea' | 'TicTacToeArea' | 'ConnectFourArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -69,6 +69,12 @@ export interface BoundingBox {
 };
 
 export interface ViewingArea extends Interactable {
+  video?: string;
+  isPlaying: boolean;
+  elapsedTimeSec: number;
+}
+
+export interface WardrobeArea extends Interactable {
   video?: string;
   isPlaying: boolean;
   elapsedTimeSec: number;
@@ -216,10 +222,14 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | WardrobeAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
+}
+export interface WardrobeAreaUpdateCommand  {
+  type: 'WardrobeAreaUpdate';
+  update: WardrobeArea;
 }
 export interface JoinGameCommand {
   type: 'JoinGame';
@@ -240,6 +250,7 @@ export interface GameMoveCommand<MoveType> {
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
   CommandType extends ViewingAreaUpdateCommand ? undefined :
+  CommandType extends WardrobeAreaUpdateCommand ? undefined :
   CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
   never;

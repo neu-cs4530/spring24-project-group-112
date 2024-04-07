@@ -5,7 +5,7 @@ import InvalidParametersError from '../lib/InvalidParametersError';
 import IVideoClient from '../lib/IVideoClient';
 import Player from '../lib/Player';
 import TwilioVideo from '../lib/TwilioVideo';
-import { isViewingArea } from '../TestUtils';
+import { isViewingArea, isWardrobeArea } from '../TestUtils';
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
@@ -17,12 +17,14 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
+  WardrobeArea as WardrobeAreaModel,
 } from '../types/CoveyTownSocket';
 import { logError } from '../Utils';
 import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import WardrobeArea from './WardrobeArea'; 
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -168,6 +170,13 @@ export default class Town {
         );
         if (viewingArea) {
           (viewingArea as ViewingArea).updateModel(update);
+        }
+      } else if (isWardrobeArea(update)) {
+        const wardrobeArea = this._interactables.find(
+          eachInteractable => eachInteractable.id === update.id,
+        );
+        if (wardrobeArea) {
+          (wardrobeArea as WardrobeArea).updateModel(update);
         }
       }
     });
@@ -341,6 +350,19 @@ export default class Town {
     return true;
   }
 
+  public addWardrobeArea(wardrobeArea: WardrobeAreaModel): boolean {
+    const area = this._interactables.find(
+      eachArea => eachArea.id === wardrobeArea.id,
+    ) as WardrobeArea;
+    if (!area || !wardrobeArea.video || area.video) {
+      return false;
+    }
+    area.updateModel(wardrobeArea);
+    area.addPlayersWithinBounds(this._players);
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+  }
+
   /**
    * Fetch a player's session based on the provided session token. Returns undefined if the
    * session token is not valid.
@@ -412,6 +434,12 @@ export default class Town {
         ViewingArea.fromMapObject(eachViewingAreaObject, this._broadcastEmitter),
       );
 
+    const wardrobeAreas = objectLayer.objects
+    .filter(eachObject => eachObject.type === 'WardrobeArea')
+    .map(eachWardrobeAreaObject =>
+      WardrobeArea.fromMapObject(eachWardrobeAreaObject, this._broadcastEmitter),
+      );
+
     const conversationAreas = objectLayer.objects
       .filter(eachObject => eachObject.type === 'ConversationArea')
       .map(eachConvAreaObj =>
@@ -424,6 +452,7 @@ export default class Town {
 
     this._interactables = this._interactables
       .concat(viewingAreas)
+      .concat(wardrobeAreas)
       .concat(conversationAreas)
       .concat(gameAreas);
     this._validateInteractables();

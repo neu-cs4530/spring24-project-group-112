@@ -23,6 +23,7 @@ import {
   SocketData,
   TownEmitter,
   ViewingArea,
+  WardrobeArea,
 } from './types/CoveyTownSocket';
 
 /**
@@ -206,6 +207,10 @@ export function expectArraysToContainSameMembers<T>(actual: T[], expected: T[]):
 }
 
 export function isViewingArea(interactable: Interactable): interactable is ViewingArea {
+  return 'isPlaying' in interactable;
+}
+
+export function isWardrobeArea(interactable: Interactable): interactable is WardrobeArea {
   return 'isPlaying' in interactable;
 }
 

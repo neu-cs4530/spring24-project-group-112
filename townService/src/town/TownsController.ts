@@ -24,6 +24,7 @@ import {
   CoveyTownSocket,
   TownSettingsUpdate,
   ViewingArea,
+  WardrobeArea
 } from '../types/CoveyTownSocket';
 
 /**
@@ -158,6 +159,26 @@ export class TownsController extends Controller {
       throw new InvalidParametersError('Invalid values specified');
     }
     const success = town.addViewingArea({ ...requestBody, type: 'ViewingArea' });
+    if (!success) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+  }
+
+  @Post('{townID}/wardrobeArea')
+  @Response<InvalidParametersError>(400, 'Invalid values specified')
+  public async createWardrobeArea(
+    @Path() townID: string,
+    @Header('X-Session-Token') sessionToken: string,
+    @Body() requestBody: Omit<WardrobeArea, 'type'>,
+  ): Promise<void> {
+    const town = this._townsStore.getTownByID(townID);
+    if (!town) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    if (!town?.getPlayerBySessionToken(sessionToken)) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    const success = town.addWardrobeArea({ ...requestBody, type: 'WardrobeArea' });
     if (!success) {
       throw new InvalidParametersError('Invalid values specified');
     }

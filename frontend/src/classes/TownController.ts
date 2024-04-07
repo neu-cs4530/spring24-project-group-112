@@ -10,6 +10,7 @@ import Interactable from '../components/Town/Interactable';
 import ConversationArea from '../components/Town/interactables/ConversationArea';
 import GameArea from '../components/Town/interactables/GameArea';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
+import WardrobeArea from '../components/Town/interactables/WardrobeArea';
 import { LoginController } from '../contexts/LoginControllerContext';
 import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
@@ -26,12 +27,14 @@ import {
   PlayerLocation,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
+  WardrobeArea as WardrobeAreaModel,
 } from '../types/CoveyTownSocket';
 import {
   isConnectFourArea,
   isConversationArea,
   isTicTacToeArea,
   isViewingArea,
+  isWardrobeArea,
 } from '../types/TypeUtils';
 import ConnectFourAreaController from './interactable/ConnectFourAreaController';
 import ConversationAreaController from './interactable/ConversationAreaController';
@@ -42,6 +45,7 @@ import InteractableAreaController, {
 } from './interactable/InteractableAreaController';
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
+import WardrobeAreaController from './interactable/WardrobeAreaController';
 import PlayerController from './PlayerController';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
@@ -332,6 +336,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return ret as ViewingAreaController[];
   }
 
+  public get wardrobeAreas() {
+    const ret = this._interactableControllers.filter(
+      eachInteractable => eachInteractable instanceof WardrobeAreaController,
+    );
+    return ret as WardrobeAreaController[];
+  }
+
   public get gameAreas() {
     const ret = this._interactableControllers.filter(
       eachInteractable => eachInteractable instanceof GameAreaController,
@@ -582,6 +593,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     await this._townsService.createViewingArea(this.townID, this.sessionToken, newArea);
   }
 
+    /**
+   * Create a new viewing area, sending the request to the townService. Throws an error if the request
+   * is not successful. Does not immediately update local state about the new viewing area - it will be
+   * updated once the townService creates the area and emits an interactableUpdate
+   *
+   * @param newArea
+   */
+    async createWardrobeArea(newArea: Omit<WardrobeAreaModel, 'type'>) {
+      await this._townsService.createWardrobeArea(this.townID, this.sessionToken, newArea);
+    }
+
   /**
    * Disconnect from the town, notifying the townService that we are leaving and returning
    * to the login page
@@ -623,6 +645,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             );
           } else if (isViewingArea(eachInteractable)) {
             this._interactableControllers.push(new ViewingAreaController(eachInteractable));
+          } else if (isWardrobeArea(eachInteractable)) {
+            this._interactableControllers.push(new WardrobeAreaController(eachInteractable));
           } else if (isTicTacToeArea(eachInteractable)) {
             this._interactableControllers.push(
               new TicTacToeAreaController(eachInteractable.id, eachInteractable, this),
@@ -660,6 +684,23 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       throw new Error(`No such viewing area controller ${existingController}`);
     }
   }
+
+    /**
+   * Retrieve the viewing area controller that corresponds to a viewingAreaModel, creating one if necessary
+   *
+   * @param wardrobeArea
+   * @returns
+   */
+    public getWardrobeAreaController(wardrobeArea: WardrobeArea): WardrobeAreaController {
+      const existingController = this._interactableControllers.find(
+        eachExistingArea => eachExistingArea.id === wardrobeArea.name,
+      );
+      if (existingController instanceof WardrobeAreaController) {
+        return existingController;
+      } else {
+        throw new Error(`No such wardrobe area controller ${existingController}`);
+      }
+    }
 
   public getConversationAreaController(
     converationArea: ConversationArea,
@@ -702,6 +743,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   public emitViewingAreaUpdate(viewingArea: ViewingAreaController) {
     this._socket.emit('interactableUpdate', viewingArea.toInteractableAreaModel());
   }
+
+    /**
+   * Emit a viewing area update to the townService
+   * @param wardrobeArea The Viewing Area Controller that is updated and should be emitted
+   *    with the event
+   */
+    public emitWardrobeAreaUpdate(wardrobeArea: WardrobeAreaController) {
+      this._socket.emit('interactableUpdate', wardrobeArea.toInteractableAreaModel());
+    }
 
   /**
    * Determine which players are "nearby" -- that they should be included in our video call
@@ -784,6 +834,12 @@ export function useInteractableAreaController<T>(interactableAreaID: string): T 
     if (viewingAreaController) {
       return viewingAreaController as unknown as T;
     }
+    const wardrobeAreaController = townController.wardrobeAreas.find(
+      eachArea => eachArea.id == interactableAreaID,
+    );
+    if (wardrobeAreaController) {
+      return wardrobeAreaController as unknown as T;
+    }
     throw new Error(`Requested interactable area ${interactableAreaID} does not exist`);
   }
   return gameAreaController as unknown as T;
@@ -830,7 +886,7 @@ export function useActiveInteractableAreas(): GenericInteractableAreaController[
   const townController = useTownController();
   const [interactableAreas, setInteractableAreas] = useState<GenericInteractableAreaController[]>(
     (townController.gameAreas as GenericInteractableAreaController[])
-      .concat(townController.conversationAreas, townController.viewingAreas)
+      .concat(townController.conversationAreas, townController.viewingAreas, townController.wardrobeAreas)
       .filter(eachArea => eachArea.isActive()),
   );
   useEffect(() => {
@@ -838,6 +894,7 @@ export function useActiveInteractableAreas(): GenericInteractableAreaController[
       const allAreas = (townController.gameAreas as GenericInteractableAreaController[]).concat(
         townController.conversationAreas,
         townController.viewingAreas,
+        townController.wardrobeAreas,
       );
       setInteractableAreas(allAreas.filter(eachArea => eachArea.isActive()));
     };
@@ -869,7 +926,7 @@ export function useActiveInteractableAreasSortedByOccupancyAndName(): GenericInt
 
   const [interactableAreas, setInteractableAreas] = useState<InteractableAreaReadAheadOccupancy[]>(
     (townController.gameAreas as GenericInteractableAreaController[])
-      .concat(townController.conversationAreas, townController.viewingAreas)
+      .concat(townController.conversationAreas, townController.viewingAreas, townController.wardrobeAreas)
       .filter(eachArea => eachArea.isActive())
       .map(area => ({ area, occupancy: area.occupants.length })),
   );
@@ -891,6 +948,7 @@ export function useActiveInteractableAreasSortedByOccupancyAndName(): GenericInt
       const allAreas = (townController.gameAreas as GenericInteractableAreaController[]).concat(
         townController.conversationAreas,
         townController.viewingAreas,
+        townController.wardrobeAreas,
       );
       const activeAreas = allAreas.filter(eachArea => eachArea.isActive());
       // Update the areas, *and* the occupancy listeners by comparing the new set of areas to the old set
