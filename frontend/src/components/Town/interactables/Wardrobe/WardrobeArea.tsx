@@ -1,38 +1,59 @@
-import { Button, List, ListItem, useToast } from "@chakra-ui/react";
-import WardrobeAreaController from "../../../../classes/interactable/TownWardrobe/WardrobeAreaController";
-import PlayerController from "../../../../classes/PlayerController";
-import { useInteractableAreaController } from "../../../../classes/TownController";
-import useTownController from "../../../../hooks/useTownController";
-import React, { useEffect, useState } from "react";
-import { WardrobeStatus, InteractableID } from "../../../../types/CoveyTownSocket";
-
-// FIXME: THIS IS AN OLD FILE, NEW ONE IS IN PARENT DIRECTORY
-
-export default function WardrobeArea({
-    interactableID,
-}: {
-    interactableID: InteractableID;
-}): JSX.Element {
-    const wardrobeAreaController = useInteractableAreaController<WardrobeAreaController>(interactableID);
-    const townController = useTownController();
-
-    const [player, setPlayer] = useState<PlayerController | undefined>(wardrobeAreaController.player);
-    const [joiningWardrobe, setJoiningWardrobe] = useState(false);
-    const [wardrobeStatus, setWardrobeStatus] = useState<WardrobeStatus>(wardrobeAreaController.status);
-    const toast = useToast();
-
-    useEffect(() => {
-        wardrobeAreaController.addListener('playersChange', );
-        return () => {
-            wardrobeAreaController.removeListener('playersChange', );
-        };
-    }, [townController, wardrobeAreaController, toast]);
-
+import {
+    Accordion,
+    AccordionButton,
+    AccordionIcon,
+    AccordionItem,
+    AccordionPanel,
+    Box,
+    Flex,
+    Heading,
+    List,
+    ListItem,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalHeader,
+    ModalOverlay,
+  } from '@chakra-ui/react';
+  import React, { useCallback, useEffect, useState } from 'react';
+  import PlayerController from '../../../../classes/PlayerController';
+  import { useInteractable, useInteractableAreaController } from '../../../../classes/TownController';
+  import useTownController from '../../../../hooks/useTownController';
+  import { GameResult, InteractableID } from '../../../../types/CoveyTownSocket';
+  import ChatChannel from '../ChatChannel';
+  import ConnectFourArea from '../ConnectFour/ConnectFourArea';
+  import WardrobeAreaInteractable from '../WardrobeArea';
+  import Leaderboard from '../Leaderboard';
+  import TicTacToeArea from '../TicTacToe/TicTacToeArea';
+  
+  export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
+  
+  /**
+   * A generic component that renders a wardrobe area.
+   *
+   * It uses Chakra-UI components (does not use other GUI widgets)
+   *
+   * 
+   * TODO: What should it render?
+   */
+  function WardrobeArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
     return (
-        <>
-        <List aria-label="Player in Wardrobe">
-            <ListItem>Player: {player?.userName || "(No player yet!"}</ListItem>
-        </List>
-        </>
-    )
-}
+      <>
+      <h1>Wardrobe Area</h1>
+      </>
+    );
+  }
+  /**
+   * A wrapper component for the ConnectFourArea and TicTacToeArea components.
+   * Determines if the player is currently in a game area on the map, and if so,
+   * renders the selected game area component in a modal.
+   *
+   */
+  export default function WardrobeAreaWrapper(): JSX.Element {
+    const wardrobeArea = useInteractable<WardrobeAreaInteractable>('wardrobeArea');
+    if (wardrobeArea) {
+      return <WardrobeArea interactableID={wardrobeArea.id} />;
+    }
+    return <></>;
+  }

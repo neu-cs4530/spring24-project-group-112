@@ -17,13 +17,14 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
-  WardrobeArea,
+  WardrobeInstance as WardrobeInstanceModel,
 } from '../types/CoveyTownSocket';
 import { logError } from '../Utils';
 import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import WardrobeArea from './wardrobe/WardrobeArea'
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -343,14 +344,13 @@ export default class Town {
     return true;
   }
 
-  public addWardrobeArea(viewingArea: WardrobeAreaModel): boolean {
+  public addWardrobeArea(wardrobeArea: WardrobeInstanceModel): boolean {
     const area = this._interactables.find(
-      eachArea => eachArea.id === viewingArea.id,
-    ) as ViewingArea;
-    if (!area || !viewingArea.video || area.video) {
+      eachArea => eachArea.id === wardrobeArea.id,
+    ) as WardrobeArea;
+    if (!area) {
       return false;
     }
-    area.updateModel(viewingArea);
     area.addPlayersWithinBounds(this._players);
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
