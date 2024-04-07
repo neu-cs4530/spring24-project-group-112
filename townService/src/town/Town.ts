@@ -17,6 +17,7 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
+  WardrobeArea,
 } from '../types/CoveyTownSocket';
 import { logError } from '../Utils';
 import ConversationArea from './ConversationArea';
@@ -330,6 +331,19 @@ export default class Town {
    * with the specified ID or if there is no video URL specified
    */
   public addViewingArea(viewingArea: ViewingAreaModel): boolean {
+    const area = this._interactables.find(
+      eachArea => eachArea.id === viewingArea.id,
+    ) as ViewingArea;
+    if (!area || !viewingArea.video || area.video) {
+      return false;
+    }
+    area.updateModel(viewingArea);
+    area.addPlayersWithinBounds(this._players);
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+  }
+
+  public addWardrobeArea(viewingArea: WardrobeAreaModel): boolean {
     const area = this._interactables.find(
       eachArea => eachArea.id === viewingArea.id,
     ) as ViewingArea;
