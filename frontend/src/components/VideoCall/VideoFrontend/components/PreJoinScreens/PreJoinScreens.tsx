@@ -9,7 +9,8 @@ import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { Heading, Text } from '@chakra-ui/react';
 import TownSelection from '../../../../Login/TownSelection';
 import { TownJoinResponse } from '../../../../../types/CoveyTownSocket';
-import FirebaseLogin from './FirebaseLogin/FirebaseLogin';
+import { FirebaseApp } from 'firebase/app';
+import Login from '../../../../Login/Authenticator';
 
 export enum Steps {
   roomNameStep,
@@ -43,8 +44,8 @@ export default function PreJoinScreens() {
         To get started, setup your camera and microphone, choose a username, and then create a new town
         to hang out in, or join an existing one.
       </Text>
-        <FirebaseLogin />
         <DeviceSelectionScreen />
+        <Login app={undefined} />
         <TownSelection />
     </IntroContainer>
   );
