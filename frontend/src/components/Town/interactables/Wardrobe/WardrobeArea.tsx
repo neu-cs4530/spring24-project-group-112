@@ -50,7 +50,7 @@ import {
    * renders the selected game area component in a modal.
    *
    */
-  export default function WardrobeWrapper(): JSX.Element {
+  export default function WardrobeAreaWrapper(): JSX.Element {
     const wardrobeArea = useInteractable<WardrobeAreaInteractable>('wardrobeArea');
     if (wardrobeArea) {
       return <WardrobeArea interactableID={wardrobeArea.id} />;
