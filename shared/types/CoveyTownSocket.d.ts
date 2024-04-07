@@ -97,7 +97,8 @@ export interface WardrobeInstance {
 
 export interface WardrobeArea extends Interactable {
   isOpen: boolean; 
-  session: WardrobeInstance | undefined;
+  user?: PlayerID;
+  session?: WardrobeInstance;
 };
 
 export type WardrobeStatus = 'OPEN' | 'OCCUPIED';

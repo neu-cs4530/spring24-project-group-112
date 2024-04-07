@@ -17,9 +17,9 @@ import TownController from '../../TownController';
  * are only ever emitted to local components (not to the townService).
  */
 export type WardrobeAreaEvents = BaseInteractableEventMap & {
-  //hairChange: (newHair: HairOption | undefined) => void;
-  //outfitChange: (newOutfit: OutfitOption | undefined) => void;
-  playersChange: (newPlayer: PlayerController[]) => void;
+  hairChange: (newHair: HairOption) => void;
+  outfitChange: (newOutfit: OutfitOption) => void;
+  playerChange: (newPlayer: PlayerController | undefined) => void;
 };
 
 export const NO_HAIR_OBJECT = { optionID: -1, optionFilePath: '(No filepath)' } as HairOption;
@@ -62,7 +62,7 @@ export default class WardrobeAreaController extends InteractableAreaController<
   /**
    * Returns the player controller of the player in the wardrobe
    * or undefined if there is no player in the wardrobe.
-   * 
+   *
    * @returns The player controller of the player in the wardrobe, or undefined if there is no player in the wardrobe
    */
   get player(): PlayerController | undefined {
@@ -81,7 +81,7 @@ export default class WardrobeAreaController extends InteractableAreaController<
    *
    * @throws An error if the server rejects the request to join the game.
    */
-  public async joinGame() {
+  public async joinWardrobe() {
     const { gameID } = await this._townController.sendInteractableCommand(this.id, {
       type: 'JoinWardrobe',
     });
@@ -91,7 +91,7 @@ export default class WardrobeAreaController extends InteractableAreaController<
   /**
    * Sends a request to the server to leave the current game in the game area.
    */
-  public async leaveGame() {
+  public async leaveWardrobe() {
     const instanceID = this._instanceID;
     if (instanceID) {
       await this._townController.sendInteractableCommand(this.id, {
@@ -112,10 +112,10 @@ export default class WardrobeAreaController extends InteractableAreaController<
       : undefined;
     if (newPlayer) {
       this._player = newPlayer;
-      this.emit('playersChange', [newPlayer]);
+      this.emit('playerChange', newPlayer);
     } else {
       this._player = undefined;
-      this.emit('playersChange', []);
+      this.emit('playerChange', undefined);
     }
     this._instanceID = newModel.session?.id ?? undefined;
   }

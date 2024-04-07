@@ -25,9 +25,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   public gameObjects?: PrototypePlayerGameObjects;
 
-  // TODO: is this really an acceptable way to implement this?
   private static _app: FirebaseApp = initializeApp(firebaseConfig);
-
 
   constructor(
     id: string,
@@ -41,7 +39,6 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._userName = userName;
     this._location = location;
     this.gameObjects = outfit;
-
   }
 
   set location(newLocation: PlayerLocation) {
@@ -118,7 +115,6 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   toPlayerModel(): PlayerModel {
     return { id: this.id, userName: this.userName, location: this.location };
   }
-
 
   private _updateGameComponentLocation() {
     if (this.gameObjects && !this.gameObjects.locationManagedByGameScene) {

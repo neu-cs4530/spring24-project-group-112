@@ -160,8 +160,6 @@ export default class WardrobeArea extends InteractableArea {
         // No session in progress, make a new one
         session = new Wardrobe({
           status: 'OCCUPIED',
-          hairChoices: this.hairChoices,
-          outfitChoices: this.outfitChoices,
           player: player.id,
         });
         this._session = session;
