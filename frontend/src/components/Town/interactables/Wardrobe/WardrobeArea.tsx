@@ -17,15 +17,10 @@ import {
     ModalOverlay,
   } from '@chakra-ui/react';
   import React, { useCallback, useEffect, useState } from 'react';
-  import PlayerController from '../../../classes/PlayerController';
-  import { useInteractable, useInteractableAreaController } from '../../../classes/TownController';
-  import useTownController from '../../../hooks/useTownController';
-  import { GameResult, InteractableID } from '../../../types/CoveyTownSocket';
-  import ChatChannel from './ChatChannel';
-  import ConnectFourArea from './ConnectFour/ConnectFourArea';
-  import WardrobeAreaInteractable from './WardrobeArea';
-  import Leaderboard from './Leaderboard';
-  import TicTacToeArea from './TicTacToe/TicTacToeArea';
+  import { useInteractable, useInteractableAreaController } from '../../../../classes/TownController';
+  import { InteractableID } from '../../../../types/CoveyTownSocket';
+  import WardrobeAreaInteractable from './../WardrobeArea';
+
   
   export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
   
