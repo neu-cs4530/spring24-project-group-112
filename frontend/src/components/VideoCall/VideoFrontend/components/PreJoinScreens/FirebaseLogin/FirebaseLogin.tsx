@@ -14,7 +14,7 @@ const provider = new GoogleAuthProvider();
 
 
 const auth = getAuth();
-signInWithRedirect(auth, provider);
+//signInWithRedirect(auth, provider);
 /*
 getRedirectResult(auth)
     .then((result) => {
