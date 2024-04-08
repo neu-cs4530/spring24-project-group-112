@@ -163,7 +163,7 @@ export class TownsController extends Controller {
     }
   }
 
-    /**
+  /**
    * Creates a viewing area in a given town
    *
    * @param townID ID of the town in which to create the new viewing area
@@ -174,27 +174,25 @@ export class TownsController extends Controller {
    * @throws InvalidParametersError if the session token is not valid, or if the
    *          viewing area could not be created
    */
-    @Post('{townID}/wardrobeArea')
-    @Response<InvalidParametersError>(400, 'Invalid values specified')
-    public async createWardrobe(
-      @Path() townID: string,
-      @Header('X-Session-Token') sessionToken: string,
-      @Body() requestBody: Omit<ViewingArea, 'type'>,
-    ): Promise<void> {
-      const town = this._townsStore.getTownByID(townID);
-      if (!town) {
-        throw new InvalidParametersError('Invalid values specified');
-      }
-      if (!town?.getPlayerBySessionToken(sessionToken)) {
-        throw new InvalidParametersError('Invalid values specified');
-      }
-      const success = town.addWardrobeArea({ ...requestBody, type: 'WardrobeArea' });
-      if (!success) {
-        throw new InvalidParametersError('Invalid values specified');
-      }
+  @Post('{townID}/wardrobeArea')
+  @Response<InvalidParametersError>(400, 'Invalid values specified')
+  public async createWardrobe(
+    @Path() townID: string,
+    @Header('X-Session-Token') sessionToken: string,
+    @Body() requestBody: Omit<ViewingArea, 'type'>,
+  ): Promise<void> {
+    const town = this._townsStore.getTownByID(townID);
+    if (!town) {
+      throw new InvalidParametersError('Invalid values specified');
     }
-
-
+    if (!town?.getPlayerBySessionToken(sessionToken)) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    const success = town.addWardrobeArea({ ...requestBody, type: 'WardrobeArea' });
+    if (!success) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+  }
 
   /**
    * Retrieves up to the first 200 chat messages for a given town, optionally filtered by interactableID
