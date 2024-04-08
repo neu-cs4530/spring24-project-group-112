@@ -9,13 +9,18 @@ import {
   Input,
   InputRightElement,
   InputGroup,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  UseDisclosureProps,
 } from '@chakra-ui/react';
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  deleteUser,
-} from 'firebase/auth';
+import assert from 'assert';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import {
   getFirestore,
   collection,
@@ -42,9 +47,19 @@ export default function Login(props: ILoginPageProps): JSX.Element {
   const [authing, setAuthing] = React.useState(false);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [username, setUsername] = React.useState('');
   const [show, setShow] = React.useState(false);
   const [error, setError] = React.useState('');
   const [responseMessage, setResponseMessage] = React.useState('');
+  const mailRef = React.useRef(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const runOnCaughtError = (consoleMsg: string, err: Error) => {
+    console.error(consoleMsg + err);
+    setAuthing(false);
+    setError(err.message);
+    setResponseMessage('');
+  };
 
   const signIn = async () => {
     setAuthing(true);
@@ -70,60 +85,39 @@ export default function Login(props: ILoginPageProps): JSX.Element {
       } else {
         throw new Error('User document not found');
       }
-    } catch (err: any) {
-      console.error('Error signing in:', err);
-      setAuthing(false);
-      setError(err.message);
-      setResponseMessage('');
+    } catch (err) {
+      assert(err instanceof Error); // otherwise ts gets mad
+      runOnCaughtError('Error signing in:', err);
     }
+  };
+
+  const closeCreationModal = () => {
+    onClose();
+    setEmail('');
+    setPassword('');
+    setUsername('');
   };
 
   const createAccount = async () => {
     setAuthing(true);
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async userCredential => {
-        console.log('Account created for ' + userCredential.user?.email);
-        const userDocRef = doc(db, 'accounts', userCredential.user?.uid);
+    try {
+      if (username === '') {
+        throw new Error('Username cannot be empty');
+      }
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log('Account created for ' + userCredential.user?.email);
+      const userDocRef = doc(db, 'accounts', userCredential.user?.uid);
 
-        await setDoc(userDocRef, { userName: email });
-        setAuthing(false);
-        setError('');
-        setResponseMessage('Account Created');
-      })
-      .catch(err => {
-        console.error('Error creating account:', err);
-        setAuthing(false);
-        setError(err.message);
-        setResponseMessage('');
-      });
-  };
-
-  const deleteAccount = async () => {
-    setAuthing(true);
-    if (auth.currentUser === null) {
-      console.error('No user is signed in');
+      await setDoc(userDocRef, { userName: username });
       setAuthing(false);
-      setError('No user is signed in');
-      setResponseMessage('');
-      return;
+      setError('');
+      setResponseMessage('Account Created');
+      closeCreationModal();
+    } catch (err) {
+      assert(err instanceof Error); // otherwise ts gets mad
+      runOnCaughtError('Error creating account:', err);
     }
-    const userId = auth.currentUser.uid;
-    deleteUser(auth.currentUser);
-    const userDocRef = doc(db, 'accounts', userId); // Reference to user's document
-    deleteDoc(userDocRef)
-      .then(() => {
-        console.log('User document deleted from Firestore');
-        setAuthing(false);
-        setError('');
-        setResponseMessage('Account Deleted');
-      })
-      .catch(err => {
-        console.error('Error deleting user document from Firestore:', err);
-        setAuthing(false);
-        setError(err.message);
-        setResponseMessage('');
-      });
   };
 
   return (
@@ -133,6 +127,7 @@ export default function Login(props: ILoginPageProps): JSX.Element {
         <FormControl>
           <FormLabel htmlFor='email'>Email</FormLabel>
           <Input
+            ref={mailRef}
             autoFocus
             name='email'
             placeholder='Your email'
@@ -162,12 +157,68 @@ export default function Login(props: ILoginPageProps): JSX.Element {
             <Button onClick={signIn} isLoading={authing}>
               Login
             </Button>
-            <Button onClick={createAccount} isLoading={authing}>
-              Create Account
-            </Button>
-            <Button onClick={deleteAccount} isLoading={authing}>
-              Delete Account
-            </Button>
+
+            <Button onClick={onOpen}>Create Account</Button>
+            <Modal finalFocusRef={mailRef} isOpen={isOpen} onClose={onClose}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>Create Account</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                  <FormControl>
+                    <FormLabel htmlFor='email'>Email</FormLabel>
+                    <Input
+                      ref={mailRef}
+                      autoFocus
+                      name='email'
+                      placeholder='Your email'
+                      value={email}
+                      onChange={event => setEmail(event.target.value)}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel htmlFor='password'>Password</FormLabel>
+                    <InputGroup>
+                      <Input
+                        type={show ? 'text' : 'password'}
+                        name='password'
+                        value={password}
+                        placeholder='Enter password'
+                        onChange={event => setPassword(event.target.value)}
+                      />
+                      <InputRightElement width='4.5rem'>
+                        <Button h='1.75rem' size='sm' onClick={event => setShow(!show)}>
+                          {show ? 'Hide' : 'Show'}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel htmlFor='username'>Username</FormLabel>
+                    <Input
+                      name='username'
+                      placeholder='Your username'
+                      value={username}
+                      onChange={event => setUsername(event.target.value)}
+                    />
+                  </FormControl>
+                </ModalBody>
+                <ModalFooter>
+                  <Button
+                    onClick={() => {
+                      onClose();
+                    }}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      createAccount();
+                    }}>
+                    Confirm
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
           </Stack>
         </Box>
         {error && (

@@ -27,7 +27,6 @@ import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
 import firebase from 'firebase/compat/app';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
-import { PrototypePlayerGameObjects } from '../../../../shared/types/CoveyTownSocket';
 
 export default function TownSelection(): JSX.Element {
   const [userName, setUserName] = useState<string>('');
