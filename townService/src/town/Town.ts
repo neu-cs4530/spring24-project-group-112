@@ -114,6 +114,7 @@ export default class Town {
   /**
    * Adds a player to this Covey Town, provisioning the necessary credentials for the
    * player, and returning them
+   * TODO: Modify input parameters to include other player information
    *
    * @param newPlayer The new player to add to the town
    */

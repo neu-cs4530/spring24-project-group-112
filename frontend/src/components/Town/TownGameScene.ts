@@ -159,10 +159,9 @@ export default class TownGameScene extends Phaser.Scene {
 
     disconnectedPlayers.forEach(disconnectedPlayer => {
       if (disconnectedPlayer.gameObjects) {
-        const { bodySprite, bodyPhysics, layer, label } = disconnectedPlayer.gameObjects;
-        if (bodySprite && label) {
-          bodySprite.destroy();
-          bodyPhysics.destroy();
+        const { body, layer, label } = disconnectedPlayer.gameObjects;
+        if (body && label && layer) {
+          body.destroy();
           layer.destroy();
           label.destroy();
         }
@@ -203,13 +202,13 @@ export default class TownGameScene extends Phaser.Scene {
       1,
     ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     if (destination.x !== undefined) {
-      gameObjects.bodySprite.x = destination.x;
+      gameObjects.body.x = destination.x;
       hairSprite.x = destination.x;
       outfitSprite.x = destination.x;
       this._lastLocation.x = destination.x;
     }
     if (destination.y !== undefined) {
-      gameObjects.bodySprite.y = destination.y;
+      gameObjects.body.y = destination.y;
       hairSprite.y = destination.y + 12;
       outfitSprite.y = destination.y + 10;
       this._lastLocation.y = destination.y;
@@ -229,8 +228,7 @@ export default class TownGameScene extends Phaser.Scene {
     }
     const gameObjects = this.coveyTownController.ourPlayer.gameObjects;
     if (gameObjects && this._cursors) {
-      const prevVelocity = gameObjects.bodyPhysics.velocity.clone();
-      const body = gameObjects.bodyPhysics;
+      const prevVelocity = gameObjects.body.body.velocity.clone();
       const hairSprite = gameObjects.layer.getAt(
         0,
       ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -239,7 +237,7 @@ export default class TownGameScene extends Phaser.Scene {
       ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
       // Stop any previous movement from the last frame
-      body.setVelocity(0);
+      gameObjects.body.setVelocity(0);
       hairSprite.setVelocity(0);
       outfitSprite.setVelocity(0);
 
@@ -247,57 +245,57 @@ export default class TownGameScene extends Phaser.Scene {
 
       switch (primaryDirection) {
         case 'left':
-          body.setVelocityX(-MOVEMENT_SPEED);
+          gameObjects.body.setVelocityX(-MOVEMENT_SPEED);
           hairSprite.setVelocityX(-MOVEMENT_SPEED);
           outfitSprite.setVelocityX(-MOVEMENT_SPEED);
-          gameObjects.bodySprite.anims.play('body-left-walk', true);
+          gameObjects.body.anims.play('body-left-walk', true);
           hairSprite.anims.play('hair-left-walk', true);
           outfitSprite.anims.play('dress-left-walk', true);
           break;
         case 'right':
-          body.setVelocityX(MOVEMENT_SPEED);
+          gameObjects.body.setVelocityX(MOVEMENT_SPEED);
           hairSprite.setVelocityX(MOVEMENT_SPEED);
           outfitSprite.setVelocityX(MOVEMENT_SPEED);
-          gameObjects.bodySprite.anims.play('body-right-walk', true);
+          gameObjects.body.anims.play('body-right-walk', true);
           hairSprite.anims.play('hair-right-walk', true);
           outfitSprite.anims.play('dress-right-walk', true);
           break;
         case 'front':
-          body.setVelocityY(MOVEMENT_SPEED);
+          gameObjects.body.setVelocityY(MOVEMENT_SPEED);
           hairSprite.setVelocityY(MOVEMENT_SPEED);
           outfitSprite.setVelocityY(MOVEMENT_SPEED);
-          gameObjects.bodySprite.anims.play('body-front-walk', true);
+          gameObjects.body.anims.play('body-front-walk', true);
           hairSprite.anims.play('hair-front-walk', true);
           outfitSprite.anims.play('dress-front-walk', true);
           break;
         case 'back':
-          body.setVelocityY(-MOVEMENT_SPEED);
+          gameObjects.body.setVelocityY(-MOVEMENT_SPEED);
           hairSprite.setVelocityY(-MOVEMENT_SPEED);
           outfitSprite.setVelocityY(-MOVEMENT_SPEED);
-          gameObjects.bodySprite.anims.play('body-back-walk', true);
+          gameObjects.body.anims.play('body-back-walk', true);
           hairSprite.anims.play('hair-back-walk', true);
           outfitSprite.anims.play('dress-back-walk', true);
           break;
         default:
           // Not moving
-          gameObjects.bodySprite.anims.stop();
+          gameObjects.body.anims.stop();
           hairSprite.anims.stop();
           outfitSprite.anims.stop();
           // If we were moving, pick and idle frame to use
           if (prevVelocity.x < 0) {
-            gameObjects.bodySprite.setTexture('bodyatlas', 'body-left');
+            gameObjects.body.setTexture('bodyatlas', 'body-left');
             hairSprite.setTexture('hairatlas', 'hair-left');
             outfitSprite.setTexture('dressatlas', 'dress-left');
           } else if (prevVelocity.x > 0) {
-            gameObjects.bodySprite.setTexture('bodyatlas', 'body-right');
+            gameObjects.body.setTexture('bodyatlas', 'body-right');
             hairSprite.setTexture('hairatlas', 'hair-right');
             outfitSprite.setTexture('dressatlas', 'dress-right');
           } else if (prevVelocity.y < 0) {
-            gameObjects.bodySprite.setTexture('bodyatlas', 'body-back');
+            gameObjects.body.setTexture('bodyatlas', 'body-back');
             hairSprite.setTexture('hairatlas', 'hair-back');
             outfitSprite.setTexture('dressatlas', 'dress-back');
           } else if (prevVelocity.y > 0) {
-            gameObjects.bodySprite.setTexture('bodyatlas', 'body-front');
+            gameObjects.body.setTexture('bodyatlas', 'body-front');
             hairSprite.setTexture('hairatlas', 'hair-front');
             outfitSprite.setTexture('dressatlas', 'dress-front');
           }
@@ -305,15 +303,16 @@ export default class TownGameScene extends Phaser.Scene {
       }
 
       // Normalize and scale the velocity so that player can't move faster along a diagonal
-      gameObjects.bodyPhysics.velocity.normalize().scale(MOVEMENT_SPEED);
+      gameObjects.body.body.velocity.normalize().scale(MOVEMENT_SPEED);
       hairSprite.body.velocity.normalize().scale(MOVEMENT_SPEED);
       outfitSprite.body.velocity.normalize().scale(MOVEMENT_SPEED);
       const isMoving = primaryDirection !== undefined;
-      hairSprite.setY(body.y + 12);
-      gameObjects.label.setX(body.x);
-      gameObjects.label.setY(body.y - 20);
-      const x = gameObjects.bodySprite.getBounds().centerX;
-      const y = gameObjects.bodySprite.getBounds().centerY;
+      // hairSprite.setY(gameObjects.body.y);
+      // outfitSprite.setY(gameObjects.body.y);
+      gameObjects.label.setX(gameObjects.body.x);
+      gameObjects.label.setY(gameObjects.body.y - 20);
+      const x = gameObjects.body.getBounds().centerX;
+      const y = gameObjects.body.getBounds().centerY;
       //Move the sprite
       if (
         !this._lastLocation ||
@@ -333,11 +332,19 @@ export default class TownGameScene extends Phaser.Scene {
         this._lastLocation.rotation = primaryDirection || this._lastLocation.rotation || 'front';
         this._lastLocation.moving = isMoving;
         this._pendingOverlapExits.forEach((cb, interactable) => {
+          const hair = gameObjects.layer.getAt(
+            0,
+          ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+          const outfit = gameObjects.layer.getAt(
+            1,
+          ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
           if (
             !Phaser.Geom.Rectangle.Overlaps(
               interactable.getBounds(),
-              gameObjects.bodySprite.getBounds(),
-            )
+              gameObjects.body.getBounds(),
+            ) ||
+            !Phaser.Geom.Rectangle.Overlaps(interactable.getBounds(), hair.getBounds()) ||
+            !Phaser.Geom.Rectangle.Overlaps(interactable.getBounds(), outfit.getBounds())
           ) {
             this._pendingOverlapExits.delete(interactable);
             cb();
@@ -348,9 +355,9 @@ export default class TownGameScene extends Phaser.Scene {
 
       //Update the location for the labels of all of the other players
       for (const player of this._players) {
-        if (player.gameObjects?.label && player.gameObjects?.bodyPhysics) {
-          player.gameObjects.label.setX(player.gameObjects.bodyPhysics.x);
-          player.gameObjects.label.setY(player.gameObjects.bodyPhysics.y - 20);
+        if (player.gameObjects?.label && player.gameObjects?.body) {
+          player.gameObjects.label.setX(player.gameObjects.body.x);
+          player.gameObjects.label.setY(player.gameObjects.body.y - 20);
         }
       }
     }
@@ -482,17 +489,18 @@ export default class TownGameScene extends Phaser.Scene {
     //   .setOffset(0, 24)
     //   .setDepth(6);
 
-    const bodySprite = this.add
+    const body = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y, 'bodyatlas', 'body-front')
-      .setSize(30, 40)
+      .setBodySize(30, 40)
+      // .setSize(30, 40)
       .setDepth(6);
-    const bodyPhysics = this.physics.add
-      .body(spawnPoint.x, spawnPoint.y)
-      .setSize(30, 40)
-      .setGameObject(bodySprite);
+    // const bodyPhysics = this.physics.add
+    //   .body(spawnPoint.x, spawnPoint.y)
+    //   .setSize(30, 40)
+    //   .setGameObject(bodySprite);
 
     const hairSprite = this.physics.add
-      .sprite(spawnPoint.x, spawnPoint.y + 12, 'hairatlas', 'hair-front')
+      .sprite(spawnPoint.x, spawnPoint.y - 10, 'hairatlas', 'hair-front')
       .setSize(32, 26);
     const outfitSprite = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y + 10, 'dressatlas', 'dress-front')
@@ -510,8 +518,7 @@ export default class TownGameScene extends Phaser.Scene {
       })
       .setDepth(6);
     this.coveyTownController.ourPlayer.gameObjects = {
-      bodySprite,
-      bodyPhysics,
+      body,
       layer,
       label,
       locationManagedByGameScene: true,
@@ -527,7 +534,13 @@ export default class TownGameScene extends Phaser.Scene {
     this._collidingLayers.push(aboveLayer);
     this._collidingLayers.push(onTheWallsLayer);
     this._collidingLayers.forEach(collidingLayer =>
-      this.physics.add.collider(bodySprite, collidingLayer),
+      this.physics.add.collider(body, collidingLayer),
+    );
+    this._collidingLayers.forEach(collidingLayer =>
+      this.physics.add.collider(hairSprite, collidingLayer),
+    );
+    this._collidingLayers.forEach(collidingLayer =>
+      this.physics.add.collider(outfitSprite, collidingLayer),
     );
 
     // Create the player's walking animations from the texture atlas. These are stored in the global
@@ -673,7 +686,7 @@ export default class TownGameScene extends Phaser.Scene {
     });
 
     const camera = this.cameras.main;
-    camera.startFollow(this.coveyTownController.ourPlayer.gameObjects.bodySprite);
+    camera.startFollow(this.coveyTownController.ourPlayer.gameObjects.body);
     camera.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
     // Help text that has a "fixed" position on the screen
@@ -700,19 +713,14 @@ export default class TownGameScene extends Phaser.Scene {
 
   createPlayerSprites(player: PlayerController) {
     if (!player.gameObjects) {
-      const bodySprite = this.add
+      const body = this.physics.add
         .sprite(player.location.x, player.location.y, 'bodyatlas', 'body-front')
         .setSize(30, 40)
         .setDepth(6);
-      const bodyPhysics = this.physics.add
-        .body(player.location.x, player.location.y)
-        .setSize(30, 40)
-        // .setOffset(0, 24)
-        .setGameObject(bodySprite);
 
       const hairSprite = this.physics.add.sprite(
         player.location.x,
-        player.location.y + 12,
+        player.location.y - 10,
         'hairatlas',
         'hair-front',
       );
@@ -738,14 +746,19 @@ export default class TownGameScene extends Phaser.Scene {
         },
       );
       player.gameObjects = {
-        bodySprite,
-        bodyPhysics,
+        body,
         layer,
         label,
         locationManagedByGameScene: true,
       };
       this._collidingLayers.forEach(collidingLayer =>
-        this.physics.add.collider(bodySprite, collidingLayer),
+        this.physics.add.collider(body, collidingLayer),
+      );
+      this._collidingLayers.forEach(collidingLayer =>
+        this.physics.add.collider(hairSprite, collidingLayer),
+      );
+      this._collidingLayers.forEach(collidingLayer =>
+        this.physics.add.collider(outfitSprite, collidingLayer),
       );
     }
   }
@@ -755,9 +768,9 @@ export default class TownGameScene extends Phaser.Scene {
       this._paused = true;
       const gameObjects = this.coveyTownController.ourPlayer.gameObjects;
       if (gameObjects) {
-        gameObjects.bodySprite.anims.stop();
+        gameObjects.body.anims.stop();
         // const body = gameObjects.sprite.body as Phaser.Physics.Arcade.Body;
-        gameObjects.bodyPhysics.setVelocity(0);
+        gameObjects.body.setVelocity(0);
       }
       assert(this.input.keyboard);
       this._previouslyCapturedKeys = this.input.keyboard.getCaptures();
