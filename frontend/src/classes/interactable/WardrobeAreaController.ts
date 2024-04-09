@@ -1,118 +1,126 @@
-import { WardrobeArea as WardrobeAreaModel } from '../../types/CoveyTownSocket';
+import {
+  GameInstanceID,
+  HairOption,
+  OutfitOption,
+  WardrobeArea as WardrobeAreaModel,
+  WardrobeStatus,
+} from '../../types/CoveyTownSocket';
+import PlayerController from '../PlayerController';
 import InteractableAreaController, {
   BaseInteractableEventMap,
   WARDROBE_AREA_TYPE,
 } from './InteractableAreaController';
+import TownController from '../TownController';
 
 /**
- * The events that a ViewingAreaController can emit
+ * The events that the WardrobeAreaController emits to subscribers. These events
+ * are only ever emitted to local components (not to the townService).
  */
 export type WardrobeAreaEvents = BaseInteractableEventMap & {
-  /**
-   * A playbackChange event indicates that the playing/paused state has changed.
-   * Listeners are passed the new state in the parameter `isPlaying`
-   */
-  playbackChange: (isPlaying: boolean) => void;
-  /**
-   * A progressChange event indicates that the progress of the video has changed, either
-   * due to the user scrubbing through the video, or from the natural progression of time.
-   * Listeners are passed the new playback time elapsed in seconds.
-   */
-  progressChange: (elapsedTimeSec: number) => void;
-  /**
-   * A videoChange event indicates that the video selected for this viewing area has changed.
-   * Listeners are passed the new video, which is either a string (the URL to a video), or
-   * the value `undefined` to indicate that there is no video set.
-   */
-  videoChange: (video: string | undefined) => void;
+  hairChange: (newHair: HairOption) => void;
+  outfitChange: (newOutfit: OutfitOption) => void;
+  playerChange: (newPlayer: PlayerController | undefined) => void;
 };
 
+export const NO_HAIR_OBJECT = { optionID: -1, optionFilePath: '(No filepath)' } as HairOption;
+export const NO_OUTFIT_OBJECT = { optionID: -1, optionFilePath: '(No filepath)' } as OutfitOption;
+
 /**
- * A ViewingAreaController manages the state for a ViewingArea in the frontend app, serving as a bridge between the video
- * that is playing in the user's browser and the backend TownService, ensuring that all players watching the same video
- * are synchronized in their playback.
- *
- * The ViewingAreaController implements callbacks that handle events from the video player in this browser window, and
- * emits updates when the state is updated, @see ViewingAreaEvents
+ * A WardrobeAreaController manages the local behavior of a wardrobe area in the frontend,
+ * implementing the logic to bridge between the townService's interpretation of wardrobe areas and the
+ * frontend's. The WardrobeAreaController emits events when the wardrobe area changes.
  */
 export default class WardrobeAreaController extends InteractableAreaController<
   WardrobeAreaEvents,
   WardrobeAreaModel
 > {
+  protected _instanceID?: GameInstanceID;
+
   private _model: WardrobeAreaModel;
 
+  private _townController: TownController;
+
+  private _player?: PlayerController;
+
   /**
-   * Constructs a new ViewingAreaController, initialized with the state of the
-   * provided viewingAreaModel.
-   *
-   * @param wardrobeAreaModel The viewing area model that this controller should represent
+   * Create a new WardrobeAreaController
+   * 
+   * @param id
+   * @param wardrobeAreaModel
+   * @param townController
    */
-  constructor(wardrobeAreaModel: WardrobeAreaModel) {
-    super(wardrobeAreaModel.id);
+  constructor(id: string, wardrobeAreaModel: WardrobeAreaModel, townController: TownController) {
+    super(id);
     this._model = wardrobeAreaModel;
+    this._townController = townController;
+    if (this._model.session?.player) {
+      this._player = this._townController.getPlayer(this._model.session?.player);
+    }
+  }
+
+  /**
+   * Returns the player controller of the player in the wardrobe
+   * or undefined if there is no player in the wardrobe.
+   *
+   * @returns The player controller of the player in the wardrobe, or undefined if there is no player in the wardrobe
+   */
+  get player(): PlayerController | undefined {
+    return this._player;
+  }
+
+  /**
+   * Returns the status of the wardrobe
+   */
+  get status(): WardrobeStatus {
+    return this._model.isOpen ? 'OPEN' : 'OCCUPIED';
+  }
+
+  /**
+   * Sends a request to the server to join the current game in the game area, or create a new one if there is no game in progress.
+   *
+   * @throws An error if the server rejects the request to join the game.
+   */
+  public async joinWardrobe() {
+    const { gameID } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'JoinWardrobe',
+    });
+    this._instanceID = gameID;
+  }
+
+  /**
+   * Sends a request to the server to leave the current game in the game area.
+   */
+  public async leaveWardrobe() {
+    const instanceID = this._instanceID;
+    if (instanceID) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'LeaveWardrobe',
+        gameID: instanceID,
+      });
+    }
+  }
+
+  toInteractableAreaModel(): WardrobeAreaModel {
+    return this._model;
+  }
+
+  protected _updateFrom(newModel: WardrobeAreaModel): void {
+    // If players change
+    const newPlayer = newModel.session?.player
+      ? this._townController.getPlayer(newModel.session.player)
+      : undefined;
+    if (newPlayer) {
+      this._player = newPlayer;
+      this.emit('playerChange', newPlayer);
+    } else {
+      this._player = undefined;
+      this.emit('playerChange', undefined);
+    }
+    this._instanceID = newModel.session?.id ?? undefined;
   }
 
   public isActive(): boolean {
-    return this._model.video !== undefined;
-  }
-
-  /**
-   * The URL of the video assigned to this viewing area, or undefined if there is not one.
-   */
-  public get video() {
-    return this._model.video;
-  }
-
-  /**
-   * The URL of the video assigned to this viewing area, or undefined if there is not one.
-   *
-   * Changing this value will emit a 'videoChange' event to listeners
-   */
-  public set video(video: string | undefined) {
-    if (this._model.video !== video) {
-      this._model.video = video;
-      this.emit('videoChange', video);
-    }
-  }
-
-  /**
-   * The playback position of the video, in seconds (a floating point number)
-   */
-  public get elapsedTimeSec() {
-    return this._model.elapsedTimeSec;
-  }
-
-  /**
-   * The playback position of the video, in seconds (a floating point number)
-   *
-   * Changing this value will emit a 'progressChange' event to listeners
-   */
-  public set elapsedTimeSec(elapsedTimeSec: number) {
-    if (this._model.elapsedTimeSec != elapsedTimeSec) {
-      this._model.elapsedTimeSec = elapsedTimeSec;
-      this.emit('progressChange', elapsedTimeSec);
-    }
-  }
-
-  /**
-   * The playback state - true indicating that the video is playing, false indicating
-   * that the video is paused.
-   */
-  public get isPlaying() {
-    return this._model.isPlaying;
-  }
-
-  /**
-   * The playback state - true indicating that the video is playing, false indicating
-   * that the video is paused.
-   *
-   * Changing this value will emit a 'playbackChange' event to listeners
-   */
-  public set isPlaying(isPlaying: boolean) {
-    if (this._model.isPlaying != isPlaying) {
-      this._model.isPlaying = isPlaying;
-      this.emit('playbackChange', isPlaying);
-    }
+    return this._model.isOpen && this.occupants.length > 0 && this._player !== undefined;
   }
 
   public get friendlyName(): string {
@@ -121,24 +129,5 @@ export default class WardrobeAreaController extends InteractableAreaController<
 
   public get type(): string {
     return WARDROBE_AREA_TYPE;
-  }
-
-  /**
-   * @returns ViewingAreaModel that represents the current state of this ViewingAreaController
-   */
-  public toInteractableAreaModel(): WardrobeAreaModel {
-    return this._model;
-  }
-
-  /**
-   * Applies updates to this viewing area controller's model, setting the fields
-   * isPlaying, elapsedTimeSec and video from the updatedModel
-   *
-   * @param updatedModel
-   */
-  protected _updateFrom(updatedModel: WardrobeAreaModel): void {
-    this.isPlaying = updatedModel.isPlaying;
-    this.elapsedTimeSec = updatedModel.elapsedTimeSec;
-    this.video = updatedModel.video;
   }
 }

@@ -24,7 +24,7 @@ import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
-import WardrobeArea from './WardrobeArea'; 
+import WardrobeArea from './wardrobe/WardrobeArea'; 
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -171,14 +171,14 @@ export default class Town {
         if (viewingArea) {
           (viewingArea as ViewingArea).updateModel(update);
         }
-      } else if (isWardrobeArea(update)) {
+      } /*else if (isWardrobeArea(update)) {
         const wardrobeArea = this._interactables.find(
           eachInteractable => eachInteractable.id === update.id,
         );
         if (wardrobeArea) {
           (wardrobeArea as WardrobeArea).updateModel(update);
         }
-      }
+      }*/
     });
 
     // Set up a listener to process commands to interactables.
@@ -354,7 +354,7 @@ export default class Town {
     const area = this._interactables.find(
       eachArea => eachArea.id === wardrobeArea.id,
     ) as WardrobeArea;
-    if (!area || !wardrobeArea.video || area.video) {
+    if (!area) {
       return false;
     }
     area.updateModel(wardrobeArea);

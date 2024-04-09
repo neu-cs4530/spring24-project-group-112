@@ -1,7 +1,7 @@
 import Interactable, { KnownInteractableTypes } from '../Interactable';
 
 export default class WardrobeArea extends Interactable {
-  private  _labelText?: Phaser.GameObjects.Text;
+  private _labelText?: Phaser.GameObjects.Text;
 
   private _defaultVideoURL?: string;
 

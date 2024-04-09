@@ -600,9 +600,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    *
    * @param newArea
    */
-    async createWardrobeArea(newArea: Omit<WardrobeAreaModel, 'type'>) {
+    /*async createWardrobeArea(newArea: Omit<WardrobeAreaModel, 'type'>) {
       await this._townsService.createWardrobeArea(this.townID, this.sessionToken, newArea);
-    }
+    }*/
 
   /**
    * Disconnect from the town, notifying the townService that we are leaving and returning
@@ -646,7 +646,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           } else if (isViewingArea(eachInteractable)) {
             this._interactableControllers.push(new ViewingAreaController(eachInteractable));
           } else if (isWardrobeArea(eachInteractable)) {
-            this._interactableControllers.push(new WardrobeAreaController(eachInteractable));
+            this._interactableControllers.push(new WardrobeAreaController(eachInteractable.id, eachInteractable, this));
           } else if (isTicTacToeArea(eachInteractable)) {
             this._interactableControllers.push(
               new TicTacToeAreaController(eachInteractable.id, eachInteractable, this),

@@ -17,7 +17,7 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 }
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'WardrobeArea' | 'TicTacToeArea' | 'ConnectFourArea';
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'WardrobeArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -35,6 +35,7 @@ export type PlayerID = string;
 export interface Player {
   id: PlayerID;
   userName: string;
+  outfit?: PrototypePlayerGameObjects;
   location: PlayerLocation;
 };
 
@@ -74,10 +75,37 @@ export interface ViewingArea extends Interactable {
   elapsedTimeSec: number;
 }
 
+export interface HairOption {
+  optionID: number;
+  optionFilePath: string; 
+  optionFrame?: string; 
+};
+export interface OutfitOption {
+  optionID: number; 
+  optionFilePath: string; 
+  optionFrame?: string; 
+}
+export interface BodyOption {
+  optionID: number; 
+  
+}
+
+export interface WardrobeInstance {
+  id: GameInstanceID;
+  player: PlayerID;
+}
+
 export interface WardrobeArea extends Interactable {
-  video?: string;
-  isPlaying: boolean;
-  elapsedTimeSec: number;
+  isOpen: boolean; 
+  user?: PlayerID;
+  session?: WardrobeInstance;
+};
+
+export type WardrobeStatus = 'OPEN' | 'OCCUPIED';
+
+export interface WardrobeState {
+  status: WardrobeStatus;
+  player?: PlayerID;
 }
 
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER' | 'WAITING_FOR_PLAYERS';
@@ -222,14 +250,18 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | WardrobeAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | JoinWardrobeCommand | LeaveWardrobeCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
 }
-export interface WardrobeAreaUpdateCommand  {
-  type: 'WardrobeAreaUpdate';
-  update: WardrobeArea;
+export interface JoinWardrobeCommand {
+  type: 'JoinWardrobe';
+}
+
+export interface LeaveWardrobeCommand {
+  type: 'LeaveWardrobe';
+  gameID: GameInstanceID;
 }
 export interface JoinGameCommand {
   type: 'JoinGame';
@@ -250,7 +282,6 @@ export interface GameMoveCommand<MoveType> {
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
   CommandType extends ViewingAreaUpdateCommand ? undefined :
-  CommandType extends WardrobeAreaUpdateCommand ? undefined :
   CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
   never;
@@ -261,6 +292,29 @@ export type InteractableCommandResponse<MessageType> = {
   error?: string;
   payload?: InteractableCommandResponseMap[MessageType];
 }
+
+export interface ILoginPageProps {
+  app: FirebaseApp | undefined;
+  callback: (userName: string, outfit?: PrototypePlayerGameObjects) => void;
+}
+
+/**
+ * This prototype player game object includes:
+ * - A GameObject.Sprite that represents the body as a sprite
+ * - A Physics.Arcade.Body that represents the dynamic body component attached to the body
+ * - A GameObject.Layer that stores 3 different components
+ *
+ * The layer contains two GameObject.Sprite objects: Hair and Outfit.
+ *
+ *
+ */
+export type PrototypePlayerGameObjects = {
+  bodySprite: Phaser.GameObjects.Sprite;
+  bodyPhysics: Phaser.Physics.Arcade.Body;
+  layer: Phaser.GameObjects.Layer;
+  label: Phaser.GameObjects.Text;
+  locationManagedByGameScene: boolean /* For the local player, the game scene will calculate the current location, and we should NOT apply updates when we receive events */;
+};
 
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;
