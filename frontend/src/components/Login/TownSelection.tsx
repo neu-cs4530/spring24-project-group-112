@@ -27,10 +27,10 @@ import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
 import firebase from 'firebase/compat/app';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
-import { PrototypePlayerGameObjects } from '../../../../shared/types/CoveyTownSocket';
 
 export default function TownSelection(): JSX.Element {
   const [userName, setUserName] = useState<string>('');
+  const [userID, setUserID] = useState<string>('');
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
   const [townIDToJoin, setTownIDToJoin] = useState<string>('');
@@ -44,8 +44,9 @@ export default function TownSelection(): JSX.Element {
   const app = firebase.initializeApp(firebaseConfig);
 
   // Create login calllback
-  const loginCallBack = (user: string, outfit?: PrototypePlayerGameObjects) => {
+  const loginCallBack = (user: string, id: string) => {
     setUserName(user);
+    setUserID(id);
   };
 
   const toast = useToast();
@@ -107,12 +108,16 @@ export default function TownSelection(): JSX.Element {
           }
         }, 1000);
         setIsJoining(true);
-        // TODO: modify constructor to take other player info
-        const newController = new TownController({
-          userName,
-          townID: coveyRoomID,
-          loginController,
-        });
+        console.log(`Creating town controller with userID ${userID}`);
+        const newController = new TownController(
+          {
+            userName,
+            townID: coveyRoomID,
+            loginController,
+          },
+          userID,
+          app,
+        );
         await newController.connect();
         const videoToken = newController.providerVideoToken;
         assert(videoToken);
