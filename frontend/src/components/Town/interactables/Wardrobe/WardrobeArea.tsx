@@ -20,12 +20,9 @@ import {
   import PlayerController from '../../../../classes/PlayerController';
   import { useInteractable, useInteractableAreaController } from '../../../../classes/TownController';
   import useTownController from '../../../../hooks/useTownController';
-  import { GameResult, InteractableID } from '../../../../types/CoveyTownSocket';
-  import ChatChannel from '../ChatChannel';
-  import ConnectFourArea from '../ConnectFour/ConnectFourArea';
+  import { InteractableID } from '../../../../types/CoveyTownSocket';
   import WardrobeAreaInteractable from '../WardrobeArea';
-  import Leaderboard from '../Leaderboard';
-  import TicTacToeArea from '../TicTacToe/TicTacToeArea';
+
   
   export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
   
@@ -52,8 +49,29 @@ import {
    */
   export default function WardrobeAreaWrapper(): JSX.Element {
     const wardrobeArea = useInteractable<WardrobeAreaInteractable>('wardrobeArea');
+    const townController = useTownController();
+
+    const isOpen = wardrobeArea !== undefined;
+
+    const closeModal = useCallback(() => {
+      if (wardrobeArea) {
+        townController.interactEnd(wardrobeArea);
+      }
+    }, [townController, wardrobeArea]);
     if (wardrobeArea) {
-      return <WardrobeArea interactableID={wardrobeArea.id} />;
+      //return <WardrobeArea wardrobeArea={wardrobeArea} />;
+      return (
+          <Modal isOpen={isOpen} closeOnOverlayClick={false} size='xl' onClose={() => {
+            closeModal();
+            townController.unPause();
+          }}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Wardrobe!</ModalHeader>
+            <ModalCloseButton />
+          </ModalContent>
+        </Modal>
+      )
     }
     return <></>;
   }
