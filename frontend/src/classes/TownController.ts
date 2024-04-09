@@ -243,7 +243,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     const url = process.env.NEXT_PUBLIC_TOWNS_SERVICE_URL;
     assert(url);
     this._socket = io(url, { auth: { userName, townID, userID } });
-    console.log(`User connecting with ${userID}`);
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
     this.registerSocketListeners();
   }
@@ -658,12 +657,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         });
         this._userID = initialData.userID;
         this._ourPlayer = this.players.find(eachPlayer => eachPlayer.id == this.userID);
-        this.emitChatMessage({
-          author: 'SERVER',
-          sid: '',
-          body: `Player ${this._userID} has joined the town`,
-          dateCreated: new Date(),
-        });
         this.emit('connect', initialData.providerVideoToken);
         resolve();
       });

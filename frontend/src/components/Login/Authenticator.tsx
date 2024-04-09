@@ -72,7 +72,7 @@ export default function Login(props: ILoginPageProps): JSX.Element {
       }
       const id = userCredential.user?.uid;
       const docRef = doc(db, 'accounts', id);
-      console.log('Searching for ' + email + ' in ' + id);
+      console.log('Searching for username...');
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists() && docSnap.data().userName !== undefined) {
