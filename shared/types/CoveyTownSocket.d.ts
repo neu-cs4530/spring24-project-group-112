@@ -309,7 +309,8 @@ export interface ILoginPageProps {
  *
  */
 export type PrototypePlayerGameObjects = {
-  body: Phaser.Physics.Arcade.SpriteWithDynamicBody;
+  bodySprite: Phaser.GameObjects.Sprite;
+  bodyPhysics: Phaser.Physics.Arcade.Body;
   layer: Phaser.GameObjects.Layer;
   label: Phaser.GameObjects.Text;
   locationManagedByGameScene: boolean /* For the local player, the game scene will calculate the current location, and we should NOT apply updates when we receive events */;

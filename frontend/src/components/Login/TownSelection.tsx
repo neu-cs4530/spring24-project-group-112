@@ -21,13 +21,9 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Town } from '../../generated/client';
-import Login from './Authenticator';
-import { firebaseConfig } from './Config';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
-import firebase from 'firebase/compat/app';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
-import { PrototypePlayerGameObjects } from '../../../../shared/types/CoveyTownSocket';
 
 export default function TownSelection(): JSX.Element {
   const [userName, setUserName] = useState<string>('');
@@ -39,14 +35,6 @@ export default function TownSelection(): JSX.Element {
   const loginController = useLoginController();
   const { setTownController, townsService } = loginController;
   const { connect: videoConnect } = useVideoContext();
-
-  // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-
-  // Create login calllback
-  const loginCallBack = (user: string, outfit?: PrototypePlayerGameObjects) => {
-    setUserName(user);
-  };
 
   const toast = useToast();
 
@@ -107,7 +95,6 @@ export default function TownSelection(): JSX.Element {
           }
         }, 1000);
         setIsJoining(true);
-        // TODO: modify constructor to take other player info
         const newController = new TownController({
           userName,
           townID: coveyRoomID,
@@ -251,7 +238,22 @@ export default function TownSelection(): JSX.Element {
     <>
       <form>
         <Stack>
-          <Login app={app} callback={loginCallBack} />
+          <Box p='4' borderWidth='1px' borderRadius='lg'>
+            <Heading as='h2' size='lg'>
+              Select a username
+            </Heading>
+
+            <FormControl>
+              <FormLabel htmlFor='name'>Name</FormLabel>
+              <Input
+                autoFocus
+                name='name'
+                placeholder='Your name'
+                value={userName}
+                onChange={event => setUserName(event.target.value)}
+              />
+            </FormControl>
+          </Box>
           <Box borderWidth='1px' borderRadius='lg'>
             <Heading p='4' as='h2' size='lg'>
               Create a New Town

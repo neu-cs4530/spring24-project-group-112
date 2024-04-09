@@ -185,37 +185,6 @@ export class TownsController extends Controller {
   }
 
   /**
-   * Creates a viewing area in a given town
-   *
-   * @param townID ID of the town in which to create the new viewing area
-   * @param sessionToken session token of the player making the request, must
-   *        match the session token returned when the player joined the town
-   * @param requestBody The new viewing area to create
-   *
-   * @throws InvalidParametersError if the session token is not valid, or if the
-   *          viewing area could not be created
-   */
-  @Post('{townID}/wardrobeArea')
-  @Response<InvalidParametersError>(400, 'Invalid values specified')
-  public async createWardrobe(
-    @Path() townID: string,
-    @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: Omit<ViewingArea, 'type'>,
-  ): Promise<void> {
-    const town = this._townsStore.getTownByID(townID);
-    if (!town) {
-      throw new InvalidParametersError('Invalid values specified');
-    }
-    if (!town?.getPlayerBySessionToken(sessionToken)) {
-      throw new InvalidParametersError('Invalid values specified');
-    }
-    const success = town.addWardrobeArea({ ...requestBody, type: 'WardrobeArea' });
-    if (!success) {
-      throw new InvalidParametersError('Invalid values specified');
-    }
-  }
-
-  /**
    * Retrieves up to the first 200 chat messages for a given town, optionally filtered by interactableID
    * @param townID town to retrieve messages for
    * @param sessionToken a valid session token for a player in the town
@@ -250,7 +219,6 @@ export class TownsController extends Controller {
    */
   public async joinTown(socket: CoveyTownSocket) {
     // Parse the client's requested username from the connection
-    // TODO: This socket information should include more player information
     const { userName, townID } = socket.handshake.auth as { userName: string; townID: string };
 
     const town = this._townsStore.getTownByID(townID);

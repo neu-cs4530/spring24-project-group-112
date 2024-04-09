@@ -47,8 +47,6 @@ import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import WardrobeAreaController from './interactable/WardrobeAreaController';
 import PlayerController from './PlayerController';
-import WardrobeArea from '../components/Town/interactables/WardrobeArea';
-import WardrobeAreaController from './interactable/TownWardrobe/WardrobeAreaController';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
 const SOCKET_COMMAND_TIMEOUT_MS = 5000;
@@ -217,7 +215,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private _interactableEmitter = new EventEmitter();
 
-  // TODO: modify constructor to accept additional player info
   public constructor({ userName, townID, loginController }: ConnectionProperties) {
     super();
     this._townID = townID;
@@ -658,10 +655,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             this._interactableControllers.push(
               new ConnectFourAreaController(eachInteractable.id, eachInteractable, this),
             );
-          } else if (isWardrobeArea(eachInteractable)) {
-            this._interactableControllers.push(
-              new WardrobeAreaController(eachInteractable.id, eachInteractable, this),
-            );
           }
         });
         this._userID = initialData.userID;
@@ -692,6 +685,23 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
   }
 
+    /**
+   * Retrieve the viewing area controller that corresponds to a viewingAreaModel, creating one if necessary
+   *
+   * @param wardrobeArea
+   * @returns
+   */
+    public getWardrobeAreaController(wardrobeArea: WardrobeArea): WardrobeAreaController {
+      const existingController = this._interactableControllers.find(
+        eachExistingArea => eachExistingArea.id === wardrobeArea.name,
+      );
+      if (existingController instanceof WardrobeAreaController) {
+        return existingController;
+      } else {
+        throw new Error(`No such wardrobe area controller ${existingController}`);
+      }
+    }
+
   public getConversationAreaController(
     converationArea: ConversationArea,
   ): ConversationAreaController {
@@ -702,26 +712,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       return existingController;
     } else {
       throw new Error(`No such viewing area controller ${existingController}`);
-    }
-  }
-
-  /**
-   * Retrieve the wardrobe area controller that corresponds to a wardrobeArea, creating one if necessary
-   * or throws an error if the wardrobe area controller does not exist
-   * 
-   * @throws Error if the wardrobe area controller does not exist
-   * 
-   * @param wardrobeArea 
-   * @returns the corresponding WardrobeAreaController
-   */
-  public getWardrobeAreaController(wardrobeArea: WardrobeArea): WardrobeAreaController {
-    const existingController = this._interactableControllers.find(
-      eachExistingArea => eachExistingArea.id === wardrobeArea.name,
-    );
-    if (existingController instanceof WardrobeAreaController) {
-      return existingController;
-    } else {
-      throw new Error(`No such wardrobe area controller ${existingController}`);
     }
   }
 

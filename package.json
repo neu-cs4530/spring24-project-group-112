@@ -28,7 +28,6 @@
         "eslint-plugin-jest": "^24.1.3",
         "eslint-plugin-react": "^7.21.5",
         "eslint-plugin-react-hooks": "^4.2.0",
-        "firebase": "^10.9.0",
         "npm-pack-zip": "^1.3.0",
         "prettier": "^2.1.2",
         "prettier-plugin-organize-imports": "^1.1.1",
@@ -40,12 +39,11 @@
     },
     "dependencies": {
         "@types/ramda": "^0.27.34",
-        "firebaseui": "^6.1.0",
         "ramda": "^0.27.1",
         "typescript-is": "^0.17.0"
     },
     "files": [
-        "frontend/src/classes/interactable/ConnectFourAreaController.ts",
+	    "frontend/src/classes/interactable/ConnectFourAreaController.ts",
         "frontend/src/classes/interactable/InteractableAreaController.ts",
         "frontend/src/components/Town/interactables/ConnectFour/ConnectFourArea.tsx",
         "frontend/src/components/Town/interactables/ConnectFour/ConnectFourBoard.tsx",

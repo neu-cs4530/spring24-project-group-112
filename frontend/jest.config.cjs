@@ -1,5 +1,4 @@
-const esModules = ['nanoid', '@firebase/firestore/dist/lite'].join('|');
-
+const esModules = ['nanoid'].join('|');
 /*
 If, after upgrading/installing new dependencies, jest complains about 
 "cannot use import outside of module" and has a dependency in that trace, add the

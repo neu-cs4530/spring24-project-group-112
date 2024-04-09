@@ -118,58 +118,58 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   private _updateGameComponentLocation() {
     if (this.gameObjects && !this.gameObjects.locationManagedByGameScene) {
-      const { body, layer, label } = this.gameObjects;
+      const { bodySprite, bodyPhysics, layer, label } = this.gameObjects;
       const hair = layer.getAt(0) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
       const outfit = layer.getAt(1) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-      if (!body.sprite.anims || !hair.anims || !outfit.anims) return;
-      body.setX(this.location.x);
-      body.setY(this.location.y);
+      if (!bodySprite.anims || !hair.anims || !outfit.anims) return;
+      bodySprite.setX(this.location.x);
+      bodySprite.setY(this.location.y);
       hair.setX(this.location.x);
-      hair.setY(this.location.y - 10);
+      hair.setY(this.location.y);
       outfit.setX(this.location.x);
-      outfit.setY(this.location.y + 10);
+      outfit.setY(this.location.y);
       if (this.location.moving) {
-        body.anims.play(`body-${this.location.rotation}-walk`, true);
+        bodySprite.anims.play(`body-${this.location.rotation}-walk`, true);
         hair.anims.play('hair-${this.location.rotation}-walk', true);
         outfit.anims.play('dress-${this.location.rotation}-walk', true);
         switch (this.location.rotation) {
           case 'front':
-            body.body.setVelocity(0, MOVEMENT_SPEED);
+            bodyPhysics.setVelocity(0, MOVEMENT_SPEED);
             hair.body.setVelocity(0, MOVEMENT_SPEED);
             outfit.body.setVelocity(0, MOVEMENT_SPEED);
             break;
           case 'right':
-            body.body.setVelocity(MOVEMENT_SPEED, 0);
+            bodyPhysics.setVelocity(MOVEMENT_SPEED, 0);
             hair.body.setVelocity(MOVEMENT_SPEED, 0);
             outfit.body.setVelocity(MOVEMENT_SPEED, 0);
             break;
           case 'back':
-            body.body.setVelocity(0, -MOVEMENT_SPEED);
+            bodyPhysics.setVelocity(0, -MOVEMENT_SPEED);
             hair.body.setVelocity(0, -MOVEMENT_SPEED);
             outfit.body.setVelocity(0, -MOVEMENT_SPEED);
             break;
           case 'left':
-            body.body.setVelocity(-MOVEMENT_SPEED, 0);
+            bodyPhysics.setVelocity(-MOVEMENT_SPEED, 0);
             hair.body.setVelocity(-MOVEMENT_SPEED, 0);
             outfit.body.setVelocity(-MOVEMENT_SPEED, 0);
             break;
         }
-        body.body.velocity.normalize().scale(175);
+        bodyPhysics.velocity.normalize().scale(175);
         hair.body.velocity.normalize().scale(175);
         outfit.body.velocity.normalize().scale(175);
       } else {
-        body.body.setVelocity(0, 0);
+        bodyPhysics.setVelocity(0, 0);
         hair.body.setVelocity(0, 0);
         outfit.body.setVelocity(0, 0);
-        body.anims.stop();
+        bodySprite.anims.stop();
         hair.anims.stop();
         outfit.anims.stop();
-        body.setTexture('bodyatlas', `body-${this.location.rotation}`);
+        bodySprite.setTexture('bodyatlas', `body-${this.location.rotation}`);
         hair.setTexture('hairatlas', `hair-${this.location.rotation}`);
         outfit.setTexture('outfitatlas', `dress-${this.location.rotation}`);
       }
-      label.setX(body.x);
-      label.setY(body.y - 20);
+      label.setX(bodyPhysics.x);
+      label.setY(bodyPhysics.y - 20);
     }
   }
 

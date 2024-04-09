@@ -9,8 +9,6 @@ import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { Heading, Text } from '@chakra-ui/react';
 import TownSelection from '../../../../Login/TownSelection';
 import { TownJoinResponse } from '../../../../../types/CoveyTownSocket';
-import { FirebaseApp } from 'firebase/app';
-import Login from '../../../../Login/Authenticator';
 
 export enum Steps {
   roomNameStep,
@@ -45,7 +43,6 @@ export default function PreJoinScreens() {
         to hang out in, or join an existing one.
       </Text>
         <DeviceSelectionScreen />
-        <Login app={undefined} />
         <TownSelection />
     </IntroContainer>
   );
