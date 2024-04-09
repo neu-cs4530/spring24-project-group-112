@@ -310,10 +310,15 @@ export default class TownGameScene extends Phaser.Scene {
       const isMoving = primaryDirection !== undefined;
       // hairSprite.setY(gameObjects.body.y);
       // outfitSprite.setY(gameObjects.body.y);
-      gameObjects.label.setX(gameObjects.body.x);
-      gameObjects.label.setY(gameObjects.body.y - 20);
+
       const x = gameObjects.body.getBounds().centerX;
       const y = gameObjects.body.getBounds().centerY;
+
+      hairSprite.copyPosition(gameObjects.body);
+      outfitSprite.copyPosition(gameObjects.body);
+      hairSprite.y -= 10;
+      outfitSprite.y += 10;
+
       //Move the sprite
       if (
         !this._lastLocation ||
@@ -484,22 +489,10 @@ export default class TownGameScene extends Phaser.Scene {
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
     // player's body.
 
-    // const sprite = this.physics.add
-    //   .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
-    //   .setSize(30, 40)
-    //   .setOffset(0, 24)
-    //   .setDepth(6);
-
     const body = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y, 'bodyatlas', 'body-front')
       .setBodySize(30, 40)
-      // .setSize(30, 40)
       .setDepth(6);
-    // const bodyPhysics = this.physics.add
-    //   .body(spawnPoint.x, spawnPoint.y)
-    //   .setSize(30, 40)
-    //   .setGameObject(bodySprite);
-
     const hairSprite = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y - 10, 'hairatlas', 'hair-front')
       .setSize(32, 26);
@@ -518,6 +511,8 @@ export default class TownGameScene extends Phaser.Scene {
         backgroundColor: '#ffffff',
       })
       .setDepth(6);
+
+    // Where info is saved to player controller
     this.coveyTownController.ourPlayer.gameObjects = {
       body,
       layer,
