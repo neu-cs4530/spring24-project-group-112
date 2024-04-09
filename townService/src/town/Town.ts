@@ -437,10 +437,17 @@ export default class Town {
       .filter(eachObject => eachObject.type === 'GameArea')
       .map(eachGameAreaObj => GameAreaFactory(eachGameAreaObj, this._broadcastEmitter));
 
+    const wardrobeAreas = objectLayer.objects
+    .filter(eachObject => eachObject.type === 'WardrobeArea')
+    .map(eachWardrobeAreaObj =>
+      WardrobeArea.fromMapObject(eachWardrobeAreaObj, this._broadcastEmitter),
+    );
+
     this._interactables = this._interactables
       .concat(viewingAreas)
       .concat(conversationAreas)
-      .concat(gameAreas);
+      .concat(gameAreas)
+      .concat(wardrobeAreas);
     this._validateInteractables();
   }
 

@@ -612,7 +612,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     await this._townsService.createViewingArea(this.townID, this.sessionToken, newArea);
   }
 
-  async createWardrobeArea(newArea: { id: string; player: string }) {
+  async createWardrobe(newArea: { id: string; player: string, occupants: Array<string>, isOpen: true }) {
     await this._townsService.createWardrobeArea(this.townID, this.sessionToken, newArea);
   }
 
@@ -647,7 +647,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             PlayerController.fromPlayerModel(eachPlayerModel),
           ),
         );
-
+        console.log(initialData.interactables);
         this._interactableControllers = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
@@ -664,10 +664,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
               new TicTacToeAreaController(eachInteractable.id, eachInteractable, this),
             );
           } else if (isConnectFourArea(eachInteractable)) {
+            console.log("Pushed connect four area.");
             this._interactableControllers.push(
               new ConnectFourAreaController(eachInteractable.id, eachInteractable, this),
             );
           } else if (isWardrobeArea(eachInteractable)) {
+            console.log("Pushed wardrobe area");
             this._interactableControllers.push(
               new WardrobeAreaController(eachInteractable.id, eachInteractable, this),
             );
@@ -847,9 +849,16 @@ export function useInteractableAreaController<T>(interactableAreaID: string): T 
     const viewingAreaController = townController.viewingAreas.find(
       eachArea => eachArea.id == interactableAreaID,
     );
+    //Look for a wardrobe area
+    const wardrobeAreaController = townController.wardrobeAreas.find(
+      eachArea => eachArea.id == interactableAreaID,
+    );
     if (viewingAreaController) {
       return viewingAreaController as unknown as T;
+    } else if (wardrobeAreaController) {
+      return wardrobeAreaController as unknown as T;
     }
+    // Throw an error if neither found
     throw new Error(`Requested interactable area ${interactableAreaID} does not exist`);
   }
   return gameAreaController as unknown as T;
