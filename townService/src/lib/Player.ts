@@ -18,9 +18,6 @@ export default class Player {
    */
   private readonly _id: string;
 
-  /** The outfit data for this player */
-  private readonly _outfit?: PrototypePlayerGameObjects;
-
   /** The player's username, which is not guaranteed to be unique within the town * */
   private readonly _userName: string;
 
@@ -33,12 +30,7 @@ export default class Player {
   /** A special town emitter that will emit events to the entire town BUT NOT to this player */
   public readonly townEmitter: TownEmitter;
 
-  constructor(
-    userName: string,
-    townEmitter: TownEmitter,
-    id?: string,
-    outfit?: PrototypePlayerGameObjects,
-  ) {
+  constructor(userName: string, townEmitter: TownEmitter, id?: string) {
     this.location = {
       x: 0,
       y: 0,
@@ -79,7 +71,6 @@ export default class Player {
     return {
       id: this._id,
       location: this.location,
-      outfit: this._outfit,
       userName: this._userName,
     };
   }

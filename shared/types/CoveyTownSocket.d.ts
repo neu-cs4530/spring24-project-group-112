@@ -295,7 +295,7 @@ export type InteractableCommandResponse<MessageType> = {
 
 export interface ILoginPageProps {
   app: FirebaseApp | undefined;
-  callback: (userName: string, outfit?: PrototypePlayerGameObjects) => void;
+  callback: (userName: string, id: string) => void;
 }
 
 /**

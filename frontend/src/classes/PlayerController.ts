@@ -88,6 +88,13 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     return this._id;
   }
 
+  private static async _init(PID: string) {
+    const player = await this._getPlayer(PID);
+    if (player) {
+      console.log('Player id "', this.id, '" exists');
+    }
+  }
+
   private async _getPlayer(id: string) {
     const db = getFirestore(PlayerController._app);
     const playersCol = collection(db, 'players');
@@ -175,7 +182,10 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     }
   }
 
-  static fromPlayerModel(modelPlayer: PlayerModel): PlayerController {
-    return new PlayerController(modelPlayer.id, modelPlayer.userName, modelPlayer.location);
+  static async fromPlayerModel(modelPlayer: PlayerModel): Promise<PlayerController> {
+    // const fbReturn = await this._init();
+    const ret = new PlayerController(modelPlayer.id, modelPlayer.userName, modelPlayer.location);
+
+    return ret;
   }
 }
