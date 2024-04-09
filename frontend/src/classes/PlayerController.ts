@@ -4,6 +4,9 @@ import {
   Player as PlayerModel,
   PlayerLocation,
   PrototypePlayerGameObjects,
+  HairOption,
+  OutfitOption,
+  BodyOption,
 } from '../types/CoveyTownSocket';
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, initializeApp } from 'firebase/app';
@@ -25,6 +28,12 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   public gameObjects?: PrototypePlayerGameObjects;
 
+  private _bodySelection: BodyOption;
+
+  private _hairSelection: HairOption;
+
+  private _outfitSelection: OutfitOption;
+
   private static _app: FirebaseApp = initializeApp(firebaseConfig);
 
   constructor(
@@ -39,6 +48,11 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._userName = userName;
     this._location = location;
     this.gameObjects = outfit;
+
+    // when first constructed, all player controllers are set with default values.
+    this._bodySelection = { optionID: 0, optionAtlas: 'bodyatlas', optionFrame: 'body-' };
+    this._hairSelection = { optionID: 0, optionAtlas: 'hairatlas', optionFrame: 'hair-' };
+    this._outfitSelection = { optionID: 0, optionAtlas: 'dressatlas', optionFrame: 'dress-' };
   }
 
   set location(newLocation: PlayerLocation) {
@@ -53,30 +67,39 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   /**
    * Sets the texture of the new hair selected in the wardrobe.
+   * The original selection for hair is automatically updated with the new hair.
    * @throws 'No body detected' if the game object of this player is undefined.
    * @param file path of the image of the hair
    */
-  set hair(newHair: string) {
+  set hairSelection(newHair: HairOption) {
     if (this.gameObjects === undefined) {
       throw new Error('No body detected');
     }
     const hairComponent = this.gameObjects.layer.getAt(0) as Phaser.Physics.Arcade.Sprite;
-    hairComponent.setTexture(newHair);
+    hairComponent.setTexture(
+      newHair.optionAtlas,
+      `${newHair.optionFrame}${this.location.rotation}`,
+    );
+    this._hairSelection = newHair;
     console.log('player hair set to: ', newHair);
   }
 
   /**
    * Sets the texture of the new outfit selected in the wardrobe.
+   * The original selection for outfit is automatically updated with the new outfit.
    * @throws 'No body detected' if the game object of this player is undefined.
    * @param file path of the image of the outfit
    */
-  set outfit(newOutfit: string) {
+  set outfitSelection(newOutfit: OutfitOption) {
     if (this.gameObjects === undefined) {
       throw new Error('No body detected');
     }
 
     const outfitComponent = this.gameObjects.layer.getAt(1) as Phaser.Physics.Arcade.Sprite;
-    outfitComponent.setTexture(newOutfit);
+    outfitComponent.setTexture(
+      newOutfit.optionAtlas,
+      `${newOutfit.optionFrame}${this.location.rotation}`,
+    );
     console.log('player outfit set to: ', newOutfit);
   }
 
@@ -86,6 +109,20 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   get id(): string {
     return this._id;
+  }
+
+  get bodySelection(): BodyOption {
+    return this._bodySelection;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/adjacent-overload-signatures
+  get hairSelection(): HairOption {
+    return this._hairSelection;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/adjacent-overload-signatures
+  get outfitSelection(): OutfitOption {
+    return this._outfitSelection;
   }
 
   private static async _init(PID: string) {
@@ -138,9 +175,12 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       outfit.setX(this.location.x);
       outfit.setY(this.location.y + 10);
       if (this.location.moving) {
-        body.anims.play(`body-${this.location.rotation}-walk`, true);
-        hair.anims.play(`hair-${this.location.rotation}-walk`, true);
-        outfit.anims.play(`dress-${this.location.rotation}-walk`, true);
+        body.anims.play(`${this._bodySelection.optionFrame}${this.location.rotation}-walk`, true);
+        hair.anims.play(`${this._hairSelection.optionFrame}${this.location.rotation}-walk`, true);
+        outfit.anims.play(
+          `${this._outfitSelection.optionFrame}${this.location.rotation}-walk`,
+          true,
+        );
         switch (this.location.rotation) {
           case 'front':
             body.body.setVelocity(0, MOVEMENT_SPEED);
@@ -173,9 +213,18 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
         body.anims.stop();
         hair.anims.stop();
         outfit.anims.stop();
-        body.setTexture('bodyatlas', `body-${this.location.rotation}`);
-        hair.setTexture('hairatlas', `hair-${this.location.rotation}`);
-        outfit.setTexture('outfitatlas', `dress-${this.location.rotation}`);
+        body.setTexture(
+          this._bodySelection.optionAtlas,
+          `${this._bodySelection.optionFrame}${this.location.rotation}`,
+        );
+        hair.setTexture(
+          this._hairSelection.optionAtlas,
+          `${this._hairSelection.optionFrame}${this.location.rotation}`,
+        );
+        outfit.setTexture(
+          this._outfitSelection.optionAtlas,
+          `${this._outfitSelection.optionFrame}${this.location.rotation}`,
+        );
       }
       label.setX(body.x);
       label.setY(body.y - 20);

@@ -22,8 +22,8 @@ export type WardrobeAreaEvents = BaseInteractableEventMap & {
   playerChange: (newPlayer: PlayerController | undefined) => void;
 };
 
-export const NO_HAIR_OBJECT = { optionID: -1, optionFilePath: '(No filepath)' } as HairOption;
-export const NO_OUTFIT_OBJECT = { optionID: -1, optionFilePath: '(No filepath)' } as OutfitOption;
+// export const NO_HAIR_OBJECT = { optionID: -1, optionFilePath: '(No filepath)' } as HairOption;
+// export const NO_OUTFIT_OBJECT = { optionID: -1, optionFilePath: '(No filepath)' } as OutfitOption;
 
 /**
  * A WardrobeAreaController manages the local behavior of a wardrobe area in the frontend,
@@ -135,12 +135,12 @@ export default class WardrobeAreaController extends InteractableAreaController<
   public changeAppearance(hair: HairOption | undefined, outfit: OutfitOption | undefined): void {
     if (this._player === undefined) {
       throw new Error('No player detected');
-    } 
+    }
     if (hair) {
-      this._player.hair = hair.optionFilePath;
+      this._player.hairSelection = hair;
     }
     if (outfit) {
-      this._player.outfit = outfit.optionFilePath;
+      this._player.outfitSelection = outfit;
     }
   }
 }
