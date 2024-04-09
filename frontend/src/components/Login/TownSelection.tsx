@@ -108,7 +108,7 @@ export default function TownSelection(): JSX.Element {
           }
         }, 1000);
         setIsJoining(true);
-        console.log(`Creating town controller with userID ${userID}`);
+        console.log(`Creating town controller with username ${userName}`);
         const newController = new TownController(
           {
             userName,
@@ -151,7 +151,7 @@ export default function TownSelection(): JSX.Element {
         }
       }
     },
-    [setTownController, userName, toast, videoConnect, loginController],
+    [setTownController, userName, userID, app, toast, videoConnect, loginController],
   );
 
   const handleCreate = async () => {
