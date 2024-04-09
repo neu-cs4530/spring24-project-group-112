@@ -226,8 +226,8 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
           `${this._outfitSelection.optionFrame}${this.location.rotation}`,
         );
       }
-      label.setX(body.x);
-      label.setY(body.y - 20);
+      label.setX(body.x + 10);
+      label.setY(body.y - 30);
     }
   }
 

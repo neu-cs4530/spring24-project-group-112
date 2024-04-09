@@ -397,8 +397,8 @@ export default class TownGameScene extends Phaser.Scene {
       //Update the location for the labels of all of the other players
       for (const playerEntity of this._players) {
         if (playerEntity.gameObjects?.label && playerEntity.gameObjects?.body) {
-          playerEntity.gameObjects.label.setX(playerEntity.gameObjects.body.x);
-          playerEntity.gameObjects.label.setY(playerEntity.gameObjects.body.y - 20);
+          playerEntity.gameObjects.label.setX(playerEntity.gameObjects.body.x + 10);
+          playerEntity.gameObjects.label.setY(playerEntity.gameObjects.body.y - 30);
         }
       }
     }
@@ -555,7 +555,7 @@ export default class TownGameScene extends Phaser.Scene {
     layer.add(outfitSprite);
 
     const label = this.add
-      .text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
+      .text(spawnPoint.x + 10, spawnPoint.y - 30, '(You)', {
         font: '18px monospace',
         color: '#000000',
         // padding: {x: 20, y: 10},
@@ -787,8 +787,8 @@ export default class TownGameScene extends Phaser.Scene {
       layer.add(outfitSprite);
 
       const label = this.add.text(
-        player.location.x,
-        player.location.y - 20,
+        player.location.x + 10,
+        player.location.y - 30,
         player === this.coveyTownController.ourPlayer ? '(You)' : player.userName,
         {
           font: '18px monospace',
