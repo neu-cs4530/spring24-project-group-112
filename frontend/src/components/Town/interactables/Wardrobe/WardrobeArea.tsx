@@ -59,7 +59,7 @@ const StyledWardrobeBoard = chakra(Container, {
 });
 
 function WardrobeBoard(
-  { wardrobeAreaController } : WardrobeProps
+  //{ wardrobeAreaController } : WardrobeProps
 ): JSX.Element {
   const hairImage1 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
   const hairImage2 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
@@ -111,11 +111,12 @@ function WardrobeBoard(
  * A generic component that renders a wardrobe area.
  *
  * It uses Chakra-UI components (does not use other GUI widgets)
+ *
+ * 
+ * TODO: What should it render?
  */
 function WardrobeArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
-  console.log("Hit WardrobeArea call.");
-  const wardrobeAreaController = useInteractableAreaController<WardrobeAreaController>(interactableID);
-  console.log("Got the area controller.");
+  //const wardrobeAreaController = useInteractableAreaController<WardrobeAreaController>(interactableID);
   const townController = useTownController();
 
   //const [status, setStatus] = useState<WardrobeStatus>(wardrobeAreaController.status);
@@ -134,13 +135,17 @@ function WardrobeArea({ interactableID }: { interactableID: InteractableID }): J
 
   return (
     <Container>
-      {//<WardrobeBoard wardrobeAreaController={wardrobeAreaController} />
-}
+      <WardrobeBoard/> 
+      {//wardrobeAreaController={wardrobeAreaController}
+}    
     </Container>
   )
 }
 
 /**
+ * A wrapper component for the ConnectFourArea and TicTacToeArea components.
+ * Determines if the player is currently in a game area on the map, and if so,
+ * renders the selected game area component in a modal.
  *
  */
 export default function WardrobeAreaWrapper(): JSX.Element {
@@ -163,7 +168,7 @@ export default function WardrobeAreaWrapper(): JSX.Element {
         }}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Wardrobe: Edit your sprite's hair and outfit!</ModalHeader>
+          <ModalHeader>Wardrobe: Edit your sprite's hair and outfit! {wardrobeArea.id}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <WardrobeArea interactableID={wardrobeArea.id} />
