@@ -25,11 +25,14 @@ import WardrobeAreaController from '../../../../classes/interactable/TownWardrob
 import PlayerController from '../../../../classes/PlayerController';
 import { useInteractable, useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
-import { InteractableID } from '../../../../types/CoveyTownSocket';
+import { HairOption, InteractableID, OutfitOption, WardrobeStatus } from '../../../../types/CoveyTownSocket';
 import WardrobeAreaInteractable from '../WardrobeArea';
 
-
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
+
+export type WardrobeProps = {
+  wardrobeAreaController: WardrobeAreaController;
+};
 
 const StyledOptionSquare = chakra(IconButton, {
   baseStyle: {
@@ -55,10 +58,53 @@ const StyledWardrobeBoard = chakra(Container, {
   },
 });
 
-function WardrobeBoard(controller: WardrobeAreaController): JSX.Element {
+function WardrobeBoard(
+  //{ wardrobeAreaController } : WardrobeProps
+): JSX.Element {
+  const hairImage1 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
+  const hairImage2 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
+  const clothingImage1 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
+  const clothingImage2 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
   
-  
-  return <></>
+  let hairChoice: HairOption | undefined = undefined;
+  let clothingChoice: OutfitOption | undefined = undefined;
+
+  /*const saveChanges = () => {
+    //This needs to save the changes to the player's sprite
+    wardrobeAreaController.changeAppearance(hairChoice, clothingChoice);
+  }*/
+
+  return (
+    <StyledWardrobeBoard>
+      <StyledOptionSquare aria-label='Hair Option 1' icon={hairImage1} onClick={() => {
+        hairChoice = {
+          optionID: 1,
+          optionFilePath: "option 1",
+        };
+      }} />
+      <StyledOptionSquare aria-label='Hair Option 2' icon={hairImage2} onClick={() => {
+        hairChoice = {
+          optionID: 2,
+          optionFilePath: "option 2",
+        };
+      }}/>
+      <StyledOptionSquare aria-label='Clothing Option 1' icon={clothingImage1} onClick={() => {
+        clothingChoice = {
+          optionID: 1,
+          optionFilePath: "option 1",
+        };
+      }}/>
+      <StyledOptionSquare aria-label='Clothing Option 2' icon={clothingImage2} onClick={() => {
+        clothingChoice = {
+          optionID: 2,
+          optionFilePath: "option 2",
+        };
+      }}/>
+      <Button aria-label='Confirm Changes' >
+        Confirm Changes
+      </Button>
+    </StyledWardrobeBoard>
+  );
 }
 
 /**
@@ -70,22 +116,32 @@ function WardrobeBoard(controller: WardrobeAreaController): JSX.Element {
  * TODO: What should it render?
  */
 function WardrobeArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
-  const hairImage1 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
-  const hairImage2 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
-  const clothingImage1 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
-  const clothingImage2 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
+  //const wardrobeAreaController = useInteractableAreaController<WardrobeAreaController>(interactableID);
+  const townController = useTownController();
+
+  //const [status, setStatus] = useState<WardrobeStatus>(wardrobeAreaController.status);
+  //const [player, setPlayer] = useState<PlayerController | undefined>(wardrobeAreaController.player);
+
+  /*useEffect(() => {
+    const updateGameState = () => {
+      setStatus(wardrobeAreaController.status || 'OPEN');
+      setPlayer(wardrobeAreaController.player);
+    };
+    wardrobeAreaController.addListener('gameUpdated', updateGameState);
+    return () => {
+      wardrobeAreaController.removeListener('gameUpdated', updateGameState);
+    };
+  }, [townController, wardrobeAreaController]);*/
+
   return (
-    <StyledWardrobeBoard>
-      <StyledOptionSquare aria-label='Hair Option 1' icon={hairImage1} />
-      <StyledOptionSquare aria-label='Hair Option 2' icon={hairImage2} />
-      <StyledOptionSquare aria-label='Clothing Option 1' icon={clothingImage1} />
-      <StyledOptionSquare aria-label='Clothing Option 2' icon={clothingImage2} />
-      <Button aria-label='Confirm Changes'>
-        Confirm Changes
-      </Button>
-    </StyledWardrobeBoard>
-  );
+    <Container>
+      <WardrobeBoard/> 
+      {//wardrobeAreaController={wardrobeAreaController}
+}    
+    </Container>
+  )
 }
+
 /**
  * A wrapper component for the ConnectFourArea and TicTacToeArea components.
  * Determines if the player is currently in a game area on the map, and if so,
@@ -112,7 +168,7 @@ export default function WardrobeAreaWrapper(): JSX.Element {
         }}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Wardrobe: Edit your sprite's hair and outfit!</ModalHeader>
+          <ModalHeader>Wardrobe: Edit your sprite's hair and outfit! {wardrobeArea.id}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <WardrobeArea interactableID={wardrobeArea.id} />

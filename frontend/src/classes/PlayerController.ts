@@ -62,6 +62,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     }
     const hairComponent = this.gameObjects.layer.getAt(0) as Phaser.Physics.Arcade.Sprite;
     hairComponent.setTexture(newHair);
+    console.log('player hair set to: ', newHair);
   }
 
   /**
@@ -76,6 +77,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
     const outfitComponent = this.gameObjects.layer.getAt(1) as Phaser.Physics.Arcade.Sprite;
     outfitComponent.setTexture(newOutfit);
+    console.log('player outfit set to: ', newOutfit);
   }
 
   get userName(): string {
@@ -130,8 +132,8 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       outfit.setY(this.location.y + 10);
       if (this.location.moving) {
         body.anims.play(`body-${this.location.rotation}-walk`, true);
-        hair.anims.play('hair-${this.location.rotation}-walk', true);
-        outfit.anims.play('dress-${this.location.rotation}-walk', true);
+        hair.anims.play(`hair-${this.location.rotation}-walk`, true);
+        outfit.anims.play(`dress-${this.location.rotation}-walk`, true);
         switch (this.location.rotation) {
           case 'front':
             body.body.setVelocity(0, MOVEMENT_SPEED);

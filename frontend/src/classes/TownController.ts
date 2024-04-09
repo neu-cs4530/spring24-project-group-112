@@ -26,6 +26,7 @@ import {
   PlayerLocation,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
+  WardrobeArea as WardrobeAreaModel,
 } from '../types/CoveyTownSocket';
 import {
   isConnectFourArea,
@@ -591,6 +592,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   async createViewingArea(newArea: Omit<ViewingAreaModel, 'type'>) {
     await this._townsService.createViewingArea(this.townID, this.sessionToken, newArea);
+  }
+
+  async createWardrobeArea(newArea: { id: string; player: string }) {
+    await this._townsService.createWardrobeArea(this.townID, this.sessionToken, newArea);
   }
 
   /**

@@ -17,7 +17,7 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
-  WardrobeInstance as WardrobeInstanceModel,
+  WardrobeArea as WardrobeAreaModel,
 } from '../types/CoveyTownSocket';
 import { logError } from '../Utils';
 import ConversationArea from './ConversationArea';
@@ -344,7 +344,7 @@ export default class Town {
     return true;
   }
 
-  public addWardrobeArea(wardrobeArea: WardrobeInstanceModel): boolean {
+  public addWardrobeArea(wardrobeArea: WardrobeAreaModel): boolean {
     const area = this._interactables.find(
       eachArea => eachArea.id === wardrobeArea.id,
     ) as WardrobeArea;

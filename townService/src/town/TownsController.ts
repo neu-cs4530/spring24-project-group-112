@@ -24,6 +24,7 @@ import {
   CoveyTownSocket,
   TownSettingsUpdate,
   ViewingArea,
+  WardrobeArea,
 } from '../types/CoveyTownSocket';
 
 /**
@@ -179,7 +180,7 @@ export class TownsController extends Controller {
   public async createWardrobe(
     @Path() townID: string,
     @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: Omit<ViewingArea, 'type'>,
+    @Body() requestBody: Omit<WardrobeArea, 'type'>,
   ): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {

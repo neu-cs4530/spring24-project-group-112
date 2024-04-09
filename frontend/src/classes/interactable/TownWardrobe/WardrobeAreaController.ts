@@ -131,4 +131,16 @@ export default class WardrobeAreaController extends InteractableAreaController<
   public get type(): string {
     return WARDROBE_AREA_TYPE;
   }
+
+  public changeAppearance(hair: HairOption | undefined, outfit: OutfitOption | undefined): void {
+    if (this._player === undefined) {
+      throw new Error('No player detected');
+    } 
+    if (hair) {
+      this._player.hair = hair.optionFilePath;
+    }
+    if (outfit) {
+      this._player.outfit = outfit.optionFilePath;
+    }
+  }
 }
