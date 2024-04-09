@@ -98,10 +98,9 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     const docRef = doc(db, 'accounts', id);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      console.log('Document data:', docSnap.data());
       return docSnap.data();
     } else {
-      console.error('No such document!');
+      console.error('No player data found!');
       return undefined;
     }
   }

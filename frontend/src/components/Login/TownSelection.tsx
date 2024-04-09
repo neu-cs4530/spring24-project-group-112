@@ -257,7 +257,6 @@ export default function TownSelection(): JSX.Element {
       <form>
         <Stack>
           <Login app={app} callback={loginCallBack} />
-          <Heading>{userID}</Heading>
           <Box borderWidth='1px' borderRadius='lg'>
             <Heading p='4' as='h2' size='lg'>
               Create a New Town
