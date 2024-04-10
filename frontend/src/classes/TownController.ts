@@ -594,7 +594,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     await this._townsService.createViewingArea(this.townID, this.sessionToken, newArea);
   }
 
-  async createWardrobeArea(newArea: { id: string; player: string }) {
+  async createWardrobeArea(newArea: { id: string; player: string, occupants: Array<string>, isOpen: true }) {
     await this._townsService.createWardrobeArea(this.townID, this.sessionToken, newArea);
   }
 
@@ -648,6 +648,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
               new ConnectFourAreaController(eachInteractable.id, eachInteractable, this),
             );
           } else if (isWardrobeArea(eachInteractable)) {
+            console.log("Pushed wardrobe area.");
             this._interactableControllers.push(
               new WardrobeAreaController(eachInteractable.id, eachInteractable, this),
             );
@@ -824,6 +825,12 @@ export function useInteractableAreaController<T>(interactableAreaID: string): T 
     if (viewingAreaController) {
       return viewingAreaController as unknown as T;
     }
+    /*const wardrobeAreaController = townController.wardrobeAreas.find(
+      eachArea => eachArea.id == interactableAreaID,
+    );
+    if (wardrobeAreaController) {
+      return wardrobeAreaController as unknown as T;
+    }*/
     throw new Error(`Requested interactable area ${interactableAreaID} does not exist`);
   }
   return gameAreaController as unknown as T;

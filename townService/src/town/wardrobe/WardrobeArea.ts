@@ -20,17 +20,17 @@ import InteractableArea from '../InteractableArea';
 export default class WardrobeArea extends InteractableArea {
   public isOpen: boolean;
 
-  public user?: PlayerID;
+  //public user?: PlayerID;
 
-  public hairChoices: Array<HairOption>;
+  //public hairChoices: Array<HairOption>;
 
-  public outfitChoices: Array<OutfitOption>;
+  //public outfitChoices: Array<OutfitOption>;
 
-  protected _session?: Wardrobe;
+  //protected _session?: Wardrobe;
 
-  public get session(): Wardrobe | undefined {
+  /*public get session(): Wardrobe | undefined {
     return this._session;
-  }
+  }*/
 
   // Is this needed?
   private _stateUpdated(updatedState: WardrobeState) {
@@ -49,7 +49,7 @@ export default class WardrobeArea extends InteractableArea {
 
   /** The conversation area is "active" when there are players inside of it  */
   public get isActive(): boolean {
-    return this._occupants.length > 0 && this.isOpen;
+    return this._occupants.length > 0;
   }
 
   /**
@@ -67,8 +67,8 @@ export default class WardrobeArea extends InteractableArea {
   ) {
     super(id, coordinates, townEmitter);
     this.isOpen = true;
-    this.hairChoices = hairChoices;
-    this.outfitChoices = outfitChoices;
+    //this.hairChoices = hairChoices;
+    //this.outfitChoices = outfitChoices;
   }
 
   /**
@@ -86,7 +86,7 @@ export default class WardrobeArea extends InteractableArea {
     } else {
       super.add(player);
       this.isOpen = true;
-      this.user = player.id;
+      //this.user = player.id;
     }
   }
 
@@ -112,7 +112,7 @@ export default class WardrobeArea extends InteractableArea {
     return {
       id: this.id,
       isOpen: this.isOpen,
-      user: this.user,
+      //user: this.user,
       occupants: this.occupantsByID,
       type: 'WardrobeArea',
     };
@@ -125,12 +125,18 @@ export default class WardrobeArea extends InteractableArea {
    * @param townEmitter An emitter that can be used by this wardrobe area to broadcast updates to players in the town
    * @returns the WardrobeArea object
    */
-  public static fromMapObject(mapObject: ITiledMapObject, townEmitter: TownEmitter): WardrobeArea {
+  public static fromMapObject(
+    mapObject: ITiledMapObject,
+    townEmitter: TownEmitter
+  ): WardrobeArea {
     const { name, width, height } = mapObject;
     if (!width || !height) {
       throw new Error(`Malformed viewing area ${name}`);
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
+    console.log("Creating new WardrobeArea object");
+    console.log(mapObject.x);
+    console.log(mapObject.y);
     return new WardrobeArea(
       nanoid(),
       rect,
@@ -149,7 +155,7 @@ export default class WardrobeArea extends InteractableArea {
    * Use the same commands as the ConnectFourGameArea?
    */
 
-  public handleCommand<CommandType extends InteractableCommand>(
+  /*public handleCommand<CommandType extends InteractableCommand>(
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
@@ -180,5 +186,10 @@ export default class WardrobeArea extends InteractableArea {
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
+  }*/
+  public handleCommand<
+    CommandType extends InteractableCommand,
+  >(): InteractableCommandReturnType<CommandType> {
+    throw new InvalidParametersError('Unknown command type');
   }
 }

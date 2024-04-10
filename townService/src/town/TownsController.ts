@@ -177,7 +177,7 @@ export class TownsController extends Controller {
    */
   @Post('{townID}/wardrobeArea')
   @Response<InvalidParametersError>(400, 'Invalid values specified')
-  public async createWardrobe(
+  public async createWardrobeArea(
     @Path() townID: string,
     @Header('X-Session-Token') sessionToken: string,
     @Body() requestBody: Omit<WardrobeArea, 'type'>,
