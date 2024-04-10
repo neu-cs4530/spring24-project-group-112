@@ -30,4 +30,4 @@ jobs:
         run: cd townService; npm install && npm run prestart && npm run lint && npm test
 
       - name: Build and test frontend components
-        run: cd frontend; npm install && npm run prestart && npm run lint && npm test
+        run: cd frontend; npm install && npm install firebase && npm run prestart && npm run lint && npm test
