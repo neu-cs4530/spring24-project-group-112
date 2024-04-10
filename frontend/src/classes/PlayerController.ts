@@ -10,13 +10,19 @@ import {
 } from '../types/CoveyTownSocket';
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore/lite';
 import { firebaseConfig } from '../components/Login/Config';
+import { getFirestore, doc, getDoc, addDoc, collection } from 'firebase/firestore';
 
 export const MOVEMENT_SPEED = 175;
 
 export type PlayerEvents = {
   movement: (newLocation: PlayerLocation) => void;
+};
+
+// "List" of the values that we want saved to the database.
+type SaveablePlayerValues = {
+  id: string;
+  userName: string;
 };
 
 export default class PlayerController extends (EventEmitter as new () => TypedEmitter<PlayerEvents>) {
@@ -125,36 +131,31 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     return this._outfitSelection;
   }
 
-  private static async _init(PID: string) {
-    const player = await this._getPlayer(PID);
-    if (player) {
-      console.log('Player id "', this.id, '" exists');
-    }
-  }
-
-  private async _getPlayer(id: string) {
+  // Retrieve the details of the given player id from the firestore database.
+  private static async _getPlayer(id: string) {
     const db = getFirestore(PlayerController._app);
-    const playersCol = collection(db, 'players');
-    const playerSnapshot = await getDocs(playersCol);
-    const players = playerSnapshot.docs.filter(doc => doc.id === id);
-    if (players.length === 1) {
-      console.log('Player id "', id, '" exists');
-      return players[0];
-    } else if (players.length > 1) {
-      console.error('More than one player with id "', id, '" exists');
-      return undefined;
+    const docRef = doc(db, 'accounts', id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data();
     } else {
-      console.log('Player id "', id, '" does not exist');
+      console.error('No player data found!');
       return undefined;
     }
   }
 
-  private async _savePlayer() {
+  // Save the current PlayerController details to the firestore database.
+  public async _savePlayer() {
     const db = getFirestore(PlayerController._app);
-    const docRef = await addDoc(collection(db, 'accounts'), {
+    const colRef = collection(db, `accounts`);
+    // With this casting choice, we can ensure that this function will alert us if we forget to update it
+    // after updating the SaveablePlayerValues type.
+    const docRef = await addDoc(colRef, {
       id: this.id,
       userName: this.userName,
-    });
+      location: this.location,
+    } as SaveablePlayerValues);
+
     console.log('Document written with ID: ', docRef.id);
   }
 
@@ -232,7 +233,9 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   }
 
   static async fromPlayerModel(modelPlayer: PlayerModel): Promise<PlayerController> {
-    // const fbReturn = await this._init();
+    const playerData = await this._getPlayer(modelPlayer.id);
+    // From here, the playerData is the information on the database. You can use it to modify the player.
+    // prior to returning them.
     const ret = new PlayerController(modelPlayer.id, modelPlayer.userName, modelPlayer.location);
 
     return ret;
