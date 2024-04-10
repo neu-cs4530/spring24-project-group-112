@@ -611,7 +611,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     await this._townsService.createViewingArea(this.townID, this.sessionToken, newArea);
   }
 
-  async createWardrobe(newArea: { id: string; occupants: Array<string>, isOpen: true }) {
+  async createWardrobe(newArea: { id: string; occupants: Array<string>; isOpen: true }) {
     await this._townsService.createWardrobeArea(this.townID, this.sessionToken, newArea);
   }
 
@@ -716,10 +716,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   /**
    * Retrieve the wardrobe area controller that corresponds to a wardrobeArea, creating one if necessary
    * or throws an error if the wardrobe area controller does not exist
-   * 
+   *
    * @throws Error if the wardrobe area controller does not exist
-   * 
-   * @param wardrobeArea 
+   *
+   * @param wardrobeArea
    * @returns the corresponding WardrobeAreaController
    */
   public getWardrobeAreaController(wardrobeArea: WardrobeArea): WardrobeAreaController {
@@ -897,7 +897,11 @@ export function useActiveInteractableAreas(): GenericInteractableAreaController[
   const townController = useTownController();
   const [interactableAreas, setInteractableAreas] = useState<GenericInteractableAreaController[]>(
     (townController.gameAreas as GenericInteractableAreaController[])
-      .concat(townController.conversationAreas, townController.viewingAreas, townController.wardrobeAreas)
+      .concat(
+        townController.conversationAreas,
+        townController.viewingAreas,
+        townController.wardrobeAreas,
+      )
       .filter(eachArea => eachArea.isActive()),
   );
   useEffect(() => {
@@ -937,7 +941,11 @@ export function useActiveInteractableAreasSortedByOccupancyAndName(): GenericInt
 
   const [interactableAreas, setInteractableAreas] = useState<InteractableAreaReadAheadOccupancy[]>(
     (townController.gameAreas as GenericInteractableAreaController[])
-      .concat(townController.conversationAreas, townController.viewingAreas, townController.wardrobeAreas)
+      .concat(
+        townController.conversationAreas,
+        townController.viewingAreas,
+        townController.wardrobeAreas,
+      )
       .filter(eachArea => eachArea.isActive())
       .map(area => ({ area, occupancy: area.occupants.length })),
   );

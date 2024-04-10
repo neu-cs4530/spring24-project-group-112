@@ -91,9 +91,9 @@ export interface BodyOption {
   optionFrame: string; 
 }
 
-export interface WardrobeInstance extends Interactable {
+export interface WardrobeInstance {
   id: GameInstanceID;
-  player: PlayerID;
+  player: PlayerID | undefined;
 }
 
 export interface WardrobeArea extends Interactable {

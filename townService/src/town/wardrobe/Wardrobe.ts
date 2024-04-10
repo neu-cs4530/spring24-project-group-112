@@ -1,9 +1,14 @@
 import { nanoid } from 'nanoid';
+import InvalidParametersError, { INVALID_COMMAND_MESSAGE } from '../../lib/InvalidParametersError';
 import Player from '../../lib/Player';
 import {
   GameInstanceID,
   HairOption,
+  InteractableCommand,
+  InteractableCommandReturnType,
   OutfitOption,
+  WardrobeArea,
+  WardrobeInstance,
   WardrobeState,
 } from '../../types/CoveyTownSocket';
 
@@ -11,8 +16,6 @@ export default class Wardrobe {
   private _player?: Player;
 
   public readonly id: GameInstanceID;
-
-  //private _controller?: PlayerController;
 
   private _hairOptions: Array<HairOption>;
 
@@ -46,62 +49,48 @@ export default class Wardrobe {
   }
 
   /**
-   * Applies the change to the player's hair or outfit based on the optionID
-   *
-   * @throws Error if the player is not found
-   *
-   * @param optionID optionID of the hair or outfit option to apply to player
-   * @param isHair flag to determine if the change is for hair or outfit
-   */
-  /*public applyChange(optionID: number, isHair: boolean): void {
-    // Select the hair or outfit option based on the optionID
-    if (!this._controller) {
-      throw new Error('Player not found');
-    }
-    const controller = this._controller;
-    if (isHair) {
-      const hairOption = this._hairOptions.find(obj => obj.optionID === optionID);
-      if (hairOption) {
-        controller.hair = hairOption.optionFilePath;
-      } else {
-        throw new Error('Hair option not found');
-      }
-    } else {
-      const outfitChoice = this._outfitOptions.find(obj => obj.optionID === optionID);
-      if (outfitChoice) {
-        controller.outfit = outfitChoice.optionFilePath;
-      } else {
-        throw new Error('Outfit option not found');
-      }
-    }
-  }*/
-
-  /**
    * Adds a player to the wardrobe
    *
    * @throws Error if the wardrobe is already occupied
    *
    * @param player Player to join the wardrobe
    */
-  /*public async join(player: Player): Promise<void> {
+  public async join(player: Player): Promise<void> {
     if (this._player) {
-      throw new Error('Wardrobe is already occupied');
+      throw new InvalidParametersError('Wardrobe is already occupied');
     }
+    console.log("Joining player to wardrobe");
     this._player = player;
-    // Set the controller to the player's controller
-    // Need to replace the previous controller with this one?
-    this._controller = await PlayerController.fromPlayerModel(player.toPlayerModel()); // Call the fromPlayerModel function
-  }*/
+  }
 
   /**
-   * Removes player from the wardrobe
-   *
-   * @throws Error if the player is not found
+   * Leaves the wardrobe
+   * 
+   * @param player 
    */
   public leave(player: Player): void {
     if (!this._player || player !== this._player) {
       throw new Error('Player not found');
     }
     this._player = undefined;
+  }
+
+  /**
+   * Removes player from the wardrobe
+   *
+   * @throws Error if the player is not found
+   */
+  public toModel(): WardrobeArea {
+    return {
+      type: "WardrobeArea",
+      id: this.id,
+      occupants: this._player ? [this._player.id] : [],
+      isOpen: this._player === undefined,
+      user: this._player?.id,
+      session: {
+        id: this.id,
+        player: this._player?.id,
+      }
+    };
   }
 }

@@ -13,6 +13,7 @@ import {
   OutfitOption,
   InteractableID,
   PlayerID,
+  WardrobeInstance,
 } from '../../types/CoveyTownSocket';
 import Wardrobe from './Wardrobe';
 import InteractableArea from '../InteractableArea';
@@ -22,20 +23,18 @@ export default class WardrobeArea extends InteractableArea {
 
   public user?: PlayerID;
 
-  /*public hairChoices: Array<HairOption>;
-
-  public outfitChoices: Array<OutfitOption>;
-
   protected _session?: Wardrobe;
 
   public get session(): Wardrobe | undefined {
     return this._session;
-  }*/
+  }
 
-  // Is this needed?
-  private _stateUpdated(updatedState: WardrobeState) {
-    if (updatedState.status === 'OCCUPIED') {
+  private _stateUpdated(updatedState: WardrobeAreaModel) {
+    console.log("State updated in WardrobeArea");
+    if (updatedState.user) {
       this.isOpen = false;
+    } else {
+      this.isOpen = true;
     }
     this._emitAreaChanged();
   }
@@ -145,41 +144,39 @@ export default class WardrobeArea extends InteractableArea {
    * Use the same commands as the ConnectFourGameArea?
    */
 
-  /*public handleCommand<CommandType extends InteractableCommand>(
+  /**
+   * Handles the commands that can be sent to the wardrobe area.
+   * 
+   * @param command command to handle
+   * @param player player making the request
+   * @returns the result of the command
+   * @throws InvalidParametersError if the command is not valid
+   */
+  public handleCommand<CommandType extends InteractableCommand>(
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
-    // applyChange is handled by the wardrobe itself, not in the WardrobeArea
+    let wardrobe = this._session;
     if (command.type === 'JoinWardrobe') {
-      let session = this._session;
-      if (!session) {
-        // No session in progress, make a new one
-        session = new Wardrobe({
+      if (!wardrobe) {
+        console.log("Making a new wardrobe");
+        wardrobe = new Wardrobe({
           status: 'OCCUPIED',
-          player: player.id,
         });
-        this._session = session;
+        this._session = wardrobe;
       }
-      session.join(player);
-      this._emitAreaChanged();
-      // Is this the right return here?
-      return { gameID: session.id } as InteractableCommandReturnType<CommandType>;
+      wardrobe.join(player);
+      this._stateUpdated(wardrobe.toModel());
+      return { gameID: wardrobe.id } as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'LeaveWardrobe') {
-      const session = this._session;
-      if (!session) {
+      if (!wardrobe) {
         throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
       }
-      // TODO: When player leaves the wardrobe, save changes to the Firebase DB
-      session.leave(player);
-      this._emitAreaChanged();
+      wardrobe.leave(player);
+      this._stateUpdated(wardrobe.toModel());
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
-  }*/
-  public handleCommand<
-    CommandType extends InteractableCommand,
-  >(): InteractableCommandReturnType<CommandType> {
-    throw new InvalidParametersError('Unknown command type');
   }
 }

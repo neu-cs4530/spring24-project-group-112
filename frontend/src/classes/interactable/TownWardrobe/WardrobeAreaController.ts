@@ -2,7 +2,9 @@ import {
   GameInstanceID,
   HairOption,
   OutfitOption,
+  Player,
   WardrobeArea as WardrobeAreaModel,
+  WardrobeInstance,
   WardrobeStatus,
 } from '../../../types/CoveyTownSocket';
 import PlayerController from '../../PlayerController';
@@ -11,6 +13,7 @@ import InteractableAreaController, {
   WARDROBE_AREA_TYPE,
 } from '../InteractableAreaController';
 import TownController from '../../TownController';
+import { nanoid } from 'nanoid';
 
 /**
  * The events that the WardrobeAreaController emits to subscribers. These events
@@ -83,20 +86,12 @@ export default class WardrobeAreaController extends InteractableAreaController<
    *
    * @throws An error if the server rejects the request to join the game.
    */
-  /*public async joinWardrobe() {
+  public async joinWardrobe() {
     const { gameID } = await this._townController.sendInteractableCommand(this.id, {
       type: 'JoinWardrobe',
     });
     this._instanceID = gameID;
-  }*/
-  public joinWardrobe() {
-    if (this._player) {
-      throw new Error('Player already in wardrobe');
-    }
-    if (!this._model.session) {
-      throw new Error('No wardrobe session');
-    }
-    this._player = this._townController.getPlayer(this._model.session?.player);
+    console.log("Player joined the wardrobe successfully!");
   }
 
   /**
@@ -117,18 +112,16 @@ export default class WardrobeAreaController extends InteractableAreaController<
   }
 
   protected _updateFrom(newModel: WardrobeAreaModel): void {
-    // If players change
-    const newPlayer = newModel.session?.player
-      ? this._townController.getPlayer(newModel.session.player)
-      : undefined;
+    const newPlayers = newModel.occupants;
+
+    const newPlayer = newModel.session?.player;
     if (newPlayer) {
-      this._player = newPlayer;
-      this.emit('playerChange', newPlayer);
+      this._player = this._townController.getPlayer(newPlayer);
+      this.emit('playerChange', this._player);
     } else {
       this._player = undefined;
       this.emit('playerChange', undefined);
     }
-    this._instanceID = newModel.session?.id ?? undefined;
   }
 
   public isActive(): boolean {
@@ -144,8 +137,9 @@ export default class WardrobeAreaController extends InteractableAreaController<
   }
 
   public changeAppearance(hair: HairOption | undefined, outfit: OutfitOption | undefined): void {
-    if (this._player === undefined) {
-      throw new Error('No player detected');
+    if (!this._player) {
+      throw new Error('Player not in wardrobe');
+      // Better way to handle this?
     }
     if (hair) {
       this._player.hairSelection = hair;
