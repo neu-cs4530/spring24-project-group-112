@@ -132,20 +132,33 @@ export default class TownGameScene extends Phaser.Scene {
       this._resourcePathPrefix + '/assets/tilesets/16_Grocery_store_32x32.png',
     );
     this.load.tilemapTiledJSON('map', this._resourcePathPrefix + '/assets/tilemaps/indoors.json');
+    // loading body atlases:
     this.load.atlas(
       'bodyatlas',
       this._resourcePathPrefix + '/assets/newatlas/body.png',
       this._resourcePathPrefix + '/assets/newatlas/body.json',
     );
+    // loading hair atlases:
     this.load.atlas(
       'hairatlas',
       this._resourcePathPrefix + '/assets/newatlas/hair.png',
       this._resourcePathPrefix + '/assets/newatlas/hair.json',
     );
     this.load.atlas(
+      'shorthairatlas',
+      this._resourcePathPrefix + '/assets/newatlas/shorthair.png',
+      this._resourcePathPrefix + '/assets/newatlas/shorthair.json',
+    );
+    // loading outfit atlases:
+    this.load.atlas(
       'dressatlas',
       this._resourcePathPrefix + '/assets/newatlas/dress-outfit.png',
       this._resourcePathPrefix + 'assets/newatlas/dress-outfit.json',
+    );
+    this.load.atlas(
+      'overallatlas',
+      this._resourcePathPrefix + '/assets/newatlas/overall-outfit.png',
+      this._resourcePathPrefix + 'assets/newatlas/overall-outfit.json',
     );
   }
 
@@ -592,6 +605,7 @@ export default class TownGameScene extends Phaser.Scene {
 
     // Create the player's walking animations from the texture atlas. These are stored in the global
     // animation manager so any sprite can access them.
+    // Body animations:
     const { anims } = this;
     anims.create({
       key: 'body-left-walk',
@@ -638,6 +652,7 @@ export default class TownGameScene extends Phaser.Scene {
       repeat: -1,
     });
 
+    // Hair animations:
     this.anims.create({
       key: 'hair-back-walk',
       frames: this.anims.generateFrameNames('hairatlas', {
@@ -721,7 +736,6 @@ export default class TownGameScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1,
     });
-
     this.anims.create({
       key: 'shorthair-left-walk',
       frames: this.anims.generateFrameNames('shorthairatlas', {
@@ -734,6 +748,7 @@ export default class TownGameScene extends Phaser.Scene {
       repeat: -1,
     });
 
+    // Outfit animations:
     this.anims.create({
       key: 'dress-back-walk',
       frames: this.anims.generateFrameNames('dressatlas', {
@@ -772,6 +787,52 @@ export default class TownGameScene extends Phaser.Scene {
       key: 'dress-left-walk',
       frames: this.anims.generateFrameNames('dressatlas', {
         prefix: 'dress-left-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'overall-back-walk',
+      frames: this.anims.generateFrameNames('overallatlas', {
+        prefix: 'overall-back-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: 'overall-front-walk',
+      frames: this.anims.generateFrameNames('overallatlas', {
+        prefix: 'overall-front-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'overall-right-walk',
+      frames: this.anims.generateFrameNames('overallatlas', {
+        prefix: 'overall-right-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: 'overall-left-walk',
+      frames: this.anims.generateFrameNames('overallatlas', {
+        prefix: 'overall-left-walk.',
         start: 0,
         end: 7,
         zeroPad: 3,
