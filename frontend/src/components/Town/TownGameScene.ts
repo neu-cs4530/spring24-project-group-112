@@ -543,7 +543,7 @@ export default class TownGameScene extends Phaser.Scene {
         spawnPoint.x,
         spawnPoint.y,
         player.bodySelection.optionAtlas,
-        `${player.bodySelection.optionFrame}-front`,
+        `${player.bodySelection.optionFrame}front`,
       )
       .setBodySize(30, 40)
       .setDepth(6);
@@ -552,7 +552,7 @@ export default class TownGameScene extends Phaser.Scene {
         spawnPoint.x,
         spawnPoint.y - 10,
         player.hairSelection.optionAtlas,
-        `${player.hairSelection.optionFrame}-front`,
+        `${player.hairSelection.optionFrame}front`,
       )
       .setSize(32, 26);
     const outfitSprite = this.physics.add
@@ -560,7 +560,7 @@ export default class TownGameScene extends Phaser.Scene {
         spawnPoint.x,
         spawnPoint.y + 10,
         player.outfitSelection.optionAtlas,
-        `${player.outfitSelection.optionFrame}-front`,
+        `${player.outfitSelection.optionFrame}front`,
       )
       .setSize(20, 14);
     const layer = this.add.layer().setDepth(7);
@@ -874,7 +874,7 @@ export default class TownGameScene extends Phaser.Scene {
           player.location.x,
           player.location.y,
           player.bodySelection.optionAtlas,
-          `${player.bodySelection.optionFrame}-front`,
+          `${player.bodySelection.optionFrame}front`,
         )
         .setSize(30, 40)
         .setDepth(6);
@@ -883,13 +883,13 @@ export default class TownGameScene extends Phaser.Scene {
         player.location.x,
         player.location.y - 10,
         player.hairSelection.optionAtlas,
-        `${player.hairSelection.optionFrame}-front`,
+        `${player.hairSelection.optionFrame}front`,
       );
       const outfitSprite = this.physics.add.sprite(
         player.location.x,
         player.location.y + 10,
         player.outfitSelection.optionAtlas,
-        `${player.outfitSelection.optionFrame}-front`,
+        `${player.outfitSelection.optionFrame}front`,
       );
       const layer = this.add.layer().setDepth(7);
       layer.add(hairSprite);
