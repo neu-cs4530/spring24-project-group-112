@@ -19,12 +19,6 @@ export type PlayerEvents = {
   movement: (newLocation: PlayerLocation) => void;
 };
 
-// "List" of the values that we want saved to the database.
-type SaveablePlayerValues = {
-  id: string;
-  userName: string;
-};
-
 export default class PlayerController extends (EventEmitter as new () => TypedEmitter<PlayerEvents>) {
   private _location: PlayerLocation;
 
@@ -150,16 +144,28 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   }
 
   // Save the current PlayerController details to the firestore database.
-  public async _savePlayer() {
+  public async savePlayer() {
     const db = getFirestore(PlayerController._app);
     const colRef = collection(db, `accounts`);
-    // With this casting choice, we can ensure that this function will alert us if we forget to update it
-    // after updating the SaveablePlayerValues type.
     const docRef = await addDoc(colRef, {
       id: this.id,
       userName: this.userName,
-      location: this.location,
-    } as SaveablePlayerValues);
+      body: [
+        this.bodySelection.optionID,
+        this.bodySelection.optionAtlas,
+        this.bodySelection.optionFrame,
+      ],
+      hair: [
+        this.hairSelection.optionID,
+        this.hairSelection.optionAtlas,
+        this.hairSelection.optionFrame,
+      ],
+      outfit: [
+        this.outfitSelection.optionID,
+        this.outfitSelection.optionAtlas,
+        this.outfitSelection.optionFrame,
+      ],
+    });
 
     console.log('Document written with ID: ', docRef.id);
   }
