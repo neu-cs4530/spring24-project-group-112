@@ -1,17 +1,9 @@
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
   Button,
   IconButton,
-  Box,
   Container,
-  Flex,
-  Heading,
-  List,
-  ListItem,
+  Grid,
+  GridItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -136,16 +128,13 @@ function WardrobeBoard({ wardrobeAreaController }: WardrobeProps): JSX.Element {
 }
 
 /**
- * A generic component that renders a wardrobe area.
- *
- * It uses Chakra-UI components (does not use other GUI widgets)
- *
- * TODO: What should it render?
+ * A React component that renders the wardrobe UI.
+ * From this screen, players can select their hair and outfit options.
  */
 function WardrobeArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const wardrobeAreaController =
     useInteractableAreaController<WardrobeAreaController>(interactableID);
-  //console.log(wardrobeAreaController.isActive());
+  
   const townController = useTownController();
 
   const player: PlayerController = townController.ourPlayer;
@@ -154,90 +143,51 @@ function WardrobeArea({ interactableID }: { interactableID: InteractableID }): J
 
   console.log("Setting the player directly");
 
-  /*const [status, setStatus] = useState<WardrobeStatus>(wardrobeAreaController.status);
-  const [player, setPlayer] = useState<PlayerController | undefined>(wardrobeAreaController.player);
-  const [joining, setJoining] = useState(false);
-  const toast = useToast();
-
-  useEffect(() => {
-    const updateGameState = () => {
-      setStatus(wardrobeAreaController.status || 'OPEN');
-      setPlayer(wardrobeAreaController.player);
-    };
-    wardrobeAreaController.addListener('wardrobeUpdated', updateGameState);
-    return () => {
-      wardrobeAreaController.removeListener('wardrobeUpdated', updateGameState);
-    };
-  }, [wardrobeAreaController, townController, toast]);
-
-  let statusText = <></>;
-  if (status === 'OCCUPIED') {
-    statusText = <Heading>Player is currently using the wardrobe.</Heading>;
-    //Get player username from the playerController?
-  } else {
-    // This will show up if the wardrobe is open
-    const text = <Heading>Wardrobe is open! Join to customize your character!</Heading>;
-    const joinButton = (
-      <Button
-        onClick={
-          async () => {
-            setJoining(true);
-            try {
-              await wardrobeAreaController.joinWardrobe();
-            } catch (e) {
-              toast({
-                title: 'Error joining wardrobe',
-                description: (e as Error).toString(),
-                status: 'error',
-              });
-            }
-            setJoining(false);
-          }
-        }
-        isLoading={joining}
-        disabled={joining}>
-        Join Wardrobe
-      </Button>
-    );
-    statusText = (
-      <b>
-        {text}
-        {joinButton}
-      </b>
-    );
-  }*/
-
   return (
-    <Container>
-      <Button onClick={() => wardrobeAreaController.changeAppearance({
-  optionID: 0,
-  optionAtlas: "atlas",
-  optionFrame: "frame",
-}, undefined)} >
-        Hair option 1
-      </Button>
-      <Button onClick={() => wardrobeAreaController.changeAppearance({
-  optionID: 1,
-  optionAtlas: "atlas",
-  optionFrame: "frame",
-}, undefined)} >
-        Hair option 2
-      </Button>
-      <Button onClick={() => wardrobeAreaController.changeAppearance(undefined, {
-  optionID: 0,
-  optionAtlas: "atlas",
-  optionFrame: "frame",
-})} >
-        Outfit option 1
-      </Button>
-      <Button onClick={() => wardrobeAreaController.changeAppearance(undefined, {
-  optionID: 1,
-  optionAtlas: "atlas",
-  optionFrame: "frame",
-})} >
-        Outfit option 2
-      </Button>
-    </Container>
+    <Grid templateColumns="repeat(3, 1fr)" >
+      <GridItem>
+        Select a hair option: 
+      </GridItem>
+      <GridItem>
+        <Button onClick={() => wardrobeAreaController.changeAppearance({
+          optionID: 0,
+          optionAtlas: "atlas",
+          optionFrame: "frame",
+        }, undefined)} >
+          Hair option 1
+        </Button>
+      </GridItem>
+      <GridItem>
+        <Button onClick={() => wardrobeAreaController.changeAppearance({
+    optionID: 1,
+    optionAtlas: "atlas",
+    optionFrame: "frame",
+  }, undefined)} >
+          Hair option 2
+        </Button>
+      </GridItem>
+      <GridItem>
+        Select an outfit option: 
+      </GridItem>
+      <GridItem>
+        <Button onClick={() => wardrobeAreaController.changeAppearance(undefined, {
+    optionID: 0,
+    optionAtlas: "atlas",
+    optionFrame: "frame",
+  })} >
+          Outfit option 1
+        </Button>
+      </GridItem>
+      <GridItem>
+        <Button onClick={() => wardrobeAreaController.changeAppearance(undefined, {
+    optionID: 1,
+    optionAtlas: "atlas",
+    optionFrame: "frame",
+  })} >
+          Outfit option 2
+        </Button>
+      </GridItem>
+    </Grid>
   );
 }
 
@@ -245,7 +195,6 @@ function WardrobeArea({ interactableID }: { interactableID: InteractableID }): J
  * A wrapper component for the ConnectFourArea and TicTacToeArea components.
  * Determines if the player is currently in a game area on the map, and if so,
  * renders the selected game area component in a modal.
- *
  */
 export default function WardrobeAreaWrapper(): JSX.Element {
   const wardrobeArea = useInteractable<WardrobeAreaInteractable>('wardrobeArea');
@@ -259,7 +208,6 @@ export default function WardrobeAreaWrapper(): JSX.Element {
     }
   }, [townController, wardrobeArea]);
   if (wardrobeArea) {
-    //return <WardrobeArea wardrobeArea={wardrobeArea} />;
     return (
       <Modal
         isOpen={isOpen}
@@ -271,7 +219,7 @@ export default function WardrobeAreaWrapper(): JSX.Element {
         }}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Wardrobe: Edit your sprites hair and outfit! {wardrobeArea.id}</ModalHeader>
+          <ModalHeader>Edit your characters hair and outfit! {wardrobeArea.id}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <WardrobeArea interactableID={wardrobeArea.id} />

@@ -32,6 +32,12 @@ export type WardrobeAreaEvents = BaseInteractableEventMap & {
  * A WardrobeAreaController manages the local behavior of a wardrobe area in the frontend,
  * implementing the logic to bridge between the townService's interpretation of wardrobe areas and the
  * frontend's. The WardrobeAreaController emits events when the wardrobe area changes.
+ * 
+ * The original intention was for this controller and the corresponding InteractableAreaModel to
+ * function like that of game areas, but obviously there are some inconsistencies in the implementation.
+ * 
+ * This controller relies on a setter to update the player controller, which is not ideal.
+ * The player controller is used to update the player's appearance: their hair or outfit options.
  */
 export default class WardrobeAreaController extends InteractableAreaController<
   WardrobeAreaEvents,
