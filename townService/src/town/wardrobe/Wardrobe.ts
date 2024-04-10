@@ -1,6 +1,4 @@
 import { nanoid } from 'nanoid';
-// eslint-disable-next-line import/no-relative-packages
-// import PlayerController from '../../../../frontend/src/classes/PlayerController';
 import Player from '../../lib/Player';
 import {
   GameInstanceID,
@@ -85,7 +83,7 @@ export default class Wardrobe {
    *
    * @param player Player to join the wardrobe
    */
-  public async join(player: Player): Promise<void> {
+  /* public async join(player: Player): Promise<void> {
     if (this._player) {
       throw new Error('Wardrobe is already occupied');
     }
@@ -93,7 +91,7 @@ export default class Wardrobe {
     // Set the controller to the player's controller
     // Need to replace the previous controller with this one?
     // this._controller = await PlayerController.fromPlayerModel(player.toPlayerModel()); // Call the fromPlayerModel function
-  }
+  } */
 
   /**
    * Removes player from the wardrobe
