@@ -28,7 +28,13 @@ import TownController from '../../classes/TownController';
 import firebase from 'firebase/compat/app';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 
-export default function TownSelection(): JSX.Element {
+interface TownSelectionProps {
+  debug: boolean;
+}
+
+// To retain the legacy tests, this component was fitted with a debug parameter to replace the new
+// component for login input with the old username input.
+export default function TownSelection(props: TownSelectionProps): JSX.Element {
   const [userName, setUserName] = useState<string>('');
   const [userID, setUserID] = useState<string>('');
   const [newTownName, setNewTownName] = useState<string>('');
@@ -116,7 +122,7 @@ export default function TownSelection(): JSX.Element {
             loginController,
           },
           userID,
-          app,
+          props.debug ? undefined : app,
         );
         await newController.connect();
         const videoToken = newController.providerVideoToken;
@@ -252,11 +258,32 @@ export default function TownSelection(): JSX.Element {
     }
   };
 
+  // Testing TownSelection with the Login component would break all the tests, so the debug
+  // parameter replaces this component with the legacy username input.
   return (
     <>
       <form>
         <Stack>
-          <Login app={app} callback={loginCallBack} />
+          {props.debug ? (
+            <Box p='4' borderWidth='1px' borderRadius='lg'>
+              <Heading as='h2' size='lg'>
+                Select a username
+              </Heading>
+
+              <FormControl>
+                <FormLabel htmlFor='name'>Name</FormLabel>
+                <Input
+                  autoFocus
+                  name='name'
+                  placeholder='Your name'
+                  value={userName}
+                  onChange={event => setUserName(event.target.value)}
+                />
+              </FormControl>
+            </Box>
+          ) : (
+            <Login app={app} callback={loginCallBack} />
+          )}
           <Box borderWidth='1px' borderRadius='lg'>
             <Heading p='4' as='h2' size='lg'>
               Create a New Town
