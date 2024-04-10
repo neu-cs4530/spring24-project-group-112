@@ -55,7 +55,7 @@ export default class Wardrobe {
    * @param optionID optionID of the hair or outfit option to apply to player
    * @param isHair flag to determine if the change is for hair or outfit
    */
-  public applyChange(optionID: number, isHair: boolean): void {
+  /*public applyChange(optionID: number, isHair: boolean): void {
     // Select the hair or outfit option based on the optionID
     if (!this._controller) {
       throw new Error('Player not found');
@@ -76,7 +76,7 @@ export default class Wardrobe {
         throw new Error('Outfit option not found');
       }
     }
-  }
+  }*/
 
   /**
    * Adds a player to the wardrobe

@@ -27,7 +27,6 @@ import PlayerController from '../../../../classes/PlayerController';
 import { useInteractable, useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import { HairOption, InteractableID, OutfitOption, WardrobeStatus } from '../../../../types/CoveyTownSocket';
-import { HairOption, InteractableID, OutfitOption, WardrobeStatus } from '../../../../types/CoveyTownSocket';
 import WardrobeAreaInteractable from '../WardrobeArea';
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
@@ -66,8 +65,8 @@ const hairImage2 = React.createElement("img", {src: 'https://www.pngitem.com/pim
 const clothingImage1 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
 const clothingImage2 = React.createElement("img", {src: 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'});
 
-let hairChoice: HairOption | undefined = undefined;
-let clothingChoice: OutfitOption | undefined = undefined;
+let hairChoice: any = undefined;
+let clothingChoice: any = undefined;
 
 const saveChanges = () => {
   //This needs to save the changes to the player's sprite
