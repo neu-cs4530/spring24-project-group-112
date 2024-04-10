@@ -74,7 +74,7 @@
 	"spriteSourceSize": {"x": 0,"y": 0,"w": 28,"h": 40},
 	"frame": {"x": 210,"y": 0,"w": 28,"h": 40}
 },
-"body-left-walk.000.png": 
+"body-left-walk.000": 
 {
 	"rotated": false,
 	"trimmed": false,

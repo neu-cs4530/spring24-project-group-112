@@ -28,7 +28,7 @@ export default class Wardrobe {
    * 'ApplyMove' command is what applies the customization to the player
    * 'LeaveGame' command is what ends the customization process and saves the changes
    * should this also end the Wardrobe session (delete the object?)
-   * 
+   *
    * Need Player field for this object?
    */
 

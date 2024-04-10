@@ -45,7 +45,7 @@ export default function PreJoinScreens() {
         to hang out in, or join an existing one.
       </Text>
         <DeviceSelectionScreen />
-        <TownSelection />
+        <TownSelection debug={false} />
     </IntroContainer>
   );
 }

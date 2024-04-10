@@ -11,18 +11,12 @@ import {
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../components/Login/Config';
-import { getFirestore, doc, getDoc, addDoc, collection } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, addDoc, collection, DocumentData } from 'firebase/firestore';
 
 export const MOVEMENT_SPEED = 175;
 
 export type PlayerEvents = {
   movement: (newLocation: PlayerLocation) => void;
-};
-
-// "List" of the values that we want saved to the database.
-type SaveablePlayerValues = {
-  id: string;
-  userName: string;
 };
 
 export default class PlayerController extends (EventEmitter as new () => TypedEmitter<PlayerEvents>) {
@@ -46,19 +40,24 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     id: string,
     userName: string,
     location: PlayerLocation,
-    outfit?: PrototypePlayerGameObjects,
+    body?: BodyOption,
+    hair?: HairOption,
+    outfit?: OutfitOption,
   ) {
     super();
-
     this._id = id;
     this._userName = userName;
     this._location = location;
-    this.gameObjects = outfit;
 
     // when first constructed, all player controllers are set with default values.
-    this._bodySelection = { optionID: 0, optionAtlas: 'bodyatlas', optionFrame: 'body-' };
-    this._hairSelection = { optionID: 0, optionAtlas: 'hairatlas', optionFrame: 'hair-' };
-    this._outfitSelection = { optionID: 0, optionAtlas: 'dressatlas', optionFrame: 'dress-' };
+    this._bodySelection =
+      body === undefined ? { optionID: 0, optionAtlas: 'bodyatlas', optionFrame: 'body-' } : body;
+    this._hairSelection =
+      hair === undefined ? { optionID: 0, optionAtlas: 'hairatlas', optionFrame: 'hair-' } : hair;
+    this._outfitSelection =
+      outfit === undefined
+        ? { optionID: 0, optionAtlas: 'dressatlas', optionFrame: 'dress-' }
+        : outfit;
   }
 
   set location(newLocation: PlayerLocation) {
@@ -145,16 +144,28 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   }
 
   // Save the current PlayerController details to the firestore database.
-  public async _savePlayer() {
+  public async savePlayer() {
     const db = getFirestore(PlayerController._app);
     const colRef = collection(db, `accounts`);
-    // With this casting choice, we can ensure that this function will alert us if we forget to update it
-    // after updating the SaveablePlayerValues type.
     const docRef = await addDoc(colRef, {
       id: this.id,
       userName: this.userName,
-      location: this.location,
-    } as SaveablePlayerValues);
+      body: [
+        this.bodySelection.optionID,
+        this.bodySelection.optionAtlas,
+        this.bodySelection.optionFrame,
+      ],
+      hair: [
+        this.hairSelection.optionID,
+        this.hairSelection.optionAtlas,
+        this.hairSelection.optionFrame,
+      ],
+      outfit: [
+        this.outfitSelection.optionID,
+        this.outfitSelection.optionAtlas,
+        this.outfitSelection.optionFrame,
+      ],
+    });
 
     console.log('Document written with ID: ', docRef.id);
   }
@@ -234,9 +245,45 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   static async fromPlayerModel(modelPlayer: PlayerModel): Promise<PlayerController> {
     const playerData = await this._getPlayer(modelPlayer.id);
+    console.log('playerData:', playerData);
     // From here, the playerData is the information on the database. You can use it to modify the player.
     // prior to returning them.
-    const ret = new PlayerController(modelPlayer.id, modelPlayer.userName, modelPlayer.location);
+
+    let bodyOption: BodyOption | undefined = undefined;
+    let hairOption: HairOption | undefined = undefined;
+    let outfitOption: OutfitOption | undefined = undefined;
+    // check for outfit options in playerData
+    if (playerData !== undefined) {
+      if (playerData.outfit !== undefined) {
+        outfitOption = {
+          optionID: playerData.outfit[0],
+          optionAtlas: playerData.outfit[1],
+          optionFrame: playerData.outfit[2],
+        } as OutfitOption;
+      }
+      if (playerData.hair !== undefined) {
+        hairOption = {
+          optionID: playerData.hair[0],
+          optionAtlas: playerData.hair[1],
+          optionFrame: playerData.hair[2],
+        } as HairOption;
+      }
+      if (playerData.body !== undefined) {
+        bodyOption = {
+          optionID: playerData.body[0],
+          optionAtlas: playerData.body[1],
+          optionFrame: playerData.body[2],
+        } as BodyOption;
+      }
+    }
+    const ret = new PlayerController(
+      modelPlayer.id,
+      modelPlayer.userName,
+      modelPlayer.location,
+      bodyOption,
+      hairOption,
+      outfitOption,
+    );
 
     return ret;
   }

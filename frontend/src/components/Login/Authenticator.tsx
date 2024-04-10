@@ -17,7 +17,6 @@ import {
   ModalBody,
   ModalFooter,
   ModalCloseButton,
-  UseDisclosureProps,
 } from '@chakra-ui/react';
 import assert from 'assert';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';

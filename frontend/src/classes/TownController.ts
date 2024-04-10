@@ -611,6 +611,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     await this._townsService.createViewingArea(this.townID, this.sessionToken, newArea);
   }
 
+  /**
+   * Create the wardrobe area, sending the request to the townService. Throws an error if the request
+   * is not successful. Does not immediately update local state about the new wardrobe area - it will be
+   * updated once the townService creates the area and emits an interactableUpdate
+   *
+   * @param newArea
+   */
   async createWardrobe(newArea: { id: string; occupants: Array<string>; isOpen: true }) {
     await this._townsService.createWardrobeArea(this.townID, this.sessionToken, newArea);
   }
