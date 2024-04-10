@@ -44,7 +44,9 @@ Create a `.env` file in the `frontend` directory, with the line: `NEXT_PUBLIC_TO
 For ease of debugging, you might also set the environmental variable `NEXT_PUBLIC_TOWN_DEV_MODE=true`. When set to `true`, the frontend will
 automatically connect to the town with the friendly name "DEBUG_TOWN" (creating one if needed), and will *not* try to connect to the Twilio API. This is useful if you want to quickly test changes to the frontend (reloading the page and re-acquiring video devices can be much slower than re-loading without Twilio).
 
+Lastly, you will need to create a project in firebase to support the database component of this project. Once you have a project, add an app, go to its general settings to copy the `firebaseConfig` file into the config file at `frontend/src/components/Login/Config.ts`. Once this is complete, you can test it by running the app locally, creating an account in the login page, and checking for it in the database.
+
 ### Running the frontend
 
-In the `frontend` directory, run `npm start` (again, you'll need to run `npm install` the very first time). After several moments (or minutes, depending on the speed of your machine), a browser will open with the frontend running locally.
+In the `frontend` directory, run `npm start` (again, you'll need to run `npm install` and `npm install firebase` the very first time). After several moments (or minutes, depending on the speed of your machine), a browser will open with the frontend running locally.
 The frontend will automatically re-compile and reload in your browser if you change any files in the `frontend/src` directory.
