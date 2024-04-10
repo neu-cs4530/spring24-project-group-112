@@ -433,7 +433,7 @@ describe('TownController', () => {
         'playerJoined',
         testPlayer,
         'playerMoved',
-        PlayerController.fromPlayerModel(testPlayer),
+        await PlayerController.fromPlayerModel(testPlayer),
       );
     });
     it('Emits playerMoved events when players move', async () => {
@@ -448,7 +448,7 @@ describe('TownController', () => {
         'playerMoved',
         testPlayer,
         'playerMoved',
-        PlayerController.fromPlayerModel(testPlayer),
+        await PlayerController.fromPlayerModel(testPlayer),
       );
     });
   });
