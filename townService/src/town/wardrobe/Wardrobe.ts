@@ -1,14 +1,11 @@
 import { nanoid } from 'nanoid';
-import InvalidParametersError, { INVALID_COMMAND_MESSAGE } from '../../lib/InvalidParametersError';
+import InvalidParametersError from '../../lib/InvalidParametersError';
 import Player from '../../lib/Player';
 import {
   GameInstanceID,
   HairOption,
-  InteractableCommand,
-  InteractableCommandReturnType,
   OutfitOption,
   WardrobeArea,
-  WardrobeInstance,
   WardrobeState,
 } from '../../types/CoveyTownSocket';
 
@@ -59,14 +56,13 @@ export default class Wardrobe {
     if (this._player) {
       throw new InvalidParametersError('Wardrobe is already occupied');
     }
-    console.log("Joining player to wardrobe");
     this._player = player;
   }
 
   /**
    * Leaves the wardrobe
-   * 
-   * @param player 
+   *
+   * @param player
    */
   public leave(player: Player): void {
     if (!this._player || player !== this._player) {
@@ -82,7 +78,7 @@ export default class Wardrobe {
    */
   public toModel(): WardrobeArea {
     return {
-      type: "WardrobeArea",
+      type: 'WardrobeArea',
       id: this.id,
       occupants: this._player ? [this._player.id] : [],
       isOpen: this._player === undefined,
@@ -90,7 +86,7 @@ export default class Wardrobe {
       session: {
         id: this.id,
         player: this._player?.id,
-      }
+      },
     };
   }
 }

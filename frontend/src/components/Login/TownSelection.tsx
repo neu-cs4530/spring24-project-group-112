@@ -157,7 +157,7 @@ export default function TownSelection(props: TownSelectionProps): JSX.Element {
         }
       }
     },
-    [setTownController, userName, userID, app, toast, videoConnect, loginController],
+    [setTownController, userName, userID, app, toast, videoConnect, loginController, props.debug],
   );
 
   const handleCreate = async () => {

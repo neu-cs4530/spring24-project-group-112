@@ -11,7 +11,7 @@ import {
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../components/Login/Config';
-import { getFirestore, doc, getDoc, addDoc, collection, DocumentData } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, addDoc, collection } from 'firebase/firestore';
 
 export const MOVEMENT_SPEED = 175;
 

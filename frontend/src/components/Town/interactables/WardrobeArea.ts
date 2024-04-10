@@ -1,5 +1,4 @@
 import Interactable, { KnownInteractableTypes } from '../Interactable';
-import WardrobeWrapper from './WardrobeArea';
 
 export default class WardrobeArea extends Interactable {
   private _labelText?: Phaser.GameObjects.Text;

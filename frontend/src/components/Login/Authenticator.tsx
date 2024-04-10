@@ -20,18 +20,7 @@ import {
 } from '@chakra-ui/react';
 import assert from 'assert';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDoc,
-  doc,
-  deleteDoc,
-  query,
-  where,
-  getDocs,
-  setDoc,
-} from 'firebase/firestore';
+import { getFirestore, getDoc, doc, setDoc } from 'firebase/firestore';
 import { firebaseConfig } from './Config';
 import { ILoginPageProps } from '../../types/CoveyTownSocket';
 import firebase from 'firebase/compat/app';
@@ -144,7 +133,7 @@ export default function Login(props: ILoginPageProps): JSX.Element {
               onChange={event => setPassword(event.target.value)}
             />
             <InputRightElement width='4.5rem'>
-              <Button h='1.75rem' size='sm' onClick={event => setShow(!show)}>
+              <Button h='1.75rem' size='sm' onClick={() => setShow(!show)}>
                 {show ? 'Hide' : 'Show'}
               </Button>
             </InputRightElement>
@@ -185,7 +174,7 @@ export default function Login(props: ILoginPageProps): JSX.Element {
                         onChange={event => setPassword(event.target.value)}
                       />
                       <InputRightElement width='4.5rem'>
-                        <Button h='1.75rem' size='sm' onClick={event => setShow(!show)}>
+                        <Button h='1.75rem' size='sm' onClick={() => setShow(!show)}>
                           {show ? 'Hide' : 'Show'}
                         </Button>
                       </InputRightElement>

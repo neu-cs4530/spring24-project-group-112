@@ -1,19 +1,14 @@
 import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
-import { nanoid } from 'nanoid';
 import Player from '../../lib/Player';
 import InvalidParametersError, { INVALID_COMMAND_MESSAGE } from '../../lib/InvalidParametersError';
 import {
   BoundingBox,
   WardrobeArea as WardrobeAreaModel,
-  WardrobeState,
   InteractableCommand,
   InteractableCommandReturnType,
   TownEmitter,
-  HairOption,
-  OutfitOption,
   InteractableID,
   PlayerID,
-  WardrobeInstance,
 } from '../../types/CoveyTownSocket';
 import Wardrobe from './Wardrobe';
 import InteractableArea from '../InteractableArea';
@@ -30,7 +25,6 @@ export default class WardrobeArea extends InteractableArea {
   }
 
   private _stateUpdated(updatedState: WardrobeAreaModel) {
-    console.log("State updated in WardrobeArea");
     if (updatedState.user) {
       this.isOpen = false;
       this.user = updatedState.user;
@@ -59,11 +53,7 @@ export default class WardrobeArea extends InteractableArea {
    * @param coordinates the bounding box that defines this wardrobe area
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
-  public constructor(
-    id: string,
-    coordinates: BoundingBox,
-    townEmitter: TownEmitter,
-  ) {
+  public constructor(id: string, coordinates: BoundingBox, townEmitter: TownEmitter) {
     super(id, coordinates, townEmitter);
     this.isOpen = true;
   }
@@ -81,7 +71,6 @@ export default class WardrobeArea extends InteractableArea {
     if (this._occupants.length > 0) {
       throw new Error('WardrobeArea is already occupied');
     } else {
-      console.log('Adding player to wardrobe area');
       super.add(player);
       this.isOpen = true;
       this.user = player.id;
@@ -96,7 +85,6 @@ export default class WardrobeArea extends InteractableArea {
    * @param player
    */
   public remove(player: Player): void {
-    console.log('Removing player from wardrobe area');
     super.remove(player);
     if (this._occupants.length === 0) {
       this.isOpen = false;
@@ -130,11 +118,7 @@ export default class WardrobeArea extends InteractableArea {
       throw new Error(`Malformed viewing area ${name}`);
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
-    return new WardrobeArea(
-      name as InteractableID,
-      rect,
-      townEmitter,
-    );
+    return new WardrobeArea(name as InteractableID, rect, townEmitter);
   }
 
   /**
@@ -148,7 +132,7 @@ export default class WardrobeArea extends InteractableArea {
 
   /**
    * Handles the commands that can be sent to the wardrobe area.
-   * 
+   *
    * @param command command to handle
    * @param player player making the request
    * @returns the result of the command
@@ -161,7 +145,6 @@ export default class WardrobeArea extends InteractableArea {
     let wardrobe = this._session;
     if (command.type === 'JoinWardrobe') {
       if (!wardrobe) {
-        console.log("Making a new wardrobe");
         wardrobe = new Wardrobe({
           status: 'OCCUPIED',
         });

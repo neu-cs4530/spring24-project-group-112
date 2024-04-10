@@ -1,10 +1,5 @@
 import { nanoid } from 'nanoid';
-import {
-  Player as PlayerModel,
-  PlayerLocation,
-  TownEmitter,
-  PrototypePlayerGameObjects,
-} from '../types/CoveyTownSocket';
+import { Player as PlayerModel, PlayerLocation, TownEmitter } from '../types/CoveyTownSocket';
 
 /**
  * Each user who is connected to a town is represented by a Player object

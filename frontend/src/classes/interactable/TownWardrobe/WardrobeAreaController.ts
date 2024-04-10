@@ -2,9 +2,7 @@ import {
   GameInstanceID,
   HairOption,
   OutfitOption,
-  Player,
   WardrobeArea as WardrobeAreaModel,
-  WardrobeInstance,
   WardrobeStatus,
 } from '../../../types/CoveyTownSocket';
 import PlayerController from '../../PlayerController';
@@ -13,7 +11,6 @@ import InteractableAreaController, {
   WARDROBE_AREA_TYPE,
 } from '../InteractableAreaController';
 import TownController from '../../TownController';
-import { nanoid } from 'nanoid';
 
 /**
  * The events that the WardrobeAreaController emits to subscribers. These events
@@ -32,10 +29,10 @@ export type WardrobeAreaEvents = BaseInteractableEventMap & {
  * A WardrobeAreaController manages the local behavior of a wardrobe area in the frontend,
  * implementing the logic to bridge between the townService's interpretation of wardrobe areas and the
  * frontend's. The WardrobeAreaController emits events when the wardrobe area changes.
- * 
+ *
  * The original intention was for this controller and the corresponding InteractableAreaModel to
  * function like that of game areas, but obviously there are some inconsistencies in the implementation.
- * 
+ *
  * This controller relies on a setter to update the player controller, which is not ideal.
  * The player controller is used to update the player's appearance: their hair or outfit options.
  */
@@ -61,7 +58,7 @@ export default class WardrobeAreaController extends InteractableAreaController<
     super(id);
     this._model = wardrobeAreaModel;
     this._townController = townController;
-    
+
     if (this._model.session?.player) {
       this._player = this._townController.getPlayer(this._model.session?.player);
     }
@@ -98,7 +95,7 @@ export default class WardrobeAreaController extends InteractableAreaController<
       type: 'JoinWardrobe',
     });
     this._instanceID = gameID;
-    console.log("Player joined the wardrobe successfully!");
+    console.log('Player joined the wardrobe successfully!');
   }
 
   /**
@@ -140,18 +137,26 @@ export default class WardrobeAreaController extends InteractableAreaController<
     return WARDROBE_AREA_TYPE;
   }
 
+  /**
+   * Handles changing the player's appearance by updating the player's hair or outfit options.
+   * Called from the wardrobe UI.
+   *
+   * @param hair
+   * @param outfit
+   */
   public changeAppearance(hair: HairOption | undefined, outfit: OutfitOption | undefined): void {
     if (!this._player) {
       throw new Error('Player not in wardrobe');
-      // Better way to handle this?
     }
     if (hair) {
-      console.log("Changing hair to: ", hair);
       this._player.hairSelection = hair;
+      this._player.savePlayer();
+      this.emit('playerChange', this._player);
     }
     if (outfit) {
-      console.log("Changing outfit to: ", outfit);
       this._player.outfitSelection = outfit;
+      this._player.savePlayer();
+      this.emit('playerChange', this._player);
     }
   }
 }
