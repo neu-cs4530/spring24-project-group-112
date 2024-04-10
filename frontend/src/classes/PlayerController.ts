@@ -105,6 +105,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       newOutfit.optionAtlas,
       `${newOutfit.optionFrame}${this.location.rotation}`,
     );
+    this._outfitSelection = newOutfit;
     console.log('player outfit set to: ', newOutfit);
   }
 
