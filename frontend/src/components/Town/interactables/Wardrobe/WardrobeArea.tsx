@@ -147,9 +147,14 @@ function WardrobeArea({ interactableID }: { interactableID: InteractableID }): J
     useInteractableAreaController<WardrobeAreaController>(interactableID);
   //console.log(wardrobeAreaController.isActive());
   const townController = useTownController();
-  
 
-  const [status, setStatus] = useState<WardrobeStatus>(wardrobeAreaController.status);
+  const player: PlayerController = townController.ourPlayer;
+
+  wardrobeAreaController.player = player;
+
+  console.log("Setting the player directly");
+
+  /*const [status, setStatus] = useState<WardrobeStatus>(wardrobeAreaController.status);
   const [player, setPlayer] = useState<PlayerController | undefined>(wardrobeAreaController.player);
   const [joining, setJoining] = useState(false);
   const toast = useToast();
@@ -200,12 +205,38 @@ function WardrobeArea({ interactableID }: { interactableID: InteractableID }): J
         {joinButton}
       </b>
     );
-  }
+  }*/
 
   return (
     <Container>
-      {statusText}
-      <WardrobeBoard wardrobeAreaController={wardrobeAreaController} />
+      <Button onClick={() => wardrobeAreaController.changeAppearance({
+  optionID: 0,
+  optionAtlas: "atlas",
+  optionFrame: "frame",
+}, undefined)} >
+        Hair option 1
+      </Button>
+      <Button onClick={() => wardrobeAreaController.changeAppearance({
+  optionID: 1,
+  optionAtlas: "atlas",
+  optionFrame: "frame",
+}, undefined)} >
+        Hair option 2
+      </Button>
+      <Button onClick={() => wardrobeAreaController.changeAppearance(undefined, {
+  optionID: 0,
+  optionAtlas: "atlas",
+  optionFrame: "frame",
+})} >
+        Outfit option 1
+      </Button>
+      <Button onClick={() => wardrobeAreaController.changeAppearance(undefined, {
+  optionID: 1,
+  optionAtlas: "atlas",
+  optionFrame: "frame",
+})} >
+        Outfit option 2
+      </Button>
     </Container>
   );
 }

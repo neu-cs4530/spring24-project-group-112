@@ -50,14 +50,11 @@ export default class WardrobeAreaController extends InteractableAreaController<
    * @param id
    * @param wardrobeAreaModel
    * @param townController
-   * @param hairOption
-   * @param outfitOption
    */
   constructor(id: string, wardrobeAreaModel: WardrobeAreaModel, townController: TownController) {
     super(id);
     this._model = wardrobeAreaModel;
     this._townController = townController;
-    //this._player = townController.ourPlayer;
     
     if (this._model.session?.player) {
       this._player = this._townController.getPlayer(this._model.session?.player);
@@ -72,6 +69,10 @@ export default class WardrobeAreaController extends InteractableAreaController<
    */
   get player(): PlayerController | undefined {
     return this._player;
+  }
+
+  set player(player: PlayerController | undefined) {
+    this._player = player;
   }
 
   /**
@@ -112,15 +113,12 @@ export default class WardrobeAreaController extends InteractableAreaController<
   }
 
   protected _updateFrom(newModel: WardrobeAreaModel): void {
-    const newPlayers = newModel.occupants;
-
-    const newPlayer = newModel.session?.player;
-    if (newPlayer) {
-      this._player = this._townController.getPlayer(newPlayer);
-      this.emit('playerChange', this._player);
+    this._model = newModel;
+    console.log(newModel);
+    if (this._model.session?.player) {
+      this._player = this._townController.getPlayer(this._model.session?.player);
     } else {
       this._player = undefined;
-      this.emit('playerChange', undefined);
     }
   }
 
@@ -142,9 +140,11 @@ export default class WardrobeAreaController extends InteractableAreaController<
       // Better way to handle this?
     }
     if (hair) {
+      console.log("Changing hair to: ", hair);
       this._player.hairSelection = hair;
     }
     if (outfit) {
+      console.log("Changing outfit to: ", outfit);
       this._player.outfitSelection = outfit;
     }
   }

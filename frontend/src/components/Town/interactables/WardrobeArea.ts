@@ -6,6 +6,19 @@ export default class WardrobeArea extends Interactable {
 
   private _isInteracting = false;
 
+  /*public changeAppearance(hair: HairOption | undefined, outfit: OutfitOption | undefined): void {
+    if (!this._player) {
+      throw new Error('Player not in wardrobe');
+      // Better way to handle this?
+    }
+    if (hair) {
+      this._player.hairSelection = hair;
+    }
+    if (outfit) {
+      this._player.outfitSelection = outfit;
+    }
+  }*/
+
   addedToScene() {
     super.addedToScene();
     this.setTintFill();

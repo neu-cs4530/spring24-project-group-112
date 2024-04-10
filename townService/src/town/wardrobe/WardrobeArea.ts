@@ -33,8 +33,10 @@ export default class WardrobeArea extends InteractableArea {
     console.log("State updated in WardrobeArea");
     if (updatedState.user) {
       this.isOpen = false;
+      this.user = updatedState.user;
     } else {
       this.isOpen = true;
+      this.user = undefined;
     }
     this._emitAreaChanged();
   }
