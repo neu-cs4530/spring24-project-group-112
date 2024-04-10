@@ -83,11 +83,20 @@ export default class WardrobeAreaController extends InteractableAreaController<
    *
    * @throws An error if the server rejects the request to join the game.
    */
-  public async joinWardrobe() {
+  /*public async joinWardrobe() {
     const { gameID } = await this._townController.sendInteractableCommand(this.id, {
       type: 'JoinWardrobe',
     });
     this._instanceID = gameID;
+  }*/
+  public joinWardrobe() {
+    if (this._player) {
+      throw new Error('Player already in wardrobe');
+    }
+    if (!this._model.session) {
+      throw new Error('No wardrobe session');
+    }
+    this._player = this._townController.getPlayer(this._model.session?.player);
   }
 
   /**

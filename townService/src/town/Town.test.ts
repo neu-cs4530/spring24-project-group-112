@@ -1,6 +1,7 @@
 import { ITiledMap } from '@jonbell/tiled-map-type-guard';
 import { DeepMockProxy, mockClear, mockDeep, mockReset } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
+import { DisconnectReason } from 'socket.io';
 import Player from '../lib/Player';
 import TwilioVideo from '../lib/TwilioVideo';
 import {
@@ -472,7 +473,7 @@ describe('Town', () => {
       function disconnectPlayer(playerToLeave: MockedPlayer) {
         // Call the disconnect event handler
         const disconnectHandler = getEventListener(playerToLeave.socket, 'disconnect');
-        disconnectHandler('unknown');
+        disconnectHandler('unknown' as DisconnectReason);
       }
       it("Invalidates the players's session token", async () => {
         const token = player.sessionToken;
