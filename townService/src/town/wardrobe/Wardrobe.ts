@@ -22,14 +22,6 @@ export default class Wardrobe {
 
   private _state: WardrobeState;
 
-  private _loadHairOptions(): Array<HairOption> {
-    return Array<HairOption>();
-  }
-
-  private _loadOutfitOptions(): Array<OutfitOption> {
-    return Array<OutfitOption>();
-  }
-
   /**
    * 'JoinGame' command is what starts the customization process
    * 'ApplyMove' command is what applies the customization to the player
@@ -93,14 +85,14 @@ export default class Wardrobe {
    *
    * @param player Player to join the wardrobe
    */
-  public join(player: Player): void {
+  public async join(player: Player): Promise<void> {
     if (this._player) {
       throw new Error('Wardrobe is already occupied');
     }
     this._player = player;
     // Set the controller to the player's controller
     // Need to replace the previous controller with this one?
-    this._controller = PlayerController.fromPlayerModel(player.toPlayerModel()); // Call the fromPlayerModel function
+    this._controller = await PlayerController.fromPlayerModel(player.toPlayerModel()); // Call the fromPlayerModel function
   }
 
   /**

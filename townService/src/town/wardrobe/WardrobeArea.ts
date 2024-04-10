@@ -22,7 +22,7 @@ export default class WardrobeArea extends InteractableArea {
 
   public user?: PlayerID;
 
-  public hairChoices: Array<HairOption>;
+  /*public hairChoices: Array<HairOption>;
 
   public outfitChoices: Array<OutfitOption>;
 
@@ -30,7 +30,7 @@ export default class WardrobeArea extends InteractableArea {
 
   public get session(): Wardrobe | undefined {
     return this._session;
-  }
+  }*/
 
   // Is this needed?
   private _stateUpdated(updatedState: WardrobeState) {
@@ -62,13 +62,9 @@ export default class WardrobeArea extends InteractableArea {
     id: string,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
-    hairChoices: Array<HairOption>,
-    outfitChoices: Array<OutfitOption>,
   ) {
     super(id, coordinates, townEmitter);
     this.isOpen = true;
-    this.hairChoices = hairChoices;
-    this.outfitChoices = outfitChoices;
   }
 
   /**
@@ -84,6 +80,7 @@ export default class WardrobeArea extends InteractableArea {
     if (this._occupants.length > 0) {
       throw new Error('WardrobeArea is already occupied');
     } else {
+      console.log('Adding player to wardrobe area');
       super.add(player);
       this.isOpen = true;
       this.user = player.id;
@@ -98,6 +95,7 @@ export default class WardrobeArea extends InteractableArea {
    * @param player
    */
   public remove(player: Player): void {
+    console.log('Removing player from wardrobe area');
     super.remove(player);
     if (this._occupants.length === 0) {
       this.isOpen = false;
@@ -132,11 +130,9 @@ export default class WardrobeArea extends InteractableArea {
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
     return new WardrobeArea(
-      nanoid(),
+      name as InteractableID,
       rect,
       townEmitter,
-      [],
-      [], // Need to find the proper way to load the hair and outfit options
     );
   }
 
@@ -149,7 +145,7 @@ export default class WardrobeArea extends InteractableArea {
    * Use the same commands as the ConnectFourGameArea?
    */
 
-  public handleCommand<CommandType extends InteractableCommand>(
+  /*public handleCommand<CommandType extends InteractableCommand>(
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
@@ -180,5 +176,10 @@ export default class WardrobeArea extends InteractableArea {
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
+  }*/
+  public handleCommand<
+    CommandType extends InteractableCommand,
+  >(): InteractableCommandReturnType<CommandType> {
+    throw new InvalidParametersError('Unknown command type');
   }
 }

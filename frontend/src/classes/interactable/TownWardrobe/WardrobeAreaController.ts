@@ -54,6 +54,8 @@ export default class WardrobeAreaController extends InteractableAreaController<
     super(id);
     this._model = wardrobeAreaModel;
     this._townController = townController;
+    //this._player = townController.ourPlayer;
+    
     if (this._model.session?.player) {
       this._player = this._townController.getPlayer(this._model.session?.player);
     }
@@ -77,7 +79,7 @@ export default class WardrobeAreaController extends InteractableAreaController<
   }
 
   /**
-   * Sends a request to the server to join the current game in the game area, or create a new one if there is no game in progress.
+   * Sends a request to the server to join the current wardrobe in the area, or create a new one if there is no game in progress.
    *
    * @throws An error if the server rejects the request to join the game.
    */
@@ -130,5 +132,17 @@ export default class WardrobeAreaController extends InteractableAreaController<
 
   public get type(): string {
     return WARDROBE_AREA_TYPE;
+  }
+
+  public changeAppearance(hair: HairOption | undefined, outfit: OutfitOption | undefined): void {
+    if (this._player === undefined) {
+      throw new Error('No player detected');
+    } 
+    if (hair) {
+      this._player.hair = hair.optionFilePath;
+    }
+    if (outfit) {
+      this._player.outfit = outfit.optionFilePath;
+    }
   }
 }

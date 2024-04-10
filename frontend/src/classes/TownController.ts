@@ -355,7 +355,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   public get wardrobeAreas() {
     const ret = this._interactableControllers.filter(
-      eachInteractable => eachInteractable instanceof ViewingAreaController,
+      eachInteractable => eachInteractable instanceof WardrobeAreaController,
     );
     return ret as WardrobeAreaController[];
   }
@@ -610,6 +610,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     await this._townsService.createViewingArea(this.townID, this.sessionToken, newArea);
   }
 
+  async createWardrobe(newArea: { id: string; occupants: Array<string>, isOpen: true }) {
+    await this._townsService.createWardrobeArea(this.townID, this.sessionToken, newArea);
+  }
+
   /**
    * Disconnect from the town, notifying the townService that we are leaving and returning
    * to the login page
@@ -641,7 +645,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             PlayerController.fromPlayerModel(eachPlayerModel),
           ),
         );
-
+        console.log(initialData.interactables);
         this._interactableControllers = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
@@ -837,6 +841,14 @@ export function useInteractableAreaController<T>(interactableAreaID: string): T 
     );
     if (viewingAreaController) {
       return viewingAreaController as unknown as T;
+    }
+    //Look for a wardrobe area
+    console.log(townController.wardrobeAreas);
+    const wardrobeAreaController = townController.wardrobeAreas.find(
+      eachArea => eachArea.id == interactableAreaID,
+    );
+    if (wardrobeAreaController) {
+      return wardrobeAreaController as unknown as T;
     }
     throw new Error(`Requested interactable area ${interactableAreaID} does not exist`);
   }
