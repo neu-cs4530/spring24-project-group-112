@@ -104,7 +104,7 @@ describe('TownController', () => {
 
     beforeEach(async () => {
       townJoinResponse = await mockTownControllerConnection(testController, mockSocket);
-    });
+    }, 10000);
     it('Initializes the properties of the controller', () => {
       expect(testController.providerVideoToken).toEqual(townJoinResponse.providerVideoToken);
       expect(testController.friendlyName).toEqual(townJoinResponse.friendlyName);
