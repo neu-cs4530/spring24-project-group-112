@@ -687,6 +687,54 @@ export default class TownGameScene extends Phaser.Scene {
     });
 
     this.anims.create({
+      key: 'shorthair-back-walk',
+      frames: this.anims.generateFrameNames('shorthairatlas', {
+        prefix: 'shorthair-back-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'shorthair-front-walk',
+      frames: this.anims.generateFrameNames('shorthairatlas', {
+        prefix: 'shorthair-front-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'shorthair-right-walk',
+      frames: this.anims.generateFrameNames('shorthairatlas', {
+        prefix: 'shorthair-right-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'shorthair-left-walk',
+      frames: this.anims.generateFrameNames('shorthairatlas', {
+        prefix: 'shorthair-left-walk.',
+        start: 0,
+        end: 7,
+        zeroPad: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
       key: 'dress-back-walk',
       frames: this.anims.generateFrameNames('dressatlas', {
         prefix: 'dress-back-walk.',
