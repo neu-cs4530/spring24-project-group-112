@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 // eslint-disable-next-line import/no-relative-packages
-import PlayerController from '../../../../frontend/src/classes/PlayerController';
+// import PlayerController from '../../../../frontend/src/classes/PlayerController';
 import Player from '../../lib/Player';
 import {
   GameInstanceID,
@@ -14,7 +14,7 @@ export default class Wardrobe {
 
   public readonly id: GameInstanceID;
 
-  private _controller?: PlayerController;
+  // private _controller?: PlayerController;
 
   private _hairOptions: Array<HairOption>;
 
@@ -27,7 +27,7 @@ export default class Wardrobe {
    * 'ApplyMove' command is what applies the customization to the player
    * 'LeaveGame' command is what ends the customization process and saves the changes
    * should this also end the Wardrobe session (delete the object?)
-   * 
+   *
    * Need Player field for this object?
    */
 
@@ -55,7 +55,7 @@ export default class Wardrobe {
    * @param optionID optionID of the hair or outfit option to apply to player
    * @param isHair flag to determine if the change is for hair or outfit
    */
-  /*public applyChange(optionID: number, isHair: boolean): void {
+  /* public applyChange(optionID: number, isHair: boolean): void {
     // Select the hair or outfit option based on the optionID
     if (!this._controller) {
       throw new Error('Player not found');
@@ -76,7 +76,7 @@ export default class Wardrobe {
         throw new Error('Outfit option not found');
       }
     }
-  }*/
+  } */
 
   /**
    * Adds a player to the wardrobe
@@ -92,7 +92,7 @@ export default class Wardrobe {
     this._player = player;
     // Set the controller to the player's controller
     // Need to replace the previous controller with this one?
-    this._controller = await PlayerController.fromPlayerModel(player.toPlayerModel()); // Call the fromPlayerModel function
+    // this._controller = await PlayerController.fromPlayerModel(player.toPlayerModel()); // Call the fromPlayerModel function
   }
 
   /**
