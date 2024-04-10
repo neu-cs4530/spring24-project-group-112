@@ -26,6 +26,7 @@ import {
   PlayerLocation,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
+  WardrobeArea as WardrobeAreaModel,
 } from '../types/CoveyTownSocket';
 import {
   isConnectFourArea,

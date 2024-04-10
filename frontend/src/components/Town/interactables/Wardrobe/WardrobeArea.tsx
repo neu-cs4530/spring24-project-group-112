@@ -27,6 +27,7 @@ import PlayerController from '../../../../classes/PlayerController';
 import { useInteractable, useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import { HairOption, InteractableID, OutfitOption, WardrobeStatus } from '../../../../types/CoveyTownSocket';
+import { HairOption, InteractableID, OutfitOption, WardrobeStatus } from '../../../../types/CoveyTownSocket';
 import WardrobeAreaInteractable from '../WardrobeArea';
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
@@ -176,6 +177,7 @@ return (
   </Container>
 )
 }
+
 
 /**
 * A wrapper component for the ConnectFourArea and TicTacToeArea components.

@@ -77,17 +77,18 @@ export interface ViewingArea extends Interactable {
 
 export interface HairOption {
   optionID: number;
-  optionFilePath: string; 
-  optionFrame?: string; 
+  optionAtlas: string; 
+  optionFrame: string; 
 };
 export interface OutfitOption {
   optionID: number; 
-  optionFilePath: string; 
-  optionFrame?: string; 
+  optionAtlas: string; 
+  optionFrame: string; 
 }
 export interface BodyOption {
   optionID: number; 
-  
+  optionAtlas: string; 
+  optionFrame: string; 
 }
 
 export interface WardrobeInstance extends Interactable {
