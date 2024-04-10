@@ -46,7 +46,7 @@ function WardrobeArea({ interactableID }: { interactableID: InteractableID }): J
         <Button
           onClick={() =>
             wardrobeAreaController.changeAppearance(
-              { optionID: 0, optionAtlas: 'shorthairatlas', optionFrame: 'hair-' },
+              { optionID: 0, optionAtlas: 'shorthairatlas', optionFrame: 'shorthair-' },
               undefined,
             )
           }>
