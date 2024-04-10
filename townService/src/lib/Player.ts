@@ -8,7 +8,9 @@ export default class Player {
   /** The current location of this user in the world map * */
   public location: PlayerLocation;
 
-  /** The unique identifier for this player * */
+  /** The unique identifier for this player *
+   * Connect this to their id in Firestore as a unique identifier
+   */
   private readonly _id: string;
 
   /** The player's username, which is not guaranteed to be unique within the town * */
@@ -23,7 +25,7 @@ export default class Player {
   /** A special town emitter that will emit events to the entire town BUT NOT to this player */
   public readonly townEmitter: TownEmitter;
 
-  constructor(userName: string, townEmitter: TownEmitter) {
+  constructor(userName: string, townEmitter: TownEmitter, id?: string) {
     this.location = {
       x: 0,
       y: 0,
@@ -31,7 +33,11 @@ export default class Player {
       rotation: 'front',
     };
     this._userName = userName;
-    this._id = nanoid();
+    if (id) {
+      this._id = id;
+    } else {
+      this._id = nanoid();
+    }
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
   }

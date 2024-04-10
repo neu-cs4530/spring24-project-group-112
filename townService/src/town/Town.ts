@@ -17,12 +17,14 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
+  WardrobeArea as WardrobeAreaModel,
 } from '../types/CoveyTownSocket';
 import { logError } from '../Utils';
 import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import WardrobeArea from './wardrobe/WardrobeArea';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -112,11 +114,12 @@ export default class Town {
   /**
    * Adds a player to this Covey Town, provisioning the necessary credentials for the
    * player, and returning them
+   * TODO: Modify input parameters to include other player information
    *
    * @param newPlayer The new player to add to the town
    */
-  async addPlayer(userName: string, socket: CoveyTownSocket): Promise<Player> {
-    const newPlayer = new Player(userName, socket.to(this._townID));
+  async addPlayer(userName: string, socket: CoveyTownSocket, userID?: string): Promise<Player> {
+    const newPlayer = new Player(userName, socket.to(this._townID), userID);
     this._players.push(newPlayer);
 
     this._connectedSockets.add(socket);
@@ -341,6 +344,18 @@ export default class Town {
     return true;
   }
 
+  public addWardrobeArea(wardrobeArea: WardrobeAreaModel): boolean {
+    const area = this._interactables.find(
+      eachArea => eachArea.id === wardrobeArea.id,
+    ) as WardrobeArea;
+    if (!area) {
+      return false;
+    }
+    area.addPlayersWithinBounds(this._players);
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+  }
+
   /**
    * Fetch a player's session based on the provided session token. Returns undefined if the
    * session token is not valid.
@@ -422,10 +437,17 @@ export default class Town {
       .filter(eachObject => eachObject.type === 'GameArea')
       .map(eachGameAreaObj => GameAreaFactory(eachGameAreaObj, this._broadcastEmitter));
 
+    const wardrobeAreas = objectLayer.objects
+      .filter(eachObject => eachObject.type === 'WardrobeArea')
+      .map(eachWardrobeAreaObj =>
+        WardrobeArea.fromMapObject(eachWardrobeAreaObj, this._broadcastEmitter),
+      );
+
     this._interactables = this._interactables
       .concat(viewingAreas)
       .concat(conversationAreas)
-      .concat(gameAreas);
+      .concat(gameAreas)
+      .concat(wardrobeAreas);
     this._validateInteractables();
   }
 

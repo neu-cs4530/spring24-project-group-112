@@ -13,6 +13,7 @@ import { CancelablePromise, Town, TownsService } from '../../generated/client';
 import * as useLoginController from '../../hooks/useLoginController';
 import { mockTownController } from '../../TestUtils';
 import TownSelection from './TownSelection';
+import { FirebaseApp } from 'firebase/app';
 
 const mockConnect = jest.fn(() => Promise.resolve());
 
@@ -85,7 +86,7 @@ const listTowns = (suffix: string) =>
 export function wrappedTownSelection() {
   return (
     <ChakraProvider>
-      <TownSelection />
+      <TownSelection debug={true} />
     </ChakraProvider>
   );
 }
@@ -96,7 +97,7 @@ describe('Town Selection', () => {
   let mockLoginController: MockProxy<LoginController>;
   let coveyTownControllerConstructorSpy: jest.SpyInstance<
     TownController.default,
-    [TownController.ConnectionProperties]
+    [TownController.ConnectionProperties, string?, FirebaseApp?]
   >;
   let mockedTownController: MockProxy<TownController.default>;
   const expectedProviderVideoToken = nanoid();
@@ -339,11 +340,15 @@ describe('Town Selection', () => {
 
           // Check for call sequence
           await waitFor(() =>
-            expect(coveyTownControllerConstructorSpy).toBeCalledWith({
-              userName,
-              townID: coveyTownID,
-              loginController: mockLoginController,
-            }),
+            expect(coveyTownControllerConstructorSpy).toBeCalledWith(
+              {
+                userName,
+                townID: coveyTownID,
+                loginController: mockLoginController,
+              },
+              '',
+              undefined,
+            ),
           );
           await waitFor(() => expect(mockedTownController.connect).toBeCalled());
           await waitFor(() => expect(mockConnect).toBeCalledWith(expectedProviderVideoToken));
@@ -428,11 +433,15 @@ describe('Town Selection', () => {
                 // userEvent.click(button);
 
                 await waitFor(() =>
-                  expect(coveyTownControllerConstructorSpy).toBeCalledWith({
-                    userName: username,
-                    townID: town.townID,
-                    loginController: mockLoginController,
-                  }),
+                  expect(coveyTownControllerConstructorSpy).toBeCalledWith(
+                    {
+                      userName: username,
+                      townID: town.townID,
+                      loginController: mockLoginController,
+                    },
+                    '',
+                    undefined,
+                  ),
                 );
 
                 await waitFor(() => expect(mockedTownController.connect).toBeCalled());
@@ -622,11 +631,15 @@ describe('Town Selection', () => {
 
             // Check for call sequence
             await waitFor(() =>
-              expect(coveyTownControllerConstructorSpy).toBeCalledWith({
-                userName,
-                townID: townID,
-                loginController: mockLoginController,
-              }),
+              expect(coveyTownControllerConstructorSpy).toBeCalledWith(
+                {
+                  userName,
+                  townID: townID,
+                  loginController: mockLoginController,
+                },
+                '',
+                undefined,
+              ),
             );
             await waitFor(() => expect(mockedTownController.connect).toBeCalled());
             await waitFor(() => expect(mockConnect).toBeCalledWith(expectedProviderVideoToken));

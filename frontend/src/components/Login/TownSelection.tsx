@@ -21,12 +21,22 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Town } from '../../generated/client';
+import Login from './Authenticator';
+import { firebaseConfig } from './Config';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
+import firebase from 'firebase/compat/app';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 
-export default function TownSelection(): JSX.Element {
+interface TownSelectionProps {
+  debug: boolean;
+}
+
+// To retain the legacy tests, this component was fitted with a debug parameter to replace the new
+// component for login input with the old username input.
+export default function TownSelection(props: TownSelectionProps): JSX.Element {
   const [userName, setUserName] = useState<string>('');
+  const [userID, setUserID] = useState<string>('');
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
   const [townIDToJoin, setTownIDToJoin] = useState<string>('');
@@ -35,6 +45,15 @@ export default function TownSelection(): JSX.Element {
   const loginController = useLoginController();
   const { setTownController, townsService } = loginController;
   const { connect: videoConnect } = useVideoContext();
+
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+
+  // Create login calllback
+  const loginCallBack = (user: string, id: string) => {
+    setUserName(user);
+    setUserID(id);
+  };
 
   const toast = useToast();
 
@@ -95,11 +114,16 @@ export default function TownSelection(): JSX.Element {
           }
         }, 1000);
         setIsJoining(true);
-        const newController = new TownController({
-          userName,
-          townID: coveyRoomID,
-          loginController,
-        });
+        console.log(`Creating town controller with username ${userName}`);
+        const newController = new TownController(
+          {
+            userName,
+            townID: coveyRoomID,
+            loginController,
+          },
+          userID,
+          props.debug ? undefined : app,
+        );
         await newController.connect();
         const videoToken = newController.providerVideoToken;
         assert(videoToken);
@@ -133,7 +157,7 @@ export default function TownSelection(): JSX.Element {
         }
       }
     },
-    [setTownController, userName, toast, videoConnect, loginController],
+    [setTownController, userName, userID, app, toast, videoConnect, loginController, props.debug],
   );
 
   const handleCreate = async () => {
@@ -234,26 +258,32 @@ export default function TownSelection(): JSX.Element {
     }
   };
 
+  // Testing TownSelection with the Login component would break all the tests, so the debug
+  // parameter replaces this component with the legacy username input.
   return (
     <>
       <form>
         <Stack>
-          <Box p='4' borderWidth='1px' borderRadius='lg'>
-            <Heading as='h2' size='lg'>
-              Select a username
-            </Heading>
+          {props.debug ? (
+            <Box p='4' borderWidth='1px' borderRadius='lg'>
+              <Heading as='h2' size='lg'>
+                Select a username
+              </Heading>
 
-            <FormControl>
-              <FormLabel htmlFor='name'>Name</FormLabel>
-              <Input
-                autoFocus
-                name='name'
-                placeholder='Your name'
-                value={userName}
-                onChange={event => setUserName(event.target.value)}
-              />
-            </FormControl>
-          </Box>
+              <FormControl>
+                <FormLabel htmlFor='name'>Name</FormLabel>
+                <Input
+                  autoFocus
+                  name='name'
+                  placeholder='Your name'
+                  value={userName}
+                  onChange={event => setUserName(event.target.value)}
+                />
+              </FormControl>
+            </Box>
+          ) : (
+            <Login app={app} callback={loginCallBack} />
+          )}
           <Box borderWidth='1px' borderRadius='lg'>
             <Heading p='4' as='h2' size='lg'>
               Create a New Town

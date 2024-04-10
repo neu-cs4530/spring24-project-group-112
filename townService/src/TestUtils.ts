@@ -174,7 +174,8 @@ export class MockedPlayer {
 export function mockPlayer(townID: string): MockedPlayer {
   const socket = mockDeep<CoveyTownSocket>();
   const userName = nanoid();
-  socket.handshake.auth = { userName, townID };
+  const userID = nanoid();
+  socket.handshake.auth = { userName, townID, userID };
   const socketToRoomMock = mock<BroadcastOperator<ServerToClientEvents, SocketData>>();
   socket.to.mockImplementation((room: string | string[]) => {
     if (townID === room) {

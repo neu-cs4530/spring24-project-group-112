@@ -1,9 +1,8 @@
 import assert from 'assert';
-import { generateKey } from 'crypto';
 import EventEmitter from 'events';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
 import Interactable from '../components/Town/Interactable';
@@ -32,6 +31,7 @@ import {
   isConversationArea,
   isTicTacToeArea,
   isViewingArea,
+  isWardrobeArea,
 } from '../types/TypeUtils';
 import ConnectFourAreaController from './interactable/ConnectFourAreaController';
 import ConversationAreaController from './interactable/ConversationAreaController';
@@ -43,6 +43,10 @@ import InteractableAreaController, {
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
+import WardrobeArea from '../components/Town/interactables/WardrobeArea';
+import WardrobeAreaController from './interactable/TownWardrobe/WardrobeAreaController';
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import { firebaseConfig } from '../components/Login/Config';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
 const SOCKET_COMMAND_TIMEOUT_MS = 5000;
@@ -178,10 +182,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private readonly _userName: string;
 
   /**
-   * The user ID of the player whose browser created this TownController. The user ID is set by the backend townsService, and
-   * is only available after the service is connected.
+   * The user ID of the player whose browser created this TownController. The user ID is provided from Firebase and the TownSelection
    */
   private _userID?: string;
+
+  /**
+   * The Firebase app object that is used to connect the user with the Firestore service
+   */
+  private readonly _app: FirebaseApp;
 
   /**
    * A reference to the Player object that represents the player whose browser created this TownController.
@@ -211,11 +219,19 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private _interactableEmitter = new EventEmitter();
 
-  public constructor({ userName, townID, loginController }: ConnectionProperties) {
+  // TODO: modify constructor to accept additional player info
+  public constructor(
+    { userName, townID, loginController }: ConnectionProperties,
+    userID?: string,
+    firebaseApp?: FirebaseApp,
+  ) {
     super();
     this._townID = townID;
+    this._userID = userID;
     this._userName = userName;
     this._loginController = loginController;
+
+    this._app = firebaseApp || initializeApp(firebaseConfig);
 
     /*
         The event emitter will show a warning if more than this number of listeners are registered, as it
@@ -226,7 +242,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     const url = process.env.NEXT_PUBLIC_TOWNS_SERVICE_URL;
     assert(url);
-    this._socket = io(url, { auth: { userName, townID } });
+    this._socket = io(url, { auth: { userName, townID, userID } });
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
     this.registerSocketListeners();
   }
@@ -239,6 +255,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     const id = this._userID;
     assert(id);
     return id;
+  }
+
+  public get firebase() {
+    return this._app;
   }
 
   public get townIsPubliclyListed() {
@@ -332,6 +352,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return ret as ViewingAreaController[];
   }
 
+  public get wardrobeAreas() {
+    const ret = this._interactableControllers.filter(
+      eachInteractable => eachInteractable instanceof WardrobeAreaController,
+    );
+    return ret as WardrobeAreaController[];
+  }
+
   public get gameAreas() {
     const ret = this._interactableControllers.filter(
       eachInteractable => eachInteractable instanceof GameAreaController,
@@ -405,8 +432,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      *
      * Note that setting the players array will also emit an event that the players in the town have changed.
      */
-    this._socket.on('playerJoined', newPlayer => {
-      const newPlayerObj = PlayerController.fromPlayerModel(newPlayer);
+    this._socket.on('playerJoined', async newPlayer => {
+      const newPlayerObj = await PlayerController.fromPlayerModel(newPlayer);
       this._players = this.players.concat([newPlayerObj]);
       this.emit('playerMoved', newPlayerObj);
     });
@@ -583,6 +610,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
+   * Create the wardrobe area, sending the request to the townService. Throws an error if the request
+   * is not successful. Does not immediately update local state about the new wardrobe area - it will be
+   * updated once the townService creates the area and emits an interactableUpdate
+   *
+   * @param newArea
+   */
+  async createWardrobe(newArea: { id: string; occupants: Array<string>; isOpen: true }) {
+    await this._townsService.createWardrobeArea(this.townID, this.sessionToken, newArea);
+  }
+
+  /**
    * Disconnect from the town, notifying the townService that we are leaving and returning
    * to the login page
    */
@@ -603,15 +641,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
          */
     return new Promise<void>((resolve, reject) => {
       this._socket.connect();
-      this._socket.on('initialize', initialData => {
+      this._socket.on('initialize', async initialData => {
         this._providerVideoToken = initialData.providerVideoToken;
         this._friendlyNameInternal = initialData.friendlyName;
         this._townIsPubliclyListedInternal = initialData.isPubliclyListed;
         this._sessionToken = initialData.sessionToken;
-        this._players = initialData.currentPlayers.map(eachPlayerModel =>
-          PlayerController.fromPlayerModel(eachPlayerModel),
+        this._players = await Promise.all(
+          initialData.currentPlayers.map(eachPlayerModel =>
+            PlayerController.fromPlayerModel(eachPlayerModel),
+          ),
         );
-
+        console.log(initialData.interactables);
         this._interactableControllers = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
@@ -630,6 +670,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           } else if (isConnectFourArea(eachInteractable)) {
             this._interactableControllers.push(
               new ConnectFourAreaController(eachInteractable.id, eachInteractable, this),
+            );
+          } else if (isWardrobeArea(eachInteractable)) {
+            this._interactableControllers.push(
+              new WardrobeAreaController(eachInteractable.id, eachInteractable, this),
             );
           }
         });
@@ -671,6 +715,26 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       return existingController;
     } else {
       throw new Error(`No such viewing area controller ${existingController}`);
+    }
+  }
+
+  /**
+   * Retrieve the wardrobe area controller that corresponds to a wardrobeArea, creating one if necessary
+   * or throws an error if the wardrobe area controller does not exist
+   *
+   * @throws Error if the wardrobe area controller does not exist
+   *
+   * @param wardrobeArea
+   * @returns the corresponding WardrobeAreaController
+   */
+  public getWardrobeAreaController(wardrobeArea: WardrobeArea): WardrobeAreaController {
+    const existingController = this._interactableControllers.find(
+      eachExistingArea => eachExistingArea.id === wardrobeArea.name,
+    );
+    if (existingController instanceof WardrobeAreaController) {
+      return existingController;
+    } else {
+      throw new Error(`No such wardrobe area controller ${existingController}`);
     }
   }
 
@@ -773,13 +837,28 @@ export function useTownSettings() {
  */
 export function useInteractableAreaController<T>(interactableAreaID: string): T {
   const townController = useTownController();
-  const interactableAreaController = townController.gameAreas.find(
+  const gameAreaController = townController.gameAreas.find(
     eachArea => eachArea.id == interactableAreaID,
   );
-  if (!interactableAreaController) {
+  if (!gameAreaController) {
+    //Look for a viewing area
+    const viewingAreaController = townController.viewingAreas.find(
+      eachArea => eachArea.id == interactableAreaID,
+    );
+    if (viewingAreaController) {
+      return viewingAreaController as unknown as T;
+    }
+    //Look for a wardrobe area
+    console.log(townController.wardrobeAreas);
+    const wardrobeAreaController = townController.wardrobeAreas.find(
+      eachArea => eachArea.id == interactableAreaID,
+    );
+    if (wardrobeAreaController) {
+      return wardrobeAreaController as unknown as T;
+    }
     throw new Error(`Requested interactable area ${interactableAreaID} does not exist`);
   }
-  return interactableAreaController as unknown as T;
+  return gameAreaController as unknown as T;
 }
 
 /**
@@ -823,7 +902,11 @@ export function useActiveInteractableAreas(): GenericInteractableAreaController[
   const townController = useTownController();
   const [interactableAreas, setInteractableAreas] = useState<GenericInteractableAreaController[]>(
     (townController.gameAreas as GenericInteractableAreaController[])
-      .concat(townController.conversationAreas, townController.viewingAreas)
+      .concat(
+        townController.conversationAreas,
+        townController.viewingAreas,
+        townController.wardrobeAreas,
+      )
       .filter(eachArea => eachArea.isActive()),
   );
   useEffect(() => {
@@ -831,6 +914,7 @@ export function useActiveInteractableAreas(): GenericInteractableAreaController[
       const allAreas = (townController.gameAreas as GenericInteractableAreaController[]).concat(
         townController.conversationAreas,
         townController.viewingAreas,
+        townController.wardrobeAreas,
       );
       setInteractableAreas(allAreas.filter(eachArea => eachArea.isActive()));
     };
@@ -862,7 +946,11 @@ export function useActiveInteractableAreasSortedByOccupancyAndName(): GenericInt
 
   const [interactableAreas, setInteractableAreas] = useState<InteractableAreaReadAheadOccupancy[]>(
     (townController.gameAreas as GenericInteractableAreaController[])
-      .concat(townController.conversationAreas, townController.viewingAreas)
+      .concat(
+        townController.conversationAreas,
+        townController.viewingAreas,
+        townController.wardrobeAreas,
+      )
       .filter(eachArea => eachArea.isActive())
       .map(area => ({ area, occupancy: area.occupants.length })),
   );
@@ -884,6 +972,7 @@ export function useActiveInteractableAreasSortedByOccupancyAndName(): GenericInt
       const allAreas = (townController.gameAreas as GenericInteractableAreaController[]).concat(
         townController.conversationAreas,
         townController.viewingAreas,
+        townController.wardrobeAreas,
       );
       const activeAreas = allAreas.filter(eachArea => eachArea.isActive());
       // Update the areas, *and* the occupancy listeners by comparing the new set of areas to the old set
